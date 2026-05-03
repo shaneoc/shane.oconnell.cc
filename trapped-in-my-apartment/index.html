@@ -72,6 +72,10 @@ details.major-event > p {
     font-family: monospace;
     font-size: 1.2em;
 }
+
+.monospace {
+    font-family: monospace;
+}
 </style>
 <script>
 if (document.location.href.startsWith('file:')) {
@@ -697,6 +701,37 @@ supposed to get after a year, even though I technically was afraid of the
 people at the company. I did not want it to be the case that my former
 coworkers from the DLA team were going to make a large amount of money and I
 was not going to participate in what was happening in some way.</p>
+<p><strong>Onboarding at RapidSilicon</strong></p>
+<p>One of the first things that happened at RapidSilicon was they sent me an
+agreement about confidential information and assigning ownership of
+intellectual property to RapidSilicon. The agreement seemed broad. I started to
+become concerned that RapidSilicon, because it was a company working on open
+source software and hardware, might try to claim they that owned things that I
+wrote in my free time as personal projects if I released them as open source.</p>
+<p>I sent an email to my future manager at RapidSilicon for clarification. I told
+them that I had been thinking of doing open hardware projects related to things
+like home automation or home security, or other small electronic devices that
+might be useful to the average person. The projects I had been thinking of
+would be made out of 3D printed parts plus electronic components and open
+source software. I told them that I was also possibly interested in
+contributing to pure-software open source projects as well, even if they did
+not have a hardware component. I told them that I was interested in
+cryptography and cryptocurrencies in particular. I asked them if RapidSilicon
+would claim ownership if I designed anything similar to what I had described in
+my spare time. My manager at RapidSilicon replied and told me that I would own
+all of those things.</p>
+<p>After this, it was time to buy a laptop for use while working at RapidSilicon.
+I was told that I should buy my own laptop and that RapidSilicon would
+reimburse me. At the time, I actually needed to buy a new laptop for personal
+use anyway, and so I emailed my future manager at RapidSilicon, and asked for
+clarification on who actually would own the physical laptop after it was
+purchased. Maybe I could buy a new laptop for work use and also use it as my
+personal laptop. My manager replied and told me that RapidSilicon would own the
+laptop for three years, and that if I left RapidSilicon before that, I would
+either have to return it or pay a fair market value. They told me that I could
+spend up to $2000 (USD). They told me that they personally spent more than
+$2000 on their laptop, and that they intended to keep their laptop no matter
+what. They suggested that I do the same thing.</p>
 <p><strong>Working at RapidSilicon</strong></p>
 <p>My first task at RapidSilicon was going to be to modify the placement and
 routing engine that is part of <a href="https://verilogtorouting.org/">VPR</a> so that it
@@ -715,19 +750,24 @@ I liked the idea of doing the investigation to determine if it was possible.</p>
 <p>However, not long after I started working at RapidSilicon, I started to feel
 uncomfortable with the job. The company seemed to be planning to release
 everything as open source. Even the hardware itself was going to be open source
-and based on <a href="https://github.com/lnis-uofu/OpenFPGA">OpenFPGA</a>. It seemed like
-something had to be closed source or controlled in some way so that the company
-would be able to make money. It was not clear to me how this was going to
-happen, and so I started to feel worried that the job might not last a long
-time. I started to feel like if I wrote a bunch of valuable code and gave it
-to the company, I might be doing something that did not make sense. If I wanted
-to write the code and release it as open source and not be paid, I could do
-that myself and own the copyright for it. This made me reluctant to write a lot
-of code.</p>
-<p>In addition to this, I felt like I did not know the people working there very
-well. It was a fully remote job at first, though later one other person joined
-who also lived in Toronto. Everyone else I only knew over video chat or using
-the instant messenger. Many of the employees were in Pakistan, which meant that
+and based on <a href="https://github.com/lnis-uofu/OpenFPGA">OpenFPGA</a>. I started to
+become concerned that the company might not really have a way to make money. I
+started to feel guilty about the idea of releasing code as open source which
+could replace closed source code that had been written by people I knew at
+Intel, and cause people to get laid off. I started to become worried that I was
+doing something that was going to cause more people to dislike me. In addition
+to that, if the company did not have a way to make money, then it was possible
+that I would write the code, cause people to dislike me, and then get laid off
+anyway. This made me reluctant to write a lot of code.</p>
+<p>In addition to this, I felt suspicious of the people at RapidSilicon. I noticed
+that they seemed extremely reluctant to send me the agreement that would
+describe in detail the equity that I owned in the company. I repeatedly asked
+for this agreement, and they kept delaying. In the end, they never actually
+provided this agreement. This also made me reluctant to write code for them.</p>
+<p>I tried to attend meetings and get to know people, however it was difficult.
+It was a fully remote job at first, though later one other person joined who
+also lived in Toronto. Everyone else I only knew over video chat or using the
+instant messenger. Many of the employees were in Pakistan, which meant that
 they were in a time zone that was very far away from mine. This caused many of
 the meetings to be scheduled at times when I was not able to attend. I felt
 very disconnected from everyone else.</p>
@@ -746,14 +786,29 @@ seemed like if that was the plan, it would also make sense to release code as
 open source slowly, because it was actually the threat of being able to release
 code as open source which made the company valuable, rather than actually
 releasing it.</p>
-<p>I was not sure if I was comfortable with this plan, if it was the plan.
-However, due to the uncertainty, I definitely felt more comfortable writing
-code slowly than trying to work quickly. I decided that at least in my case, as
-long as the work I was doing was legitimate work that needed to be done and I
-was simply doing it slowly, and I was not doing any fake unnecessary work, that
-this might be acceptable.</p>
-<p>RapidSilicon laid me off after 10 months. I have mixed feelings about whether
-or not I think this was fair.</p>
+<p>I decided that I would do my work on the laptop that I had bought for
+RapidSilicon, however I would be extremely careful about actually transferring
+any of the code that I wrote back to RapidSilicon. I figured that maybe what I
+could do was to do the work more quickly on my laptop, and then transfer the
+results to RapidSilicon over time at a slower pace. In order to do my work on
+the laptop, however, I needed timing models from
+<a href="https://en.wikipedia.org/wiki/TSMC">TSMC</a>, which were required in order to use
+OpenSTA. RapidSilicon had a copy of the timing models on an Amazon cloud
+server, and had provided instructions that implied that they wanted us to
+actually do our work on the Amazon cloud server. However, I specifically did
+not want to do that, because I did not want RapidSilicon to be able to observe
+my work in progress. RapidSilcion only implied that they wanted us to do the
+work on the cloud server, and did not state that it was required, so I decided
+to copy the TSMC timing models from the Amazon cloud server to my work laptop.
+After this, because I found it amusing, and because I symbolically wanted to
+make sure RapidSilicon would not get any of my work in progress if they laid me
+off, I modified the <a href="https://www.gnu.org/software/bash/manual/html_node/Bash-History-Facilities.html"><span
+class="monospace">.bash_history</span></a>
+file on the Amazon cloud server so that the home directory was completely fresh
+as if I had never even logged in.</p>
+<p>RapidSilicon laid me off after 10 months. They told me that I had been writing
+code too slowly. I have now deleted the TSMC timing models from the work
+laptop, which is now my personal laptop.</p>
 </details>
 <details class="major-event"><summary><span>
 <span>Alone in My Apartment</span>
@@ -1856,7 +1911,7 @@ it seems like it is worth mentioning. It is an interesting coincidence.</p>
 <li>2026-03-17 - <a href="2026-03-17-phone-call-to-the-supreme-court-of-canada.html">Phone Call to the Supreme Court of Canada</a></li>
 </ul>
 <p>First Version: 2026-04-11<br>
-Last Update: 2026-05-02<br>
+Last Update: 2026-05-03<br>
 <a href="https://github.com/shaneoc/shaneoc.github.io/commits/main/trapped-in-my-apartment/index.html">Page History</a></p>
 <p><a href="../" class="index-link">Back to homepage</a></p>
 </div></body></html>
