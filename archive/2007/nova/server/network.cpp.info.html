@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/notes/pof-profile.txt - Archive - shane.oconnell.cc</title>
+<title>2007/nova/server/network.cpp - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../database.js"></script>
+<script src="../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../";
+const root_relpath = "../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,32 +517,231 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../" class="archive-link index-link">Archive</a>
+<a href="../../../" class="archive-link index-link">Archive</a>
 <button class="popup-button">2007</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">nova</button>
 <span>/</span>
-<span class="filename">pof-profile.txt</span>
+<button class="popup-button">server</button>
+<span>/</span>
+<span class="filename">network.cpp</span>
 </div>
-<div class="mtime-info">2008-01-15 03:28:19 UTC</div>
-<a class="prev-link active-link" href="../../2006/Shane-put-this-stuff-here/doodle-2.bmp.info.html">previous</a>
-<a class="next-link active-link" href="../../2007/nova/cproject.info.html">next</a>
+<div class="mtime-info">2007-09-22 17:00:24 UTC</div>
+<a class="prev-link active-link" href="../../../2007/nova/server/modules.cpp.info.html">previous</a>
+<a class="next-link active-link" href="../../../2007/nova/server/notes.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">UPDATE: I just added the two pictures of me in the black shirt.. they are more recent. (You can tell, my hair is longer) However in the first one I look like I'm kind of out of it; so I took the second one with the hopes that maybe it would make me look like a normal person, but nope! I look like I'm crazy. Oh well.
+<div class="text-view">#include &lt;boost/asio.hpp&gt;
+#include &lt;boost/thread.hpp&gt;
+#include &lt;boost/bind.hpp&gt;
+#include &lt;boost/format.hpp&gt;
+#include &lt;exception&gt;
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include &lt;functional&gt;
 
-I'm a pretty easy-going guy. I like talking to friends, having fun, and all that stuff. I'm pretty happy in general; I like where my life is going and what I'm doing in school, etc. I'm currently working on an engineering degree.
+#include "network.h"
+#include "log.h"
 
-I like being outdoors, and I love camping. I like hiking too although I don't really end up doing it as much as I want to. Maybe I'll meet somebody on here who would want to do that with me. :)
+using boost::asio::ip::tcp;
 
-I'm somewhat interested in politics. I watch The Daily Show and the Colbert Report every day. I've spent a lot of time on wikipedia reading about places around the world, and I'm especially interested in the middle east and the war in Iraq. I also tend to have more liberal viewpoints on things, although that's probably pretty clear if you've ever seen those shows. :P
+namespace Network
+{
+	boost::scoped_ptr&lt;Manager&gt; Manager::_instance;
+	
+	Manager&amp; manager()
+	{
+		// TODO: End the program if this check fails
+//		if (Manager::_instance)
+			return *Manager::_instance;
+//		else
+			
+	}
 
-I love listening to music. My favourite band is definitely Pink Floyd, although I like a lot of different kinds of music. Just to name some random bands I like: Radiohead, The Beatles, Tool, A Perfect Circle, Simon &amp; Garfunkel, Matthew Good, Coldplay, Mike Oldfield, U2, Engineers, and others. Actually, maybe there's not a huge variation in the kinds of music in that list.. but still, I like to think I'd be open-minded about anything else I heard.
-
-I don't watch a lot of TV, other then the two shows I mentioned above, although I think "The Office" is really funny. And "Law &amp; Order" is awesome. I also enjoy a good movie every now and then. The best movie I've seen that I can think of off hand is probably The Shawshank Redemption.. although I've seen loads of others that were good too. Apocalypse Now was cool in a weird/crazy sort of way. And I've seen The Matrix and some of the Star Wars movies of course. I could probably list loads more but this isn't really what the site is for I suppose. :P
-
-I'm also sort of a computer nerd, but please don't hold that against me. :P I'm not a social recluse though, and I'm generally very friendly and sociable. I like parties and meeting people. (I really am a nerd though :P)
-
-I like people who can have intelligent conversation, although that doesn't mean you have to be a genius. What's most important to me in a person is if they treat people well. I don't really like people who are too sarcastic or negative; I want to meet someone who I can be really comfortable with and talk about anything.
+	Manager::Manager()
+	{
+		log::debug("Starting network manager thread");
+		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+	}
+	
+	Manager::~Manager()
+	{
+		log::debug("Stopping network manager thread");
+		_io_service_work.reset();
+		
+		// Thread may not have been created correctly, so check first
+		if (_thread)
+			_thread-&gt;join();
+	}
+	
+	void Manager::start()
+	{
+		log::debug("NetworkManager: Started network manager thread");
+		start_listener_int();
+		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
+		_io_service.run();
+	}
+	
+	void Manager::start_listener()
+	{
+		_io_service.post(boost::bind(&amp;Manager::start_listener_int, this));
+	}
+	
+	void Manager::start_listener_int()
+	{
+		log::debug("NetworkManager: Starting a new listener thread");
+		_connections.push_back(boost::shared_ptr&lt;Connection&gt;(new Connection(*this)));
+	}
+	
+	void Manager::end_connection(
+			boost::shared_ptr&lt;Connection&gt; connection)
+	{
+		_io_service.post(boost::bind(&amp;Manager::end_connection_int, this, connection));
+	}
+	
+	void Manager::end_connection_int(
+			boost::shared_ptr&lt;Connection&gt; connection)
+	{
+		log::debug("NetworkManager: Ending a connection");
+		// TODO: I'm pretty sure boost has a better way of doing this
+		_connections.erase(std::remove_if(_connections.begin(), _connections.end(),
+				std::bind2nd(std::equal_to&lt;boost::shared_ptr&lt;Connection&gt; &gt;(), connection)), _connections.end());
+	}
+	
+	Connection::Connection(Manager&amp; manager)
+			: _socket(_io_service),
+			_manager(manager)
+	{
+		try
+		{
+			_acceptor.reset(new tcp::acceptor(_io_service, tcp::v4()));
+			_acceptor-&gt;set_option(boost::asio::socket_base::reuse_address(true));
+			_acceptor-&gt;bind(tcp::endpoint(tcp::v4(), 7111));
+			_acceptor-&gt;listen();
+			_thread.reset(new boost::thread(boost::bind(&amp;Connection::start_listening, this)));
+		}
+		catch (boost::asio::error&amp; e)
+		{
+			log::error(boost::str(boost::format("Could not open socket for the following reason: %1%") % e.what()));
+		}
+	}
+	
+	Connection::~Connection()
+	{
+		_io_service_work.reset();
+		_io_service.interrupt();
+		
+		// Thread may not have been created correctly, so check first
+		if (_thread)
+			_thread-&gt;join();
+	}
+	
+	void Connection::start_listening()
+	{
+		log::debug("NetworkConnection: Started new listener thread");
+		_acceptor-&gt;async_accept(_socket, boost::bind(&amp;Connection::accept_connection, this, _1));
+		
+		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
+		_io_service.run();
+	}
+	
+	void Connection::accept_connection(const boost::asio::error&amp; error)
+	{
+		if (error)
+		{
+			log::error(boost::str(boost::format("async_accept() failed for the following reason: %1%") % error.what()));
+			return;
+		}
+		
+		try
+		{
+			log::debug("Connection: New connection received, closing acceptor");
+			_acceptor-&gt;close();
+			_acceptor.reset();
+		}
+		catch (boost::asio::error&amp; e)
+		{
+			log::error(boost::str(boost::format("Could not close acceptor for the following reason: %1%") % e.what()));
+			return;
+		}
+	
+		log::debug("NetworkConnection: Telling manager to create new listener");
+		manager().start_listener();
+		
+		try
+		{
+			boost::asio::write(_socket, boost::asio::buffer("nova", 4));
+			std::size_t bytes_transferred = boost::asio::read(_socket,
+					boost::asio::buffer(_buffer, 4));
+			
+			if (bytes_transferred != 4 || _buffer[0] != 'n' || _buffer[1] != 'o'
+				|| _buffer[2] != 'v' || _buffer[3] != 'a')
+			{
+				log::error("Received error while accepting new connection: Bad handshake from client");
+				_manager.end_connection(shared_from_this());
+				return;
+			}
+			
+			std::string my_version = "nova-server SVN";
+			_buffer[0] = 0;
+			_buffer[1] = my_version.length();
+			boost::asio::write(_socket, boost::asio::buffer(_buffer, 2));
+			boost::asio::write(_socket, boost::asio::buffer(my_version, my_version.length()));
+			
+			boost::asio::read(_socket, boost::asio::buffer(_buffer, 2));
+			unsigned short version_length = _buffer[0];
+			version_length = (version_length &lt;&lt; 8) + _buffer[1];
+			
+			if (version_length &gt; (_buffer.size() - 3))
+			{
+				log::error("Received error while accepting new connection: Client version string is too long");
+				_manager.end_connection(shared_from_this());
+				return;
+			}
+			
+			boost::asio::read(_socket, boost::asio::buffer(_buffer, version_length));
+			_buffer[version_length] = 0;
+			
+			log::info(boost::str(boost::format("Received connection from client '%1%'") % _buffer.c_array()));
+			
+			_socket.async_receive(boost::asio::buffer(_buffer),
+					boost::bind(&amp;Connection::receive_data, this, _1, _2));
+		}
+		catch (std::exception&amp; e)
+		{
+			log::error(boost::str(boost::format("Received error while accepting new connection: %1%") % e.what()));
+			_manager.end_connection(shared_from_this());
+		}
+	}
+	
+	void Connection::receive_data(
+			const boost::asio::error&amp;					error,
+			std::size_t									bytes_transferred)
+	{
+		if (error == boost::asio::error::eof || _buffer[0] == 'x')
+		{
+			log::debug("NetworkConnection: Client disconnected");
+			manager().end_connection(shared_from_this());
+			return;
+		}
+		else if (error)
+		{
+			log::error(boost::str(boost::format("async_receive() failed for the following reason: %1%") % error.what()));
+			return;
+		}
+		
+		boost::asio::write(_socket, boost::asio::buffer("\nI agree!\n "),
+				boost::asio::transfer_all(), boost::asio::ignore_error());
+		
+		boost::asio::write(_socket, boost::asio::buffer(_buffer, bytes_transferred),
+				boost::asio::transfer_all(), boost::asio::ignore_error());
+		
+		boost::asio::write(_socket, boost::asio::buffer("is awesome!\n\n&gt;"),
+				boost::asio::transfer_all(), boost::asio::ignore_error());
+		
+		_socket.async_receive(boost::asio::buffer(_buffer),
+				boost::bind(&amp;Connection::receive_data, this, _1, _2));
+	}
+}
 </div>
 </body></html>

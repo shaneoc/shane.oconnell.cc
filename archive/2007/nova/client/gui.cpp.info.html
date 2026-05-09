@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/notes/pof-profile.txt - Archive - shane.oconnell.cc</title>
+<title>2007/nova/client/gui.cpp - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../database.js"></script>
+<script src="../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../";
+const root_relpath = "../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,32 +517,83 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../" class="archive-link index-link">Archive</a>
+<a href="../../../" class="archive-link index-link">Archive</a>
 <button class="popup-button">2007</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">nova</button>
 <span>/</span>
-<span class="filename">pof-profile.txt</span>
+<button class="popup-button">client</button>
+<span>/</span>
+<span class="filename">gui.cpp</span>
 </div>
-<div class="mtime-info">2008-01-15 03:28:19 UTC</div>
-<a class="prev-link active-link" href="../../2006/Shane-put-this-stuff-here/doodle-2.bmp.info.html">previous</a>
-<a class="next-link active-link" href="../../2007/nova/cproject.info.html">next</a>
+<div class="mtime-info">2007-10-03 01:31:06 UTC</div>
+<a class="prev-link active-link" href="../../../2007/nova/project.info.html">previous</a>
+<a class="next-link active-link" href="../../../2007/nova/client/gui_nativeapi.cpp.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">UPDATE: I just added the two pictures of me in the black shirt.. they are more recent. (You can tell, my hair is longer) However in the first one I look like I'm kind of out of it; so I took the second one with the hopes that maybe it would make me look like a normal person, but nope! I look like I'm crazy. Oh well.
+<div class="text-view">#include &lt;list&gt;
+#include &lt;cassert&gt;
+#include &lt;iostream&gt;
 
-I'm a pretty easy-going guy. I like talking to friends, having fun, and all that stuff. I'm pretty happy in general; I like where my life is going and what I'm doing in school, etc. I'm currently working on an engineering degree.
+#include "gui.h"
 
-I like being outdoors, and I love camping. I like hiking too although I don't really end up doing it as much as I want to. Maybe I'll meet somebody on here who would want to do that with me. :)
+namespace GUI
+{
+	std::list&lt;MainMenu::MenuItem&gt; MainMenu::_menu;
 
-I'm somewhat interested in politics. I watch The Daily Show and the Colbert Report every day. I've spent a lot of time on wikipedia reading about places around the world, and I'm especially interested in the middle east and the war in Iraq. I also tend to have more liberal viewpoints on things, although that's probably pretty clear if you've ever seen those shows. :P
+	MainMenu::MainMenu()
+	{
+		sort_menu();
+	}
+	
+	void MainMenu::MenuItem::add_subitem(MenuItem item)
+	{
+		assert(!_target);
+		_submenu.push_back(item);
+	}
+	
+	void MainMenu::add_item(MenuItem item)
+	{
+		_menu.push_back(item);
+	}
 
-I love listening to music. My favourite band is definitely Pink Floyd, although I like a lot of different kinds of music. Just to name some random bands I like: Radiohead, The Beatles, Tool, A Perfect Circle, Simon &amp; Garfunkel, Matthew Good, Coldplay, Mike Oldfield, U2, Engineers, and others. Actually, maybe there's not a huge variation in the kinds of music in that list.. but still, I like to think I'd be open-minded about anything else I heard.
-
-I don't watch a lot of TV, other then the two shows I mentioned above, although I think "The Office" is really funny. And "Law &amp; Order" is awesome. I also enjoy a good movie every now and then. The best movie I've seen that I can think of off hand is probably The Shawshank Redemption.. although I've seen loads of others that were good too. Apocalypse Now was cool in a weird/crazy sort of way. And I've seen The Matrix and some of the Star Wars movies of course. I could probably list loads more but this isn't really what the site is for I suppose. :P
-
-I'm also sort of a computer nerd, but please don't hold that against me. :P I'm not a social recluse though, and I'm generally very friendly and sociable. I like parties and meeting people. (I really am a nerd though :P)
-
-I like people who can have intelligent conversation, although that doesn't mean you have to be a genius. What's most important to me in a person is if they treat people well. I don't really like people who are too sarcastic or negative; I want to meet someone who I can be really comfortable with and talk about anything.
+	void MainMenu::sort_menu()
+	{
+		// TODO: Sort menu items using preferences from database, with sensible defaults
+	}
+	
+	void MainMenu::on_redraw_event(
+			Cairo::RefPtr&lt;Cairo::Context&gt; cr,
+			double width, double height)
+	{
+		// Paint black background
+		cr-&gt;set_source_rgb(0.0, 0.0, 0.0);
+		cr-&gt;paint();
+		
+		cr-&gt;set_source_rgb(192.0/255.0, 192.0/255.0, 192.0/255.0);
+		cr-&gt;select_font_face("Bitstream Vera Sans",
+				Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
+		cr-&gt;set_font_size(height/18.0);
+		int i = 0;
+		for (std::list&lt;MenuItem&gt;::iterator it = _menu.begin(); it != _menu.end(); it++, i++)
+		{
+			cr-&gt;move_to(width/5.0, height/2.0 - (_menu.size()*(height/18.0)*2.0 - height/18.0)/2.0 + i*(height/18.0)*2.0);
+			cr-&gt;show_text(it-&gt;_label);
+		}
+		
+		Cairo::RefPtr&lt;Cairo::LinearGradient&gt; pattern =
+			Cairo::LinearGradient::create(width/3.0, height/3.0, width*(2.0/3.0), height*(2.0/3.0));
+		
+		pattern-&gt;add_color_stop_rgba(0.0, 0.0, 0.0, 192.0/255.0, 0.0);
+		pattern-&gt;add_color_stop_rgba(0.5, 0.0, 0.0, 192.0/255.0, 1.0);
+		pattern-&gt;add_color_stop_rgba(1.0, 0.0, 0.0, 192.0/255.0, 0.0);
+		
+		cr-&gt;set_source(pattern);
+		
+		cr-&gt;paint();
+		
+		
+	}
+}
 </div>
 </body></html>
