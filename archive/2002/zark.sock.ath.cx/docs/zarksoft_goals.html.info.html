@@ -403,32 +403,33 @@ function create_popup() {
             const file_path_el = document.getElementById('file-path');
             const file_path_rect = file_path_el.getBoundingClientRect();
             const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
 
             const max_top = Math.max(
-                file_path_rect.height, window.innerHeight - popup_rect.height);
-            const max_left = Math.max(0, window.innerWidth - popup_rect.width);
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
 
             if (popup_rect.top > max_top) {
                 popup_el.style.top = `${max_top}px`;
 
-                if ((max_top + popup_rect.height) > window.innerHeight) {
-                    popup_el.style.height = `${window.innerHeight - max_top}px`;
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
                 }
             } else {
-                if (popup_rect.bottom > window.innerHeight) {
-                    popup_el.style.height = `${window.innerHeight - popup_rect.top}px`;
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
                 }
             }
 
             if (popup_rect.left > max_left) {
                 popup_el.style.left = `${max_left}px`;
 
-                if ((max_left + popup_rect.width) > window.innerWidth) {
-                    popup_el.style.width = `${window.innerWidth - max_left}px`;
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
                 }
             } else {
-                if (popup_rect.right > window.innerWidth) {
-                    popup_el.style.width = `${window.innerWidth - popup_rect.right}px`;
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
                 }
             }
         }
