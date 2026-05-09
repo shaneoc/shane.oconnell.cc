@@ -298,7 +298,6 @@ const archive_database = [
 ["file", "8-sobriety.bmp", "8 - sobriety.bmp"],
 ["file", "9-invisible-reds.bmp", "9 - invisible reds.bmp"],
 ["file", "doodle-2.bmp", "doodle 2.bmp"],
-["file", "doodling.bmp", "doodling!.bmp"],
 "up",
 "up",
 "up",
