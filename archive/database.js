@@ -300,5 +300,10 @@ const archive_database = [
 ["file", "doodle-2.bmp", "doodle 2.bmp"],
 "up",
 "up",
+["dir", "2007"],
+["dir", "notes"],
+["file", "pof-profile.txt"],
+"up",
+"up",
 "up",
 ];
