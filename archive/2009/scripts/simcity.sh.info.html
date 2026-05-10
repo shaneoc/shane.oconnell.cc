@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.VolumeControlToolItem.vala - Archive - shane.oconnell.cc</title>
+<title>2009/scripts/simcity.sh - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../../../database.js"></script>
+<script src="../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../../../";
+const root_relpath = "../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,43 +517,20 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2008</button>
+<a href="../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2009</button>
 <span>/</span>
-<button class="popup-button">echo</button>
+<button class="popup-button">scripts</button>
 <span>/</span>
-<button class="popup-button">vala</button>
-<span>/</span>
-<button class="popup-button">src</button>
-<span>/</span>
-<button class="popup-button">Echo.UI</button>
-<span>/</span>
-<span class="filename">Echo.UI.Widgets.VolumeControlToolItem.vala</span>
+<span class="filename">simcity.sh</span>
 </div>
-<div class="mtime-info">2008-11-27 23:48:48 UTC</div>
-<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.TrackSliderToolItem.vala.info.html">previous</a>
-<a class="next-link active-link" href="../../../../../2009/notes/games.txt.info.html">next</a>
+<div class="mtime-info">2009-06-16 18:14:47 UTC</div>
+<a class="prev-link active-link" href="../../2009/scripts/archive.py.info.html">previous</a>
+<a class="next-link active-link" href="../../2010/notes/cars.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
- *
- * Echo Media Player
- * Copyright (C) 2008 Shane O'Connell
- *
- * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
- * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
- * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
- * <span style="background: #ffeeee; ">archive. ]</span>
- */
+<div class="text-view">#!/bin/bash
 
-using Echo.Core;
-
-public class Echo.UI.Widgets.VolumeControlToolItem : Gtk.ToolButton
-{
-	construct
-	{
-		this.set("icon-name", "audio-volume-high");
-	}
-}
+taskset -c 1 wine "C:\\Program Files\\Maxis\\SimCity 4 Deluxe\\Apps\\SimCity 4.exe" -d:software -intro:off -r1280x1024x32
 </div>
 </body></html>

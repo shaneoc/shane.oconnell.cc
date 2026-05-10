@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.VolumeControlToolItem.vala - Archive - shane.oconnell.cc</title>
+<title>2009/scripts/archive-old.py - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../../../database.js"></script>
+<script src="../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../../../";
+const root_relpath = "../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,43 +517,111 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2008</button>
+<a href="../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2009</button>
 <span>/</span>
-<button class="popup-button">echo</button>
+<button class="popup-button">scripts</button>
 <span>/</span>
-<button class="popup-button">vala</button>
-<span>/</span>
-<button class="popup-button">src</button>
-<span>/</span>
-<button class="popup-button">Echo.UI</button>
-<span>/</span>
-<span class="filename">Echo.UI.Widgets.VolumeControlToolItem.vala</span>
+<span class="filename">archive-old.py</span>
 </div>
-<div class="mtime-info">2008-11-27 23:48:48 UTC</div>
-<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.TrackSliderToolItem.vala.info.html">previous</a>
-<a class="next-link active-link" href="../../../../../2009/notes/games.txt.info.html">next</a>
+<div class="mtime-info">2009-05-13 05:17:54 UTC</div>
+<a class="prev-link active-link" href="../../2009/notes/network.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../2009/scripts/archive.py.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
- *
- * Echo Media Player
- * Copyright (C) 2008 Shane O'Connell
- *
- * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
- * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
- * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
- * <span style="background: #ffeeee; ">archive. ]</span>
- */
+<div class="text-view">#!/usr/bin/python3 -tt
 
-using Echo.Core;
+from optparse import OptionParser, OptionGroup, OptionValueError
 
-public class Echo.UI.Widgets.VolumeControlToolItem : Gtk.ToolButton
-{
-	construct
-	{
-		this.set("icon-name", "audio-volume-high");
-	}
-}
+cfg_archive_dir = "/home/shane/scratch/archivepy-test"
+cfg_output_dir = "/home/shane/scratch/archivepy-text/extracted"
+
+#def extract_action_callback(option, opt_str, value, parser):
+#    global show_help
+#    show_help = False
+#    
+#    if (value &lt; 1990 or value &gt; 2020):
+#        raise OptionValueError("'{0}' is not a valid year".format(value))
+#    
+#    print('Extracting {0}...'.format(value))
+
+
+def parse_options():
+    parser = OptionParser(version="%prog 1.0")
+    
+    actions = []
+    
+    def extract_callback(option, opt_str, value, parser):
+        if (value &lt; 1990 or value &gt; 2020): # TODO check for year in archive
+            raise OptionValueError("'{0}' is not a valid year".format(value))
+        else:
+            actions.append(("extract", value))
+    
+    def import_callback(option, opt_str, value, parser):
+        if (value &lt; 1990 or value &gt; 2020): # TODO check for year in archive
+            raise OptionValueError("'{0}' is not a valid year".format(value))
+        else:
+            actions.append(("import", value))
+
+    parser.set_defaults(archive_dir=cfg_archive_dir, output_dir=cfg_output_dir,
+                      check_data=False, delete_output=False)
+    
+    action_group = OptionGroup(parser, "Actions",
+                      "One or more of these actions are required")
+    action_group.add_option("-e", "--extract", type="int",
+                      action="callback", callback=extract_callback,
+                      metavar="YEAR", help="Extract archive for YEAR")
+    action_group.add_option("-i", "--import", type="int",
+                      action="callback", callback=import_callback,
+                      metavar="YEAR", help="Import new or modified data "
+                      "from the output directory for YEAR to created a new "
+                      "archive file (any preexisting archive file will be "
+                      "backed up beforehand)")
+    action_group.add_option("-c", "--check", dest="check_data",
+                      action="store_true", help="Check archive files against "
+                      "checksums to ensure they have not be corrupted, then "
+                      "check any extracted content to ensure it matches the "
+                      "data in the archive files")
+    action_group.add_option("-d", "--delete-output", dest="delete_output",
+                      action="store_true", help="Delete extracted content of "
+                      "archive files (implies -c)")
+
+    
+    parser.add_option_group(action_group)
+    
+    config_group = OptionGroup(parser, "Options")
+    config_group.add_option("--archive-dir", dest="archive_dir",
+                      metavar="PATH", help="Specify the directory with the "
+                      "stored archive files. (Currently set to {0})".format(
+                      cfg_archive_dir))
+    config_group.add_option("--output-dir", dest="output_dir",
+                      metavar="PATH", help="Specify the directory which "
+                      "contains the extracted content of the archive files. "
+                      "(Currently set to {0})".format(cfg_output_dir))
+    parser.add_option_group(config_group)
+    
+
+    (options, args) = parser.parse_args()
+    
+    if (options.delete_output == True):
+        if (actions != []):
+            parser.error("cannot extract or import data while deleting output")
+        else:
+            return "delete-output"
+    
+    if (options.check
+    
+    
+    if (actions == [] and options.check_archive == False and
+            options.check_output == False and ):
+        parser.print_help()
+        return False
+    else:
+        return (actions, options
+    
+
+
+if __name__ == "__main__":
+    main()
 </div>
 </body></html>

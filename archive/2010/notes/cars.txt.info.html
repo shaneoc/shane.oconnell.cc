@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.VolumeControlToolItem.vala - Archive - shane.oconnell.cc</title>
+<title>2010/notes/cars.txt - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../../../database.js"></script>
+<script src="../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../../../";
+const root_relpath = "../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,43 +517,107 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2008</button>
+<a href="../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2010</button>
 <span>/</span>
-<button class="popup-button">echo</button>
+<button class="popup-button">notes</button>
 <span>/</span>
-<button class="popup-button">vala</button>
-<span>/</span>
-<button class="popup-button">src</button>
-<span>/</span>
-<button class="popup-button">Echo.UI</button>
-<span>/</span>
-<span class="filename">Echo.UI.Widgets.VolumeControlToolItem.vala</span>
+<span class="filename">cars.txt</span>
 </div>
-<div class="mtime-info">2008-11-27 23:48:48 UTC</div>
-<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.TrackSliderToolItem.vala.info.html">previous</a>
-<a class="next-link active-link" href="../../../../../2009/notes/games.txt.info.html">next</a>
+<div class="mtime-info">2010-05-24 20:19:41 UTC</div>
+<a class="prev-link active-link" href="../../2009/scripts/simcity.sh.info.html">previous</a>
+<a class="next-link active-link" href="../../2010/notes/grad-planning.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
- *
- * Echo Media Player
- * Copyright (C) 2008 Shane O'Connell
- *
- * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
- * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
- * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
- * <span style="background: #ffeeee; ">archive. ]</span>
- */
+<div class="text-view">Process:
+--------
+1. Get credit report
+2. Visit various new car dealerships and test drive the basic model cars. Find out:
+	- make, model, year
+	- financing (APR, term, monthly payment, is there any penelty for paying more each month then you're supposed to or for paying off in full anytime)
+	- extra dealer fees
+	- cost of extended warranty
+3. Visit various used car dealerships and test drive some cars. Find out:
+	- make, model, year, ___VIN number___
+	- financing (APR, term, monthly payment, is there any penelty for paying more each month then you're supposed to or for paying off in full anytime)
+	- extra dealer fees
+	- whether or not the car is sold "as is"
+	- cost of extended warranty
+4. If some of the new cars are somewhat reasonably priced, find out dealer information at carcostcanada.com. If not and there's some potential used cars, use their
+	VIN numbers to find information from carproof.com.
+5. Investigate extended warrantys from third-parties, http://www.warrantydirect.ca/index.asp?url=cbtcanada.
+6. Investigate financing from bank
+7. Choose a car, potentially re-test drive some maybe, and then try to make an offer.
 
-using Echo.Core;
 
-public class Echo.UI.Widgets.VolumeControlToolItem : Gtk.ToolButton
-{
-	construct
-	{
-		this.set("icon-name", "audio-volume-high");
-	}
-}
+When buying car:
+- know cost of car insurance for that car beforehand
+- have credit score
+- have cost of extended warranty from online
+- have MSRP
+- have cost at car at other dealerships?
+- (used) do not buy car "as is", need at least 30 day warrenty and also extended warrenty from somebody
+- possibly take dealer car loan to get rebate, but then immediately pay off in full using another car loan from another place with low APR
+
+
+
+- get credit report
+- make list of possible cars and prices (with VINs if possible)
+
+http://newfoundlandusedcars.com/st_johns.htm
+http://saveoncarsnl.ca/
+http://www.edmunds.com/
+
+Car requirements:
+- 4 doors
+- A/C
+- Power door locks
+
+
+
+Make		Model		Year	Mileage	Price		Fual (c/h)	VIN
+-------------------------------------------------------------------------------------------------------------------------------
+Kia		Magentis	2004	129930	 $4,500							http://saveoncarsnl.ca/cinventorydetails.asp?id=611&amp;icat=Cars&amp;imake=Kia
+Toyota		Echo		2005	158079	 $4,700							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=588&amp;icat=Cars&amp;imake=Toyota
+Toyota		Corolla		2005	127163	 $5,200							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=651&amp;icat=Cars&amp;imake=Toyota
+Toyota		Echo		2005	78583	 $6,400							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=614&amp;icat=Cars&amp;imake=Toyota
+Toyota		Echo		2005	109683	 $6,600							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=602&amp;icat=Cars&amp;imake=Toyota
+Chevrolet	Malibu		2005	93416	 $7,200							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=653&amp;icat=Cars&amp;imake=Chevrolet
+Chevrolet	Colbalt		2006	62182	 $7,600							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=665&amp;icat=Cars&amp;imake=Chevrolet
+Chevrolet	Malibu		2006	75056	 $8,000							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=626&amp;icat=Cars&amp;imake=Chevrolet
+Toyota		Corolla		2005	80037	 $8,200							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=634&amp;icat=Cars&amp;imake=Toyota
+Mazda		3		2006	98772	 $8,400							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=669&amp;icat=Cars&amp;imake=Mazda
+Mazda		6		2005	104099	 $8,800							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=672&amp;icat=Cars&amp;imake=Mazda
+Mazda		6		2006	95626	 $9,500							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=629&amp;icat=Cars&amp;imake=Mazda
+Mazda		3		2006	91577	 $9,500							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=671&amp;icat=Cars&amp;imake=Mazda
+Mazda		3 Sport		2006	95135	 $9,700							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=649&amp;icat=Cars&amp;imake=Mazda
+Mazda		3		2007	93508	$11,600							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=646&amp;icat=Cars&amp;imake=Mazda
+Mazda		6 Liftback	2006	85148	$12,900							http://www.saveoncarsnl.ca/cinventorydetails.asp?id=658&amp;icat=Cars&amp;imake=Mazda
+Pontiac		G5		2007	36716	$10,593		9.5/6.1		1G2AJ55F277373638	http://www.terranovamotors.com/used.php?s2=2&amp;search.results_per_page=10&amp;search.order=5&amp;search.order.dir=1&amp;s0=1&amp;s1=1&amp;search.page=1&amp;vi=810621
+Saturn		Ion		2007	66705	$10,593		9.5/6.1		1G8AM15F97Z121265	http://www.terranovamotors.com/used.php?s2=2&amp;search.results_per_page=10&amp;search.order=5&amp;search.order.dir=1&amp;s0=1&amp;s1=1&amp;search.page=1&amp;vi=856786
+Pontiac		G6		2006	61610	$10,593		10.6/6.8	1G2ZG558664235572	http://www.terranovamotors.com/used.php?s2=2&amp;search.results_per_page=10&amp;search.order=5&amp;search.order.dir=1&amp;s0=1&amp;s1=1&amp;search.page=1&amp;vi=870956
+Chevrolet	Cobalt		2008	61220	 $9,910		9.2/5.9		1G1AJ15F987306579	http://www.terranovamotors.com/used.php?s2=2&amp;search.results_per_page=10&amp;search.order=5&amp;search.order.dir=1&amp;s0=1&amp;s1=1&amp;search.page=1&amp;vi=733621
+Saturn		Ion		2007	14450	$12,593		9.5/6.7		1G8AJ55F97Z124540	http://www.terranovamotors.com/used.php?s2=2&amp;search.results_per_page=10&amp;search.order=5&amp;search.order.dir=1&amp;s0=1&amp;s1=1&amp;search.page=2&amp;vi=870973
+Honda		Civic		2005	79476	 $9,988							http://www.cityautomart.ca/ddetails.php?id=161&amp;idnum=369313&amp;sort=4&amp;vtype1=ALL&amp;dealer1=161&amp;make1=&amp;model1=&amp;_string=&amp;Year1=1940&amp;Year2=2011&amp;kilometers=999&amp;minprice=0&amp;maxprice=999999&amp;num=30&amp;offset=0&amp;altdir=1
+Honda		Civic		2006	90532	$11,498							http://www.cityautomart.ca/ddetails.php?id=161&amp;idnum=369224&amp;sort=4&amp;vtype1=ALL&amp;dealer1=161&amp;make1=&amp;model1=&amp;_string=&amp;Year1=1940&amp;Year2=2011&amp;kilometers=999&amp;minprice=0&amp;maxprice=999999&amp;num=30&amp;offset=0&amp;altdir=1
+Honda		Civic		2008	74000	$14,988							http://www.cityautomart.ca/ddetails.php?id=161&amp;idnum=400706&amp;sort=4&amp;vtype1=ALL&amp;dealer1=161&amp;make1=&amp;model1=&amp;_string=&amp;Year1=1940&amp;Year2=2011&amp;kilometers=999&amp;minprice=0&amp;maxprice=999999&amp;num=30&amp;offset=0&amp;altdir=1
+
+
+Requirements:
+- 4 doors
+- A/C
+- Power windows
+- Power locks (keyless entry not required)
+- aux input jack
+
+
+Make		Model		Starting Price	Configured Price
+----------------------------------------------------------
+Ford		Fiesta		$12,999		$14,949
+Honda		Fit		$14,480		$15,780			7.1/5.5
+
+
+
+
 </div>
 </body></html>

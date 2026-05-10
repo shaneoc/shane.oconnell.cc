@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.VolumeControlToolItem.vala - Archive - shane.oconnell.cc</title>
+<title>2012/notes/todo app idea.txt - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../../../database.js"></script>
+<script src="../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../../../";
+const root_relpath = "../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,43 +517,36 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2008</button>
+<a href="../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2012</button>
 <span>/</span>
-<button class="popup-button">echo</button>
+<button class="popup-button">notes</button>
 <span>/</span>
-<button class="popup-button">vala</button>
-<span>/</span>
-<button class="popup-button">src</button>
-<span>/</span>
-<button class="popup-button">Echo.UI</button>
-<span>/</span>
-<span class="filename">Echo.UI.Widgets.VolumeControlToolItem.vala</span>
+<span class="filename">todo app idea.txt</span>
 </div>
-<div class="mtime-info">2008-11-27 23:48:48 UTC</div>
-<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.TrackSliderToolItem.vala.info.html">previous</a>
-<a class="next-link active-link" href="../../../../../2009/notes/games.txt.info.html">next</a>
+<div class="mtime-info">2012-02-06 11:59:19 UTC</div>
+<a class="prev-link active-link" href="../../2012/notes/todo/computer-do.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../2012/notes/washing-machine-cycle.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
- *
- * Echo Media Player
- * Copyright (C) 2008 Shane O'Connell
- *
- * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
- * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
- * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
- * <span style="background: #ffeeee; ">archive. ]</span>
- */
+<div class="text-view">todo app idea:
 
-using Echo.Core;
+A hierarchical list, somewhat like nautilus, which shows folders which can be expanded to show their contents or double clicked to make that folder the top-level.
 
-public class Echo.UI.Widgets.VolumeControlToolItem : Gtk.ToolButton
-{
-	construct
-	{
-		this.set("icon-name", "audio-volume-high");
-	}
-}
-</div>
+Each item and folder has:
+ - a name
+ - one or more tags?
+ - optional password-protection (possibly one password used for all password-protected folders, and the folder just has a flag to say it's protected)
+
+Each item in a folder has:
+ - a date or date range (optionally including time)
+ - contents (free-form text)
+ - a 'completed/not completed' flag
+
+Each folder has:
+ - an item sorting policy (manual, by date, by name, by completion etc)
+ - if manual sorting, then some options to rearrange by date, name, completion, etc.
+
+
+Both items and folders can be set to notify you at certain times. A folder with items corresponding to christmas gift ideas can be set to show up in the notification bar each year from november to december to remind me continuously, and can't be cleared. Notifications can be set to show continuously for a period of time, or be set to go off at a certain time, causing a vibration, and can be cleared from the notification bar.</div>
 </body></html>
