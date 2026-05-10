@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/notes-2.txt - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -518,89 +518,141 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<span class="filename">notes-2.txt</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-21 01:23:53 UTC</div>
+<a class="prev-link active-link" href="../../../2008/echo/cpp/icons.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../../2008/echo/cpp/release-plan.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">Things that can be shown in the right pane:
 
-#include "scheduler.h"
-#include "log.h"
+* playlists			- reorderable, not sortable, with save button, with search filter box
+* smart playlists	- not reorderable, with search filter box
+* CD song list - not reorderable, with rip button
+* Entire libraries - not reorderable, with search filter box
 
-namespace Scheduler
-{
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+Thing								Reorderable		Sortable	Drag source		Drop target
+-----								-----------		--------	-----------		-----------
+Playlist in database				Yes				No			Yes				Yes
+Playlist from file					Yes				No			Yes				Yes
+CD									No				Yes			Yes				No
+Entire library						No				Yes			Yes				No
+Album from clicking it in library	No				Yes			Yes				No
+Smart playlist (library filter)		No				Yes			Yes				No
+iPod								No				Yes			Yes				No
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
-}
-</div>
+
+TrackViewPane
+
+
+BrowserPane
+FileBrowserModel
+LibraryBrowserModel
+BrowserComboBoxModel
+
+or
+
+BrowserPane::Widget
+BrowserPane::FileModel
+BrowserPane::LibraryModel
+BrowserPane::ComboBoxModel
+
+PlaylistPane::Widget
+PlaylistPane::PlaylistModel
+
+----------------------------------------------------
+Database:
+
+Config: Name, Value
+
+Artists: ArtistID, ArtistName
+Albums: AlbumID, ArtistID, AlbumName, AlbumReleaseDate
+Tracks: TrackID, AlbumID, TrackName, TrackNumber, TrackRating, TrackURI
+
+Libraries: LibraryID, LibraryName, LibraryIcon
+LibraryTracks: LibraryID, TrackID
+
+Playlists: PlaylistID, PlaylistName
+PlaylistTracks: PlaylistID, TrackID, PlaylistOrder
+
+MemoryPlaylists: PlaylistID, PlaylistName
+MemoryPlaylistTracks: TrackID, PlaylistID, PlaylistOrder, ArtistName, AlbumName,
+    AlbumReleaseDate, TrackName, TrackNumber, TrackURI
+    
+Or, if accessing playlists from the TreeView is too slow, change that too:
+
+Library_&lt;LibraryID&gt;: LibraryOrderID, TrackID
+Playlist_&lt;PlaylistID&gt;: PlaylistOrderID, TrackID
+MemoryPlaylist_&lt;MemoryPlaylistID&gt;: PlaylistOrderID, ArtistName, AlbumName, etc.
+
+so that the TreeView row is also the sqlite primary key
+
+
+Database::tidy_up()
+- Make sure every artist has at least one album and every album has at least one artist
+- For each Album, if all tracks have the same release date set that as the album release date
+- Tell sqlite to tidy up unused space in it's database too?
+- Call after updating the libraries
+
+-------
+
+Research to see if there's a way to monitor an entire directory tree using something like inotify
+    
+    
+------------------
+
+Database/Database
+Database/Library : PlaySource
+Database/Album : PlaySource
+Database/Artist : PlaySource
+Database/Playlist : PlaySource
+
+PlaySource
+CDSource : PlaySource
+NetworkLibrary : PlaySource
+RadioSource : PlaySource
+Track
+
+
+
+typedef boost::shared_ptr&lt;Library&gt; LibraryRef;
+typedef boost::shared_ptr&lt;Playlist&gt; PlaylistRef;
+typedef boost::shared_ptr&lt;Artist&gt; ArtistRef;
+typedef boost::shared_ptr&lt;Album&gt; AlbumRef;
+
+typedef boost::shared_ptr&lt;vector&lt;LibraryRef&gt; &gt; LibraryListRef;
+typedef boost::shared_ptr&lt;vector&lt;PlaylistRef&gt; &gt; PlaylistListRef;
+typedef boost::shared_ptr&lt;vector&lt;ArtistRef&gt; &gt; ArtistListRef;
+typedef boost::shared_ptr&lt;vector&lt;AlbumRef&gt; &gt; AlbumListRef;
+
+Database::get_libraries() : LibraryListRef
+Database::get_playlists() : PlaylistListRef
+
+Library::get_artists() : ArtistListRef
+Library::get_track(int index) : const Track&amp;
+Library::get_name() : const Glib::ustring&amp;
+
+Artist::get_albums() : AlbumListRef
+Artist::get_track(int index) : const Track&amp;
+Artist::get_name() : const Glib::ustring&amp;
+
+Album::get_track(int index) : const Track&amp;
+Album::get_name() : const Glib::ustring&amp;
+
+Playlist::get_track(int index) : const Track&amp;
+Playlist::get_name() : const Glib::ustring&amp;
+
+--
+
+- Album/Artist should just use the same infrastructure as the "Search" feature. They could
+   store a reference to the Library PlaySource inside them, and use the Search to find all
+   tracks in their album/artist, and pass through any extra search terms </div>
 </body></html>

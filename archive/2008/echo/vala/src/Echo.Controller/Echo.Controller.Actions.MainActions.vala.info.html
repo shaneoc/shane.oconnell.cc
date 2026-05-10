@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.Controller/Echo.Controller.Actions.MainActions.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,173 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.Controller</button>
+<span>/</span>
+<span class="filename">Echo.Controller.Actions.MainActions.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-11-28 05:35:41 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/notes.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.Controller/Echo.Controller.Actions.PlaybackActions.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using Echo.Controller.Tabs;
+using Echo.Core;
+using Echo.Database;
+using Echo.Interfaces;
+using Echo.UI;
+using Echo.UI.Preferences;
+using Echo.UI.Tabs;
+using Echo.UI.Widgets;
 
-namespace Scheduler
+public class Echo.Controller.Actions.MainActions : GLib.Object
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
+	private bool _fullscreen = false;
+
+	public MainActions()
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		// File menu
+		Services.ui().get_action("new-playlist").activate += this.on_new_playlist;
+		//add_action("new-smart-playlist", "New _Smart Playlist");
+		//add_action("open-file", null, "gtk-open");
+		//add_action("open-url", "Open _URL");
+		Services.ui().get_action("refresh-libraries").activate += this.on_refresh_libraries;
+		Services.ui().get_action("close").activate += this.on_close;
+		Services.ui().get_action("quit").activate += this.on_quit;
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
+		// Edit menu
+		Services.ui().get_action("edit-preferences").activate += this.on_edit_preferences;
+		
+		// View menu
+		((Gtk.ToggleAction)Services.ui().get_action("view-browser")).activate += this.on_view_browser;
+		Services.ui().get_action("view-fullscreen").activate += this.on_view_fullscreen;
+		
+		// Help menu
+		//add_action("about", null, "gtk-about");
+		
+		// Sources pane
+		Services.ui().main_window.sources_pane.now_playing_opened += this.on_now_playing_opened;
+		Services.ui().main_window.sources_pane.library_opened += this.on_library_opened;
+		
+		// Tab pane
+		Services.ui().main_window.tab_pane.tab_removed += this.on_tab_removed;
+		
+		
+		// Connect signals that update actions:
+		Services.ui().main_window.window_state_event += (window, event) =&gt; {
+			_fullscreen = ((event.new_window_state &amp; Gdk.WindowState.FULLSCREEN) != 0);
+			Services.ui().get_action("view-fullscreen").set("stock-id",
+				(_fullscreen) ? "gtk-leave-fullscreen" : "gtk-fullscreen");
+			return false;
+		};
 	}
 	
-	void Manager::start()
+	private void on_new_playlist(Gtk.Action action)
 	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
-
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+		int playlist_num = 1;
+		bool found_num = false;
+		
+		while (found_num == false) {
+			found_num = true;
+			
+			foreach(ITab tab in Services.ui().main_window.tab_pane.tabs) {
+				if (tab is PlaySourceTab &amp;&amp;
+						((PlaySourceTab)tab).get_name() == "Playlist %d".printf(playlist_num)) {
+					playlist_num++;
+					found_num = false;
+					break;
+				}
+			}
 		}
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		Services.ui().main_window.tab_pane.add_tab(
+			PlaySourceTabController.create_tab(new Playlist("Playlist %d".printf(playlist_num))));
+	}
+	
+	private void on_refresh_libraries(Gtk.Action action)
+	{
+		foreach(Library library in Services.database().get_libraries()) {
+			library.refresh_tracks();
+		}
+	}
+	
+	private void on_close(Gtk.Action action)
+	{
+		Services.ui().main_window.hide();
+	}
+	
+	private void on_quit(Gtk.Action action)
+	{
+		Gtk.main_quit();
+	}
+	
+	private void on_edit_preferences(Gtk.Action action)
+	{
+		PreferencesWindow.create(Services.ui().main_window);
+	}
+	
+	private void on_view_browser(Gtk.ToggleAction action)
+	{
+		Services.ui().main_window.browser_pane.visible = action.active;
+	}
+	
+	private void on_view_fullscreen(Gtk.Action action)
+	{
+		if (_fullscreen)
+			Services.ui().main_window.unfullscreen();
+		else
+			Services.ui().main_window.fullscreen();
+	}
+	
+	private void on_now_playing_opened(SourcesPane sources_pane)
+	{
+		foreach(ITab tab in Services.ui().main_window.tab_pane.tabs) {
+			if (tab is NowPlayingTab) {
+				Services.ui().main_window.tab_pane.switch_to_tab(tab);
+				return;
+			}
+		}
+		
+		Services.ui().main_window.tab_pane.add_tab(new NowPlayingTab());
+	}
+	
+	private void on_library_opened(SourcesPane sources_pane, Library library)
+	{
+		foreach(ITab tab in Services.ui().main_window.tab_pane.tabs) {
+			if (tab is PlaySourceTab &amp;&amp; ((PlaySourceTab)tab).source == (IPlaySource)library) {
+				Services.ui().main_window.tab_pane.switch_to_tab(tab);
+				return;
+			}
+		}
+		
+		Services.ui().main_window.tab_pane.add_tab(PlaySourceTabController.create_tab(library));
+	}
+	
+	private void on_tab_removed(TabPane tab_pane)
+	{
+		if (tab_pane.tabs.size == 0)
+			Services.ui().main_window.tab_pane.add_tab(new NowPlayingTab());
 	}
 }
+
 </div>
 </body></html>

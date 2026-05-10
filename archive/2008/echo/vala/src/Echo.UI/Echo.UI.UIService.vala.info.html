@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.UI/Echo.UI.UIService.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,89 +517,140 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.UI</button>
+<span>/</span>
+<span class="filename">Echo.UI.UIService.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-19 05:26:50 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.TreeModels.PlaySourceModel.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.BrowserPane.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
-
-namespace Scheduler
+public class Echo.UI.UIService
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
+	private ActionManager _action_manager;
+	public enum RepeatValue
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+		OFF, ALL, SINGLE
 	}
 	
-	Manager::~Manager()
+	public enum ShuffleValue
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		OFF, ALL, BY_ARTIST, BY_ALBUM
+	}
+	
+	public MainWindow main_window { get { return _main_window; } }
+	private MainWindow _main_window;
+	private StatusIcon _status_icon;
+	
+	public UIService()
+	{
+		_action_manager = new ActionManager();
+		init_actions();
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
+		_main_window = new MainWindow(_action_manager);
+		_status_icon = new StatusIcon(_action_manager);
+		if (_status_icon.visible)
+			debug("visible");
+		else
+			debug("not visible");
 	}
 	
-	void Manager::start()
+	public weak Gtk.Action? get_action(string name)
 	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
+		return _action_manager.get_action(name);
 	}
 	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
+	private void init_actions()
 	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+		// Main menus
+		_action_manager.add_action("file-menu", "_File");
+		_action_manager.add_action("edit-menu", "_Edit");
+		_action_manager.add_action("view-menu", "_View");
+		_action_manager.add_action("playback-menu", "_Playback");
+		_action_manager.add_action("help-menu", "_Help");
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
+		// File menu
+		_action_manager.add_action("new-playlist", "New _Playlist", "gtk-new");
+		_action_manager.add_action("new-smart-playlist", "New _Smart Playlist");
+		_action_manager.add_action("open-file", null, "gtk-open");
+		_action_manager.add_action("open-url", "Open _URL");
+		_action_manager.add_action("refresh-libraries", "_Refresh Libraries", "gtk-refresh");
+		_action_manager.add_action("close", null, "gtk-close");
+		_action_manager.add_action("quit", null, "gtk-quit");
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		// Edit menu
+		_action_manager.add_action("edit-preferences", null, "gtk-preferences");
+		
+		// View menu
+		_action_manager.add_toggle_action("view-browser", false, "Show _Browser");
+		_action_manager.add_action("view-fullscreen", null, "gtk-fullscreen", "F11");
+		
+		// Playback menu
+		_action_manager.add_action("play-pause", null, "gtk-media-play");
+		_action_manager.add_action("next-track", "_Next", "gtk-media-next");
+		_action_manager.add_action("previous-track", null, "gtk-media-previous");
+		_action_manager.add_toggle_action("stop-when-finished", false, "Stop When _Finished");
+
+		// Repeat menu
+		_action_manager.add_action("repeat-menu", "_Repeat");
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("repeat-off", "Repeat _Off", null, null, RepeatValue.OFF));
+		_action_manager.get_action("repeat-off").set("active", true);
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("repeat-all", "Repeat _All", null, null, RepeatValue.ALL));
+		_action_manager.get_action("repeat-all").set("group", _action_manager.get_action("repeat-off"));
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("repeat-single", "Repeat _Single", null, null, RepeatValue.SINGLE));
+		_action_manager.get_action("repeat-single").set("group", _action_manager.get_action("repeat-off"));
+		
+		_action_manager.add_toggle_action("shuffle", false, "_Shuffle");
+		
+		/*
+		// Shuffle menu
+		_action_manager.add_action("shuffle-menu", "_Shuffle");
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("shuffle-off", "Shuffle _Off", null, null, ShuffleValue.OFF));
+		_action_manager.get_action("shuffle-off").set("active", true);
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("shuffle-all", "Shuffle _All", null, null, ShuffleValue.ALL));
+		_action_manager.get_action("shuffle-all").set("group", _action_manager.get_action("shuffle-off"));
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("shuffle-by-artist", "Shuffle By _Artist", null, null, ShuffleValue.BY_ARTIST));
+		_action_manager.get_action("shuffle-by-artist").set("group", _action_manager.get_action("shuffle-off"));
+		
+		_action_manager.add_custom_action(
+			new Gtk.RadioAction("shuffle-by-album", "Shuffle By Al_bum", null, null, ShuffleValue.BY_ALBUM));
+		_action_manager.get_action("shuffle-by-album").set("group", _action_manager.get_action("shuffle-off"));
+		*/
+		// Help menu
+		_action_manager.add_action("about", null, "gtk-about");
 	}
 }
 </div>

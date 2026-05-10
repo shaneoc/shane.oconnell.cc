@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.UI/Echo.UI.MainWindow.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,175 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.UI</button>
+<span>/</span>
+<span class="filename">Echo.UI.MainWindow.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-19 05:20:11 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.ContextMenu.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Preferences.GeneralTab.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using Echo.Core;
+using Echo.UI.Tabs;
+using Echo.UI.Widgets;
 
-namespace Scheduler
+public class Echo.UI.MainWindow : Gtk.Window
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	private SourcesPane _sources_pane;
+	private BrowserPane _browser_pane;
+	private TabPane _tab_pane;
+	private Gtk.Statusbar _statusbar;
+	private uint _statusbar_context_id;
 	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
+	public SourcesPane sources_pane { get { return _sources_pane; } }
+	public BrowserPane browser_pane { get { return _browser_pane; } }
+	public TabPane tab_pane { get { return _tab_pane; } }
 	
-	Manager::~Manager()
+	public MainWindow(ActionManager action_manager)
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		action_manager.add_menubar("main-menu", """
+			&lt;menu action="file-menu"&gt;
+				&lt;menuitem action="new-playlist"/&gt;
+				&lt;menuitem action="new-smart-playlist"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="open-file"/&gt;
+				&lt;menuitem action="open-url"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="refresh-libraries"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="close"/&gt;
+				&lt;menuitem action="quit"/&gt;
+			&lt;/menu&gt;
+			&lt;menu action="edit-menu"&gt;
+				&lt;menuitem action="edit-preferences"/&gt;
+			&lt;/menu&gt;
+			&lt;menu action="view-menu"&gt;
+				&lt;menuitem action="view-browser"/&gt;
+				&lt;menuitem action="view-fullscreen"/&gt;
+			&lt;/menu&gt;
+			&lt;menu action="playback-menu"&gt;
+				&lt;menuitem action="play-pause"/&gt;
+				&lt;menuitem action="next-track"/&gt;
+				&lt;menuitem action="previous-track"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="stop-when-finished"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="shuffle"/&gt;
+				&lt;menu action="repeat-menu"&gt;
+					&lt;menuitem action="repeat-off"/&gt;
+					&lt;separator/&gt;
+					&lt;menuitem action="repeat-all"/&gt;
+					&lt;menuitem action="repeat-single"/&gt;
+				&lt;/menu&gt;
+				&lt;!--&lt;menu action="shuffle-menu"&gt;
+					&lt;menuitem action="shuffle-off"/&gt;
+					&lt;separator/&gt;
+					&lt;menuitem action="shuffle-all"/&gt;
+					&lt;menuitem action="shuffle-by-artist"/&gt;
+					&lt;menuitem action="shuffle-by-album"/&gt;
+				&lt;/menu&gt;--&gt;
+			&lt;/menu&gt;
+			&lt;menu action="help-menu"&gt;
+				&lt;menuitem action="about"/&gt;
+			&lt;/menu&gt;
+		""");
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
-
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
+		action_manager.add_menu("next-track-popup", """
+			&lt;menuitem action="shuffle"/&gt;
+			&lt;menu action="repeat-menu"&gt;
+				&lt;menuitem action="repeat-off"/&gt;
+				&lt;separator/&gt;
+				&lt;menuitem action="repeat-all"/&gt;
+				&lt;menuitem action="repeat-single"/&gt;
+			&lt;/menu&gt;
+		""");
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		this.set_title("Echo Media Player");
+		this.set_default_size(800, 600);
+		this.set_icon_name("applications-multimedia");
+		this.delete_event += this.hide_on_delete;
+		
+		// Create main window widgets
+		_sources_pane = new SourcesPane();
+		_browser_pane = new BrowserPane();
+		_tab_pane = new TabPane();
+		_statusbar = new Gtk.Statusbar();
+		_statusbar_context_id = _statusbar.get_context_id("status");
+		
+		// Create toolbar
+		var toolbar = new Gtk.Toolbar();
+		toolbar.set_style(Gtk.ToolbarStyle.ICONS);
+		toolbar.insert(action_manager.get_toolbutton_proxy("previous-track"), -1);
+		toolbar.insert(action_manager.get_toolbutton_proxy("play-pause"), -1);
+		toolbar.insert(action_manager.get_menutoolbutton_proxy("next-track", "next-track-popup"), -1);
+		toolbar.insert(new Gtk.SeparatorToolItem(), -1);
+		var track_info = new TrackInfoToolItem();
+		track_info.set_expand(true);
+		toolbar.insert(track_info, -1);
+		toolbar.insert(new Gtk.SeparatorToolItem(), -1);
+		toolbar.insert(new TrackSliderToolItem(), -1);
+		toolbar.insert(new Gtk.SeparatorToolItem(), -1);
+		toolbar.insert(new VolumeControlToolItem(), -1);
+		
+		// Create sizers
+		var browser_sizer = new Gtk.HPaned();
+		browser_sizer.set_position(200);
+		browser_sizer.add1(_browser_pane);
+		browser_sizer.add2(_tab_pane);
+		
+		var main_sizer = new Gtk.HPaned();
+		main_sizer.set_position(160);
+		main_sizer.add1(_sources_pane);
+		main_sizer.add2(browser_sizer);
+		
+		// Create main VBox and add it
+		var vbox = new Gtk.VBox(false, 0);
+		vbox.pack_start(action_manager.get_menubar("main-menu"), false, false, 0);
+		vbox.pack_start(toolbar, false, false, 0);
+		vbox.pack_start(main_sizer, true, true, 2);
+		vbox.pack_start(_statusbar, false, false, 0);
+		this.add(vbox);
+		
+		// Don't show the resize grip if we don't need to
+		this.window_state_event += (window, event) =&gt; {
+			_statusbar.set_has_resize_grip(
+				(event.new_window_state &amp; (Gdk.WindowState.MAXIMIZED | Gdk.WindowState.FULLSCREEN)) == 0);
+			return false;
+		};
+
+		// TODO set everything visible except the window itself, instead of show_all
+		this.show_all();
+		// TODO set browser visible based on user preferences
+		_browser_pane.visible = false;
+	}
+	
+	public void show_status_message(string message)
+	{
+		_statusbar.pop(_statusbar_context_id);
+		_statusbar.push(_statusbar_context_id, message);
 	}
 }
+
 </div>
 </body></html>

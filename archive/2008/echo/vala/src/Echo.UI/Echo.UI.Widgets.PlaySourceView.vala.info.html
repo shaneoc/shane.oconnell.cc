@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.PlaySourceView.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,424 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.UI</button>
+<span>/</span>
+<span class="filename">Echo.UI.Widgets.PlaySourceView.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-02 06:48:35 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.BrowserPane.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.SourcesPane.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using Echo.Core;
+using Echo.Interfaces;
+using Echo.Tools;
+using Echo.UI;
+using Echo.UI.TreeModels;
 
-namespace Scheduler
+public class Echo.UI.Widgets.PlaySourceView : Gtk.ScrolledWindow
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	private PlaySourceModel _treemodel;
+	private Gtk.TreeView _treeview;
+	private ContextMenu _context_menu;
+	public ContextMenu context_menu { get { return _context_menu; } }
 	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
+	private IPlaySource _source;
+	public IPlaySource source { get { return _source; } }
+	private IModPlaySource _mod_source = null;
+
+	public signal void delete_pressed();
 	
-	Manager::~Manager()
+	public PlaySourceView(IPlaySource source)
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		_source = source;
+		if (_source is IModPlaySource)
+			_mod_source = (IModPlaySource)_source;
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
-
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+		this.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+		this.set_shadow_type(Gtk.ShadowType.IN);
+		
+		_treemodel = new PlaySourceModel(_source);
+		_treeview = new Gtk.TreeView.with_model(_treemodel);
+		_treeview.set_rules_hint(true);
+		_treeview.set_fixed_height_mode(true);
+		
+		_treeview.row_activated += (treeview, path, column) =&gt; {
+			Services.playback().play(_source.get_track(_treemodel.get_index_from_path(path)));
+		};
+		
+		_treeview.get_selection().set_mode(Gtk.SelectionMode.MULTIPLE);
+		
+		if (_mod_source != null) {
+			_treeview.key_press_event += (treeview, event) =&gt; {
+				int GDK_Delete = 0xffff;
+				int GDK_KP_Delete = 0xff9f;
+				
+				if (event.keyval == GDK_Delete || event.keyval == GDK_KP_Delete)
+					delete_pressed();;
+			};
 		}
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		init_dnd();
+		init_columns();
+		init_context_menu();
+		
+		this.add(_treeview);
+	}
+	
+	private void init_columns()
+	{
+		/*
+		var playing_column = new Gtk.TreeViewColumn.with_attributes(
+			new Gtk.CellRendererToggle(), "active", PlaySourceModel.Column.PLAYING);
+		playing_column.set_fixed_width(30);
+		_treeview.append_column(playing_column);
+		*/
+		
+		_treeview.insert_column_with_attributes(0, " ",
+			new Gtk.CellRendererToggle(), "active", PlaySourceModel.Column.PLAYING);
+
+		_treeview.insert_column_with_data_func(1, "Track", new Gtk.CellRendererText(),
+			(column, cell, model, iter) =&gt; {
+				Value value;
+				model.get_value(iter, PlaySourceModel.Column.TRACK_NUMBER, out value);
+				cell.set("text", value.get_int().to_string());
+			}, null);
+		
+		_treeview.insert_column_with_attributes(2, "Artist",
+			new Gtk.CellRendererText(), "text", PlaySourceModel.Column.ARTIST);
+		
+		_treeview.insert_column_with_attributes(3, "Title",
+			new Gtk.CellRendererText(), "text", PlaySourceModel.Column.TITLE);
+		
+		_treeview.insert_column_with_attributes(4, "Album",
+			new Gtk.CellRendererText(), "text", PlaySourceModel.Column.ALBUM);
+
+		_treeview.insert_column_with_attributes(5, "Year",
+			new Gtk.CellRendererText(), "text", PlaySourceModel.Column.YEAR);
+
+		_treeview.insert_column_with_attributes(6, "Rating",
+			new Gtk.CellRendererText(), "text", PlaySourceModel.Column.RATING);
+		
+		foreach(Gtk.TreeViewColumn col in (List&lt;Gtk.TreeViewColumn&gt;)_treeview.get_columns()) {
+			col.set_reorderable(true);
+			col.set_resizable(true);
+			col.set_fixed_width(60);
+		}
+	}
+	
+	private void init_context_menu()
+	{
+		_context_menu = new ContextMenu(this);
+		_context_menu.add_item("play", null, "gtk-media-play");
+		_context_menu.add_item("play-multiple", "_Play in New Playlist", "gtk-media-play");
+		_context_menu.add_item("add-to-playlist", "Add to New Playlist");
+		_context_menu.add_item("delete", null, "gtk-delete");
+		_context_menu.add_separator();
+		_context_menu.add_item("rating-1", "Rating: 0.5");
+		_context_menu.add_item("rating-2", "Rating: 1");
+		_context_menu.add_item("rating-3", "Rating: 1.5");
+		_context_menu.add_item("rating-4", "Rating: 2");
+		_context_menu.add_item("rating-5", "Rating: 2.5");
+		_context_menu.add_item("rating-6", "Rating: 3");
+		_context_menu.add_item("rating-7", "Rating: 3.5");
+		_context_menu.add_item("rating-8", "Rating: 4");
+		_context_menu.add_item("rating-9", "Rating: 4.5");
+		_context_menu.add_item("rating-10", "Rating: 5");
+		_context_menu.add_separator();
+		_context_menu.add_item("open-album", "Open _Album");
+		_context_menu.add_item("open-album-in-new-tab", "Open Album in New Tab");
+		_context_menu.add_separator();
+		_context_menu.add_item("open-artist", "Open Ar_tist");
+		_context_menu.add_item("open-artist-in-new-tab", "Open Artist in New Tab");
+		_context_menu.add_separator();
+		_context_menu.add_item("select-all", null, "gtk-select-all");
+		_context_menu.add_item("select-album", "Select Album");
+		_context_menu.add_item("select-artist", "Select Artist");
+		
+		_treeview.button_press_event += (treeview, event) =&gt; {
+			if (event.button == 3) {
+				var tree_selection = _treeview.get_selection();
+	
+				Gtk.TreePath path;
+				bool on_track = _treeview.get_path_at_pos((int)event.x, (int)event.y, out path, null, null, null);
+	
+				bool multiple_tracks = false;
+				if (on_track) {
+					var mouse_over_index = _treemodel.get_index_from_path(path);
+					GLib.List&lt;Gtk.TreePath&gt; selected_rows = tree_selection.get_selected_rows(null);
+					weak GLib.List&lt;Gtk.TreePath&gt; row = selected_rows.first();
+
+					bool on_selected_track = false;
+					while (row != null) {
+						int this_index = _treemodel.get_index_from_path(row.data);
+						if (this_index == mouse_over_index)
+							on_selected_track = true;
+
+						row = row.next;
+					}
+		
+					if (!on_selected_track) {
+						tree_selection.unselect_all();
+						tree_selection.select_path(_treemodel.get_path_from_index(mouse_over_index));
+					}
+				}
+				else
+					tree_selection.unselect_all();
+			
+				_context_menu.popup(event.button, event.time);
+				return true;
+			}
+			return false;
+		};
+	}
+	
+	public int[] get_selected_indexes()
+	{
+		GLib.List&lt;Gtk.TreePath&gt; selected_rows =
+			_treeview.get_selection().get_selected_rows(null);
+		
+		var row_indexes = new int[selected_rows.length()];
+		
+		int last_index = -1;
+		for (int i = 0; i &lt; row_indexes.length; i++) {
+			int smallest_index = int.MAX;
+			
+			weak GLib.List&lt;Gtk.TreePath&gt; row = selected_rows.first();
+			while (row != null) {
+				int this_index = _treemodel.get_index_from_path(row.data);
+				
+				if (this_index &lt; smallest_index &amp;&amp; this_index &gt; last_index)
+					smallest_index = this_index;
+				
+				row = row.next;
+			}
+			/*foreach(Gtk.TreePath path in selected_rows) {
+				int this_index = _treemodel.get_index_from_path(path);
+				
+				if (this_index &lt; smallest_index &amp;&amp; this_index &gt; last_index)
+					smallest_index = this_index;
+			}*/
+			
+			row_indexes[i] = smallest_index;
+			last_index = smallest_index;
+		}
+
+		return row_indexes;
+	}
+	
+	public void select_all()
+	{
+		_treeview.get_selection().select_all();
+	}
+	
+	// ----------------------------------------[Drag n Drop]----------------------------------------
+	
+	private int _dnd_source_x;
+	private int _dnd_source_y;
+	private IPlaySource* _dnd_source;
+	private int _dnd_source_index;
+	private string[] _dnd_uris;
+	
+	private void init_dnd()
+	{
+		var targets = new Gtk.TargetEntry[1];
+		targets[0].target = "ECHO_PLAYLIST_ITEM";
+		targets[0].flags = Gtk.TargetFlags.SAME_APP;
+		targets[0].info = 1;
+		
+		Gtk.drag_source_set(_treeview, Gdk.ModifierType.MODIFIER_MASK, targets, Gdk.DragAction.MOVE);
+		Gtk.drag_source_set_icon_name(_treeview, "audio-x-generic");
+
+		_treeview.drag_data_get += on_drag_data_get;
+
+		_treeview.button_press_event += (treeview, event) =&gt; {
+			_dnd_source_x = (int)event.x;
+			_dnd_source_y = (int)event.y;
+			return false;
+		};
+
+		if (_mod_source != null) {
+			Gtk.drag_dest_set(_treeview, 0, targets, Gdk.DragAction.MOVE | Gdk.DragAction.COPY);
+			Gtk.drag_dest_add_uri_targets(_treeview);
+
+			_treeview.drag_data_received += on_drag_data_received;
+			_treeview.drag_motion += on_drag_motion;
+			_treeview.drag_drop += on_drag_drop;
+		
+			_treeview.drag_leave += (treeview, drag_context, time) =&gt; {
+				treeview.set_drag_dest_row(null, Gtk.TreeViewDropPosition.BEFORE);
+			};
+		}
+	}
+	
+	private void on_drag_data_get(Gtk.TreeView treeview, Gdk.DragContext drag_context,
+			Gtk.SelectionData selection_data, uint info, uint time)
+	{
+		assert(selection_data.target.name() == "ECHO_PLAYLIST_ITEM");
+		assert(info == 1);
+		
+		Gtk.TreePath path;
+		if (_treeview.get_path_at_pos(
+				_dnd_source_x, _dnd_source_y, out path, null, null, null)) {
+			int index = _treemodel.get_index_from_path(path);
+			var data = new uchar[(int)(sizeof(void*) + sizeof(int))];
+			Memory.copy(data, &amp;_source, sizeof(void*));
+			Memory.copy((void*)data + sizeof(void*), &amp;index, sizeof(int));
+			selection_data.set(selection_data.target, 0, data);
+		}
+		else {
+			var data = new uchar[(int)(sizeof(void*) + sizeof(int))];
+			Memory.set(data, 0, sizeof(void*) + sizeof(int));
+			selection_data.set(selection_data.target, 0, data);
+		}
+	}
+	
+	private void on_drag_data_received(Gtk.TreeView treeview, Gdk.DragContext drag_context,
+			int x, int y, Gtk.SelectionData selection_data, uint info, uint time)
+	{
+		if (info == 0) {
+			_dnd_uris = selection_data.get_uris();
+
+			_dnd_source = null;
+			_dnd_source_index = -1;
+		}
+		else {
+			assert(info == 1);
+			assert(selection_data.target.name() == "ECHO_PLAYLIST_ITEM");
+			
+			_dnd_uris = null;
+			Memory.copy(&amp;_dnd_source, (void*)selection_data.data, sizeof(void*));
+			Memory.copy(&amp;_dnd_source_index, (void*)selection_data.data + sizeof(void*), sizeof(int));
+		}
+		
+		Signal.stop_emission_by_name(treeview, "drag-data-received");
+	}
+	
+	private bool on_drag_motion(Gtk.TreeView treeview, Gdk.DragContext drag_context,
+			int x, int y, uint time)
+	{
+		var target_list = Gtk.drag_dest_get_target_list(treeview);
+		var target = Gtk.drag_dest_find_target(treeview, drag_context, target_list);
+		
+		if (target == (Gdk.Atom)0)
+			return false;
+		
+		Gtk.TreePath path;
+		Gtk.TreeViewDropPosition pos;
+		if (treeview.get_dest_row_at_pos(x, y, out path, out pos)) {
+			if (pos == Gtk.TreeViewDropPosition.INTO_OR_BEFORE)
+				pos = Gtk.TreeViewDropPosition.BEFORE;
+			if (pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER)
+				pos = Gtk.TreeViewDropPosition.AFTER;
+			
+			treeview.set_drag_dest_row(path, pos);
+		}
+		else {
+		
+			int binx, biny;
+			treeview.convert_widget_to_bin_window_coords(x, y, out binx, out biny);
+			if (biny &lt; 0) {
+				treeview.set_drag_dest_row(null, 0);
+				return false;
+			}
+			
+			if (_source.get_num_tracks() &gt; 0)
+				treeview.set_drag_dest_row(
+					_treemodel.get_path_from_index(_source.get_num_tracks() - 1),
+					Gtk.TreeViewDropPosition.AFTER);
+			else
+				treeview.set_drag_dest_row(
+					_treemodel.get_path_from_index(0, false),
+					Gtk.TreeViewDropPosition.BEFORE);
+		}
+		
+		Gtk.drag_get_data(treeview, drag_context, target, time);
+		
+		if (_dnd_source == null &amp;&amp; _dnd_uris == null) {
+			treeview.set_drag_dest_row(null, 0);
+			return false;
+		}
+		
+		if (_dnd_source == _source)
+			Gdk.drag_status(drag_context, Gdk.DragAction.MOVE, time);
+		else
+			Gdk.drag_status(drag_context, Gdk.DragAction.COPY, time);
+		
+		return true;
+	}
+	
+	private int _track_insertion_index;
+	
+	private bool on_drag_drop(Gtk.TreeView treeview, Gdk.DragContext drag_context,
+			int x, int y, uint time)
+	{
+		var target_list = Gtk.drag_dest_get_target_list(treeview);
+		var target = Gtk.drag_dest_find_target(treeview, drag_context, target_list);
+		
+		if (target == (Gdk.Atom)0) {
+			Gtk.drag_finish(drag_context, false, false, time);
+			return false;
+		}
+		
+		Gtk.drag_get_data(treeview, drag_context, target, time);
+		assert(_dnd_source != null || _dnd_uris != null);
+		assert(_dnd_source == null || _dnd_uris == null);
+		
+		Gtk.TreePath path;
+		Gtk.TreeViewDropPosition pos;
+		int index;
+		if (treeview.get_dest_row_at_pos(x, y, out path, out pos)) {
+			index = _treemodel.get_index_from_path(path);
+			
+			if (pos == Gtk.TreeViewDropPosition.INTO_OR_AFTER ||
+					pos == Gtk.TreeViewDropPosition.AFTER)
+				index++;
+		}
+		else {
+			index = _source.get_num_tracks();
+		}
+		
+		if (_dnd_source != null) {
+			if (_dnd_source == _source)
+				_mod_source.move_track(_dnd_source_index, index);
+			else {
+				_mod_source.insert_track(index, _dnd_source-&gt;get_track(_dnd_source_index));
+			}
+		}
+		
+		if (_dnd_uris != null) {
+			_track_insertion_index = index;
+			URIHandler.handle_uris(_dnd_uris, (track) =&gt; {
+				_mod_source.insert_track(_track_insertion_index++, track);
+			});
+		}
+		
+		Gtk.drag_finish(drag_context, true, false, time);
+		
+		return true;
 	}
 }
+
 </div>
 </body></html>

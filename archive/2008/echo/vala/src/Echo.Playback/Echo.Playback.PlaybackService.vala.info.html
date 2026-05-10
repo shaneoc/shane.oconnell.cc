@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.Playback/Echo.Playback.PlaybackService.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,89 +517,228 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.Playback</button>
+<span>/</span>
+<span class="filename">Echo.Playback.PlaybackService.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-02 06:05:13 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.Interfaces/Echo.Interfaces.ITrack.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.Playback/Echo.Playback.PlaybackState.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using Echo.Interfaces;
 
-namespace Scheduler
+public class Echo.Playback.PlaybackService : GLib.Object
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	// ----------- Signals -----------
 	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
+	public signal void state_changed();
+	public signal void track_changed(bool is_automatic);
 	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	// ----------- Private fields -----------
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
+	private Gst.Pipeline _gst_player;
+	private PlaybackState _current_state = PlaybackState.STOPPED;	
+	private ITrack _track = null;
+	private ShuffleType _shuffle_type = ShuffleType.NONE;
+	
+	// ----------- Public attributes -----------
+	
+	public PlaybackState current_state {
+		get { return _current_state; }
 	}
 	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
+	public weak ITrack? current_track {
+		get {
+			if (_track == null)
+				return null;
+			else
+				return _track;
+		}
+	}
+	/*
+	public IPlaySource? current_source {
+		get {
+			if (_track == null)
+				return null;
+			else {
+				var source = _track.get_source();
+				return source;
+			}
+		}
+	}
+	
+	public int current_index {
+		get {
+			if (_track == null)
+				return -1;
+			else
+				return _track.get_index();
+		}
+	}*/
+	
+	// ----------- Methods -----------
+	
+	public PlaybackService(ref weak string[] args)
 	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
+		Gst.init(ref args);
+		_gst_player = (Gst.Pipeline)Gst.ElementFactory.make("playbin", "player");
+		var bus = _gst_player.get_bus();
+		bus.add_watch(bus_callback);
+	}
+	
+	private bool bus_callback(Gst.Bus bus, Gst.Message message)
+	{
+		switch(message.type)
 		{
-			// TODO: Handle error
-			return;
+		case Gst.MessageType.ERROR:
+			GLib.Error gerror;
+			string debug_string;
+			message.parse_error(out gerror, out debug_string);
+			stderr.printf("GStreamer error: %s\nGStreamer debug information:\n%s\n\n", gerror.message, debug_string);
+			break;
+		case Gst.MessageType.EOS:
+			next(true);
+			break;
 		}
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		return true;
+	}
+	
+	private void change_track(ITrack? track, bool is_automatic)
+	{
+		if (_track != null)
+			_track.track_invalidated -= this.on_track_invalidated;
+		
+		if (track == null || !track.valid) {
+			_gst_player.set_state(Gst.State.READY);
+			
+			if (_current_state != PlaybackState.STOPPED) {
+				_current_state = PlaybackState.STOPPED;
+				state_changed();
+			}
+
+			if (_track != null &amp;&amp; _track.valid) {
+				_track = null;
+				track_changed(is_automatic);
+			}
+			_track = null;
+		}
+		else {
+			_track = track;
+			_track.track_invalidated += this.on_track_invalidated;
+			
+			_gst_player.set_state(Gst.State.READY);
+			((GLib.Object)_gst_player).set("uri", _track.uri);
+			_gst_player.set_state(Gst.State.PLAYING);
+
+			if (_current_state != PlaybackState.PLAYING) {
+				_current_state = PlaybackState.PLAYING;
+				state_changed();
+			}
+
+			track_changed(is_automatic);
+		}
+	}
+	
+	public void play(ITrack track)
+	{
+		change_track(track, false);
+	}
+	
+	public void stop()
+	{
+		change_track(null, false);
+	}
+
+	public void next(bool is_automatic = false)
+	{
+		ITrack next_track;
+
+		if (_shuffle_type != ShuffleType.NONE)
+			next_track = _track.source.get_track(
+				GLib.Random.int_range(0, _track.source.get_num_tracks()));
+		else
+			next_track = _track.get_next();
+
+		change_track(next_track, is_automatic);
+	}
+	
+	public void prev()
+	{
+		change_track(_track.get_prev(), false);
+	}
+	
+	public void pause()
+	{
+		if (_current_state == PlaybackState.PLAYING || _current_state == PlaybackState.BUFFERING) {
+			_gst_player.set_state(Gst.State.PAUSED);
+		
+			if (_current_state != PlaybackState.PAUSED) {
+				_current_state = PlaybackState.PAUSED;
+				state_changed();
+			}
+		}
+	}
+	
+	public void unpause()
+	{
+		if (_current_state == PlaybackState.PAUSED &amp;&amp; _track != null &amp;&amp; _track.valid) {
+			_gst_player.set_state(Gst.State.PLAYING);
+			_current_state = PlaybackState.PLAYING;
+			state_changed();
+		}
+	}
+	
+	private void on_track_invalidated(ITrack track)
+	{
+		if (track == _track)
+			stop();
+	}
+	
+	public void set_shuffle(ShuffleType shuffle_type)
+	{
+		_shuffle_type = shuffle_type;
+	}
+	
+	public int64 get_track_length()
+	{
+		Gst.Format format = Gst.Format.TIME;
+		int64 length;
+		if (_gst_player.query_duration(ref format, out length) &amp;&amp; format == Gst.Format.TIME)
+			return (length / 1000000); // return in ms
+		else
+			return -1;
+	}
+	
+	public int64 get_track_position()
+	{
+		Gst.Format format = Gst.Format.TIME;
+		int64 position;
+		if (_gst_player.query_position(ref format, out position) &amp;&amp; format == Gst.Format.TIME)
+			return (position / 1000000); // return in ms
+		else
+			return -1;
 	}
 }
 </div>

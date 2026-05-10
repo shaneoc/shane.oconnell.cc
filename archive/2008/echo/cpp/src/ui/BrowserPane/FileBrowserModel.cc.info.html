@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/ui/BrowserPane/FileBrowserModel.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,254 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">ui</button>
+<span>/</span>
+<button class="popup-button">BrowserPane</button>
+<span>/</span>
+<span class="filename">FileBrowserModel.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-06 11:18:27 UTC</div>
+<a class="prev-link active-link" href="../../../../../../2008/echo/cpp/src/ui/BrowserPane/ComboBoxModel.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../../2008/echo/cpp/src/ui/BrowserPane/FileBrowserModel.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include &lt;cassert&gt;
+#include &lt;iostream&gt;
+#include &lt;algorithm&gt;
+#include "FileBrowserModel.h"
 
-namespace Scheduler
+FileBrowserModel::FileBrowserModel(const std::string&amp; uri)
+	: Glib::ObjectBase(typeid(FileBrowserModel)), Glib::Object(), m_stamp(1)
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+	m_root_node = new Node(NULL, 0, "", uri, true, Glib::RefPtr&lt;Gio::Icon&gt;());
+}
+
+GType FileBrowserModel::get_column_type_vfunc(int index) const
+{
+	assert(index &gt;= 0);
+	assert(index &lt; (int)get_columns().size());
+
+	return get_columns().types()[index];
+}
+
+void FileBrowserModel::get_value_vfunc(const Gtk::TreeIter&amp; iter, int column, Glib::ValueBase&amp; value) const
+{
+	assert(iter.get_stamp() == m_stamp);
+	assert(iter.gobj()-&gt;user_data != NULL);
+	assert(column &gt;= 0);
+	assert(column &lt; (int)get_columns().size());
+
+	Node* node = (Node*)(iter.gobj()-&gt;user_data);
+
+	Glib::Value&lt;Glib::ustring&gt; value_ustring;
+	value_ustring.init(Glib::Value&lt;Glib::ustring&gt;::value_type());
+
+	Glib::Value&lt;Glib::RefPtr&lt;Gio::Icon&gt; &gt; value_icon;
+	value_icon.init(Glib::Value&lt;Glib::RefPtr&lt;Gio::Icon&gt; &gt;::value_type());
+
+	value.init(get_column_type_vfunc(column));
+
+	switch (column) {
+	case 0: // filename
+		value_ustring.set(node-&gt;get_display_name());
+		value = value_ustring;
+		break;
+	case 1: // icon
+		value_icon.set(node-&gt;get_icon());
+		value = value_icon;
+		break;
 	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
+}
+
+bool FileBrowserModel::get_iter_vfunc(const Gtk::TreePath&amp; path, Gtk::TreeIter&amp; iter) const
+{
+	assert(path.size() &gt; 0);
+
+	Node* node = m_root_node;
+	for (int i = 0; i &lt; (int)path.size(); i++) {
+		node = node-&gt;get_child(path[i]);
+		if (!node)
+			return false;
 	}
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	iter.set_stamp(m_stamp);
+	iter.gobj()-&gt;user_data = (void*)node;
+	return true;
+}
 
+Gtk::TreePath FileBrowserModel::get_path_vfunc(const Gtk::TreeIter&amp; iter) const
+{
+	assert(iter.get_stamp() == m_stamp);
+	assert(iter.gobj()-&gt;user_data != NULL);
+
+	Gtk::TreePath path;
+	Node* node = (Node*)(iter.gobj()-&gt;user_data);
+	while (node) {
+		path.push_front(node-&gt;get_index());
+		node = node-&gt;get_parent();
 	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+
+	return path;
+}
+
+bool FileBrowserModel::iter_next_vfunc(const Gtk::TreeIter&amp; iter, Gtk::TreeIter&amp; iter_next) const
+{
+	assert(iter.get_stamp() == m_stamp);
+	assert(iter.gobj()-&gt;user_data != NULL);
+
+	Node* node = (Node*)(iter.gobj()-&gt;user_data);
+	node = node-&gt;get_parent()-&gt;get_child(node-&gt;get_index()+1);
+
+	if (node) {
+		iter_next.set_stamp(m_stamp);
+		iter_next.gobj()-&gt;user_data = (void*)node;
+		return true;
+	} else {
+		return false;
 	}
+}
+
+int FileBrowserModel::iter_n_children_vfunc(const Gtk::TreeIter&amp; iter) const
+{
+	assert(iter.get_stamp() == m_stamp);
+	assert(iter.gobj()-&gt;user_data != NULL);
+
+	Node* node = (Node*)(iter.gobj()-&gt;user_data);
+	return node-&gt;get_num_children();
+}
+
+bool FileBrowserModel::iter_nth_child_vfunc(const Gtk::TreeIter&amp; parent, int n, Gtk::TreeIter&amp; iter) const
+{
+	assert(parent.get_stamp() == m_stamp);
+	assert(parent.gobj()-&gt;user_data != NULL);
+	assert(n &gt;= 0);
+
+	Node* node = (Node*)(parent.gobj()-&gt;user_data);
+	node = node-&gt;get_child(n);
+
+	if (node) {
+		iter.set_stamp(m_stamp);
+		iter.gobj()-&gt;user_data = (void*)node;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool FileBrowserModel::iter_nth_root_child_vfunc (int n, Gtk::TreeIter&amp; iter) const
+{
+	assert(n &gt;= 0);
+
+	if (m_root_node-&gt;get_child(n)) {
+		iter.set_stamp(m_stamp);
+		iter.gobj()-&gt;user_data = (void*)(m_root_node-&gt;get_child(n));
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool FileBrowserModel::iter_parent_vfunc(const Gtk::TreeIter&amp; child, Gtk::TreeIter&amp; iter) const
+{
+	assert(child.get_stamp() == m_stamp);
+	assert(child.gobj()-&gt;user_data != NULL);
+
+	Node* node = (Node*)(child.gobj()-&gt;user_data);
+	node = node-&gt;get_parent();
+
+	if (node &amp;&amp; node-&gt;get_parent()) {
+		iter.set_stamp(m_stamp);
+		iter.gobj()-&gt;user_data = (void*)node;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+int FileBrowserModel::Node::get_num_children()
+{
+	if (!m_children_known)
+		add_children();
+
+	return m_children.size();
+}
+
+FileBrowserModel::Node* FileBrowserModel::Node::get_child(int index)
+{
+	assert(index &gt;= 0);
+
+	if (!m_children_known)
+		add_children();
+
+	if (index &gt;= (int)m_children.size()) {
+		return NULL;
+	} else {
+		return &amp;m_children[index];
+	}
+}
+
+void FileBrowserModel::Node::add_children()
+{
+	if (m_children_known)
+		return;
+
+	Glib::RefPtr&lt;Gio::File&gt; parent = Gio::File::create_for_uri(m_uri);
+	Glib::RefPtr&lt;Gio::FileEnumerator&gt; children;
+	try {
+		children = parent-&gt;enumerate_children("standard::type,standard::name,standard::display-name,standard::fast-content-type,standard::icon");
+	} catch (Glib::Error&amp; e) {
+		// TODO Handle error (file may have been deleted)
+		// Maybe somehow send a signal to make the TreeModel update?
+		m_children_known = true;
+		return;
+	}
+
+	Glib::RefPtr&lt;Gio::FileInfo&gt; child;
+	while(child = children-&gt;next_file()) {
+		if (child-&gt;get_name().at(0) == '.')
+			continue;
+		if (child-&gt;get_file_type() != Gio::FILE_TYPE_DIRECTORY &amp;&amp; child-&gt;get_attribute_string("standard::fast-content-type") != "audio/mpeg")
+			continue; // TODO get a list of supported media content types from somewhere (gstreamer?)
+		std::string uri = parent-&gt;get_child(child-&gt;get_name())-&gt;get_uri();
+		m_children.push_back(Node(this, 0, child-&gt;get_display_name(), uri,
+				child-&gt;get_file_type() == Gio::FILE_TYPE_DIRECTORY,
+				child-&gt;get_icon()));
+	}
+
+	sort(m_children.begin(), m_children.end());
+	for (int i = 0; i &lt; (int)m_children.size(); i++) {
+		m_children[i].m_index = i;
+	}
+
+	m_children_known = true;
+}
+
+bool FileBrowserModel::Node::operator&lt;(const Node&amp; other_node) const
+{
+	if (is_directory() &amp;&amp; !other_node.is_directory())
+		return true;
+	if (!is_directory() &amp;&amp; other_node.is_directory())
+		return false;
+
+	return (m_display_name.casefold() &lt; other_node.m_display_name.casefold());
 }
 </div>
 </body></html>

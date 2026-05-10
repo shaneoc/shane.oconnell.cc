@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/notes/notes.txt - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,60 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">notes</button>
+<span>/</span>
+<span class="filename">notes.txt</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-09-11 18:34:03 UTC</div>
+<a class="prev-link active-link" href="../../../../2008/echo/vala/features.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../../../2008/echo/vala/notes.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">* Tag tracks with arbatrary strings
+* Assign tracks a score from half a star to 5 stars with 0.5 star increments
 
-#include "scheduler.h"
-#include "log.h"
+View:
+* Hierarchal view of artist/album/track, with the levels being customizable (could put genre in, etc. or could just use the filesystem layout)
+* Ability to view library in a left pane and a playlist in the right pane and drag over tracks
+* Ability to have playlists that combine tracks from the library, random files on the computer, and files on a media player, with an icon next to the track showing what it is from
 
-namespace Scheduler
-{
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+Idea 1:
+Left pane like exaile with hierarchial library view
+Right pane defaults to "Now Playing" or something like that which shows all the albums with album covers in a cool way when
+an artist is selected in the library view
+Right pane has tabs and there could be playlists in various tabs
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+Idea 2:
+Right pane could show playlists, and could have various views, one of them shows just the list of tracks, another shows an album cover view
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
-}
+
+Idea 3:
+Looks like banshee with 3 vertical panes
+
+
+Idea 4:
+Looks kind of like songbird with 2 vertical panes, left one has various sources and things and right one has tabs. Tabs can have either lists of songs associated with a source on the left that was double clicked, or a website. Toolbar buttons or View menu options open a third pane in the middle which can show either a hierarcal view of the library, or the filesystem, or maybe a dual artist/album pane view like banshee does. Playlists can contain tracks from any source, or from the filesystem and not in the library, or from a media device, etc and is represented with an icon in the playlist.
+
+-----------------
+Naming ideas:
+* Regale
+* Euphony
+
+
+------------------------------------------------
+Regale Media Player
+
+
+Regale
+
+PlayerWindow : Gtk::Window
+
 </div>
 </body></html>

@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.SourcesPane.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,140 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.UI</button>
+<span>/</span>
+<span class="filename">Echo.UI.Widgets.SourcesPane.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-01 17:54:33 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.PlaySourceView.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.Widgets.TabPane.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using Echo.Core;
+using Echo.Database;
 
-namespace Scheduler
+public class Echo.UI.Widgets.SourcesPane : Gtk.ScrolledWindow
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	private Gtk.TreeView treeview;
+	private Gtk.ListStore liststore;
 	
-	Manager::Manager()
+	private enum Column
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+		SOURCE_TYPE = 0,
+		LABEL = 1,
+		ICON = 2,
+		LIBRARY_INDEX = 3
 	}
 	
-	Manager::~Manager()
+	private enum SourceType
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		NOW_PLAYING,
+		LIBRARY,
+		PLAYLIST,
+		SEPERATOR
+	}
+	
+	construct
+	{
+		this.liststore = new Gtk.ListStore(4,
+			typeof(int), typeof(string), typeof(Gdk.Pixbuf), typeof(int));
+
+		Gtk.TreeIter iter;
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+		this.liststore.insert_with_values(out iter, int.MAX,
+			Column.SOURCE_TYPE, SourceType.NOW_PLAYING,
+			Column.LABEL, "Now Playing",
+			Column.ICON, Gtk.IconTheme.get_default().load_icon("applications-multimedia", 24, 0));
+		
+		this.liststore.insert_with_values(out iter, int.MAX,
+			Column.SOURCE_TYPE, SourceType.SEPERATOR);
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+		Gee.List&lt;Library&gt; libraries = Services.database().get_libraries();
+		for (int i = 0; i &lt; libraries.size; i++)
+			this.liststore.insert_with_values(out iter, int.MAX,
+				Column.SOURCE_TYPE, SourceType.LIBRARY,
+				Column.LIBRARY_INDEX, i,
+				Column.LABEL, libraries.get(i).name,
+				Column.ICON, Gtk.IconTheme.get_default().load_icon(libraries.get(i).icon, 24, 0));
+		
+		this.liststore.insert_with_values(out iter, int.MAX,
+			Column.SOURCE_TYPE, SourceType.SEPERATOR);
 
+		this.liststore.insert_with_values(out iter, int.MAX,
+			Column.SOURCE_TYPE, SourceType.PLAYLIST,
+			Column.LABEL, "Playlists",
+			Column.ICON, Gtk.IconTheme.get_default().load_icon("text-x-generic", 24, 0));
+
+		
+		var column = new Gtk.TreeViewColumn();
+		
+		var icon_renderer = new Gtk.CellRendererPixbuf();
+		column.pack_start(icon_renderer, false);
+		column.add_attribute(icon_renderer, "pixbuf", Column.ICON);
+		
+		var text_renderer = new Gtk.CellRendererText();
+		column.pack_start(text_renderer, true);
+		column.add_attribute(text_renderer, "text", Column.LABEL);
+		
+		this.treeview = new Gtk.TreeView.with_model(this.liststore);
+		this.treeview.append_column(column);
+		this.treeview.set_headers_visible(false);
+		this.treeview.row_activated += this.row_activated;
+		this.treeview.set_row_separator_func((model, iter) =&gt; {
+			Value row_type;
+			model.get_value(iter, Column.SOURCE_TYPE, out row_type);
+			return (row_type.get_int() == SourceType.SEPERATOR);
+		}, null);
+		
+		this.add(this.treeview);
+		this.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC);
+		this.set_shadow_type(Gtk.ShadowType.IN);
+		
 	}
 	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
+	public signal void now_playing_opened();
+	public signal void library_opened(Library library);
+	
+	private void row_activated(Gtk.TreeView treeview, Gtk.TreePath path, Gtk.TreeViewColumn column)
 	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+		Gtk.TreeIter iter;
+		if (this.liststore.get_iter(out iter, path)) {
+			Value row_type;
+			this.liststore.get_value(iter, Column.SOURCE_TYPE, out row_type);
+			switch (row_type.get_int()) {
+			case SourceType.NOW_PLAYING:
+				this.now_playing_opened();
+				break;
+			case SourceType.LIBRARY:
+				Value library_index;
+				this.liststore.get_value(iter, Column.LIBRARY_INDEX, out library_index);
+				this.library_opened(Services.database().get_libraries().get(library_index.get_int()));
+				break;
+			}
 		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
 	}
+	
 }
+
 </div>
 </body></html>

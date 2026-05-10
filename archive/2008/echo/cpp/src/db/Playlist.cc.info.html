@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/db/Playlist.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,162 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">db</button>
+<span>/</span>
+<span class="filename">Playlist.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-21 13:56:51 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/cpp/src/db/Library.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/cpp/src/db/Playlist.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "Playlist.h"
+#include "Database.h"
 
-namespace Scheduler
+#include &lt;string&gt;
+#include &lt;cassert&gt;
+#include &lt;memory&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+Playlist::Playlist() : db(*Database::m_instance)
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	assert(Database::m_instance);
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	db.run("INSERT INTO MemoryPlaylists (PlaylistID, PlaylistName) VALUES(NULL, 'Untitled')");
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
+	m_playlist_id = db.last_rowid();
+
+	Glib::ustring sql;
+
+	// 'remove' sql commands
+	db.prepare(m_remove1_stmt, Glib::ustring::compose(
+			"DELETE FROM MemoryPlaylistTracks "
+			"WHERE PlaylistID = %1 AND PlaylistIndex = ?", m_playlist_id));
+
+	db.prepare(m_remove2_stmt, Glib::ustring::compose(
+			"UPDATE MemoryPlaylistTracks SET PlaylistIndex = (PlaylistIndex - 1) "
+			"WHERE PlaylistID = %1 AND PlaylistIndex &gt;= ?", m_playlist_id));
+
+
+	// 'insert' sql commands
+	db.prepare(m_insert1_stmt, Glib::ustring::compose(
+			"UPDATE MemoryPlaylistTracks SET PlaylistIndex = (PlaylistIndex + 1) "
+			"WHERE PlaylistID = %1 AND PlaylistIndex &gt;= ?", m_playlist_id));
+
+	db.prepare(m_insert2_stmt, Glib::ustring::compose(
+			"INSERT INTO MemoryPlaylistTracks (PlaylistID, PlaylistIndex, ArtistName, AlbumName, "
+			"AlbumReleaseDate, TrackName, TrackNumber, TrackURI) "
+			"VALUES(%1, ?, ?, ?, ?, ?, ?, ?)", m_playlist_id));
+
+
+	/* 			"CREATE TEMPORARY TABLE MemoryPlaylistTracks (PlaylistID INTEGER, "
+			"PlaylistOrder INTEGER, ArtistName TEXT, AlbumName TEXT, AlbumReleaseDate INTEGER, "
+			"TrackName TEXT, TrackNumber INTEGER, TrackURI TEXT)" */
+
+	// 'get_track' sql command
+	db.prepare(m_get_track_stmt, Glib::ustring::compose(
+				"SELECT ArtistName, AlbumName, AlbumReleaseDate, TrackName, "
+				"TrackNumber, TrackURI FROM MemoryPlaylistTracks "
+				"WHERE PlaylistID = %1 ORDER BY PlaylistIndex LIMIT %2 OFFSET ?",
+				m_playlist_id, m_track_cache.size()));
+
+	m_size = 0;
 }
+
+void Playlist::insert_track(int index, TrackRef track)
+{
+	assert(index &gt;= 0);
+	assert(index &lt;= get_num_tracks()); // '&lt;=' because could be inserting at the end
+
+	db.run("BEGIN TRANSACTION");
+
+	m_insert1_stmt.bind(1, index);
+	m_insert1_stmt.step();
+	m_insert1_stmt.reset();
+
+	/* "INSERT INTO MemoryPlaylistTracks (PlaylistID, PlaylistIndex, ArtistName, AlbumName, "
+			"AlbumReleaseDate, TrackName, TrackNumber, TrackURI) "
+			"VALUES(%1, ?, ?, ?, ?, ?, ?, ?)" */
+
+	m_insert2_stmt.bind(1, index);
+	m_insert2_stmt.bind(2, track-&gt;get_artist());
+	m_insert2_stmt.bind(3, track-&gt;get_album());
+	m_insert2_stmt.bind(4, 0);
+	m_insert2_stmt.bind(5, track-&gt;get_title());
+	m_insert2_stmt.bind(6, track-&gt;get_track_number());
+	m_insert2_stmt.bind(7, track-&gt;get_uri());
+	m_insert2_stmt.step();
+	m_insert2_stmt.reset();
+
+	db.run("END TRANSACTION");
+
+	m_size++;
+	invalidate_cache();
+
+	signal_track_inserted().emit(index);
+}
+
+void Playlist::remove_track(int index)
+{
+	assert(index &gt;= 0);
+	assert(index &lt; get_num_tracks());
+
+	db.run("BEGIN TRANSACTION");
+
+	m_remove1_stmt.bind(1, index);
+	m_remove1_stmt.step();
+	m_remove1_stmt.reset();
+
+	m_remove2_stmt.bind(1, index);
+	m_remove2_stmt.step();
+	m_remove2_stmt.reset();
+
+	db.run("END TRANSACTION");
+
+	invalidate_cache();
+
+	signal_track_removed().emit(index);
+}
+
+void Playlist::move_track(int old_index, int new_index)
+{
+	assert(old_index &gt;= 0);
+	assert(old_index &lt; get_num_tracks());
+	assert(new_index &gt;= 0);
+	assert(new_index &lt; get_num_tracks());
+
+	TrackRef track_info = get_track(old_index);
+	remove_track(old_index);
+
+	if (old_index &lt; new_index)
+		new_index--; // Adjust for the removed track
+
+	insert_track(new_index, track_info);
+}
+
+int Playlist::get_num_tracks() const
+{
+	return m_size;
+}
+
 </div>
 </body></html>

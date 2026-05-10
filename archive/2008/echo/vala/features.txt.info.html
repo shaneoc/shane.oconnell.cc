@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/features.txt - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -518,89 +518,66 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<span class="filename">features.txt</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-11-28 08:35:21 UTC</div>
+<a class="prev-link active-link" href="../../../2008/echo/vala/bzrignore.info.html">previous</a>
+<a class="next-link active-link" href="../../../2008/echo/vala/notes/notes.txt.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">Stuff to cleanup before the first release:
 
-#include "scheduler.h"
-#include "log.h"
+- Make everything match the preferred coding style
+  - Function/class/attribute main brackets on new line
+  - switch statement brackets on new line
+  - if/for/while/foreach/etc. brackets on same line
+  - Private variables have _ in front
+  - space between if/for/while/foreach/etc and the (
+- Check every API call and make sure that we handle any errors it can return
+- Check every spot that a string is used and make sure any unicode stuff is taken care of
+- Look into automated code scanning/bug finding tools?
+- Figure out how translations are done
+- Make sure that any long running task doesn't block the UI (i.e. drag/dropping a lot of tracks)
+- Write unit tests of some kind?
 
-namespace Scheduler
-{
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+Features to have for the first release:
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
-}
+- Multiple user-defined libraries, configrable in the way they show up in the browser and what icon
+   they use
+- Multiple playlists in each library
+- Cover art from mp3 tags, and from cover.jpg/folder.jpg files
+- Tabs:
+  - Now Playing
+  - Library view
+  - Album view?
+  - Playlist from library
+  - Playlist from file
+- Scrobble tracks to last.fm
+
+Features for future releases:
+
+- Ability to change the location of the library without losing all the metadata (ratings, tags, etc)
+- Ability to watch videos
+- Ability to watch visualizations
+- Support for iPods
+- Ability to view the Now Playing/Coverart/Video/Visualization thing fullscreen as well as in
+   the now playing tab, in an external window, and in the TrackInfoPane
+- Cover art downloaded automatically
+- Ability to edit mp3 id3 info
+- Ability to have different views in Library View tab such as ones that show cover art by album
+   or by artist, and allow you to double click a cover art to see a track list or an album list,
+   with a bar on the top showing the hierachy you've travelled (like naulatus does)
+- Ability to tag songs with arbitrary strings, potentially suggesting tags by looking them up in last.fm
+- Smart Playlists based on a search query allowing usage of mp3 id3 info, tags, rating, times
+   listened, etc.
+- "Suggested" song ratings based on times the song has been listened to and/or using last.fm data, etc?
+ 
 </div>
 </body></html>

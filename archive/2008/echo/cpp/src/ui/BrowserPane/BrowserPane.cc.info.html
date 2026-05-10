@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/ui/BrowserPane/BrowserPane.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,96 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">ui</button>
+<span>/</span>
+<button class="popup-button">BrowserPane</button>
+<span>/</span>
+<span class="filename">BrowserPane.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-08 20:17:27 UTC</div>
+<a class="prev-link active-link" href="../../../../../../2008/echo/cpp/src/Track.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../../2008/echo/cpp/src/ui/BrowserPane/BrowserPane.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "BrowserPane.h"
+#include "FileBrowserModel.h"
 
-namespace Scheduler
+BrowserPane::BrowserPane()
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	append_page(m_vbox);
+	set_show_tabs(false);
+	//add(m_vbox);
+	//set_shadow_type(Gtk::SHADOW_OUT);
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
+	m_combobox_model = ComboBoxModel::create();
+	m_combobox.set_model(m_combobox_model);
+	m_combobox.pack_start(m_combobox_model-&gt;get_columns().name);
+	//m_combobox.add_attribute(m_combobox_render_text, "text", m_combobox_model-&gt;get_columns().name);
+	m_vbox.pack_start(m_combobox, false, true);
+
+	//Gtk::HSeparator* pSep = Gtk::manage(new Gtk::HSeparator());
+
+	//m_vbox.pack_start(*pSep, false, true);
+
+	Gtk::ToolButton* pBackButton = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::GO_BACK));
+	Gtk::ToolButton* pForwardButton = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::GO_FORWARD));
+	Gtk::ToolButton* pUpButton = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::GO_UP));
+	Gtk::ToolButton* pRefreshButton = Gtk::manage(new Gtk::ToolButton(Gtk::Stock::REFRESH));
+
+	m_toolbar.append(*pBackButton);
+	m_toolbar.append(*pForwardButton);
+	m_toolbar.append(*pUpButton);
+	m_toolbar.append(*Gtk::manage(new Gtk::SeparatorToolItem()));
+	m_toolbar.append(*pRefreshButton);
+	m_toolbar.set_toolbar_style(Gtk::TOOLBAR_ICONS);
+	m_toolbar.set_icon_size(Gtk::ICON_SIZE_MENU);
+	m_vbox.pack_start(m_toolbar, false, true);
+
+	m_file_browser_model = FileBrowserModel::create("file:/");
+
+	//Gtk::ComboBox* comb = Gtk::manage(new Gtk::ComboBox(m_file_browser_model));
+	//pack_start(*comb);
+
+	m_treeview.set_model(m_file_browser_model);
+	m_treeview.set_headers_visible(false);
+
+	Gtk::CellRendererPixbuf* icon_renderer =
+		Gtk::manage(new Gtk::CellRendererPixbuf());
+	Gtk::TreeViewColumn* column =
+		Gtk::manage(new Gtk::TreeViewColumn());
+	column-&gt;pack_start(*icon_renderer, false);
+	column-&gt;add_attribute(*icon_renderer,
+			"gicon", m_file_browser_model-&gt;get_columns().icon);
+	column-&gt;pack_start(
+			m_file_browser_model-&gt;get_columns().filename, true);
+	column-&gt;set_sizing(Gtk::TREE_VIEW_COLUMN_AUTOSIZE);
+	m_treeview.append_column(*column);
+
+	m_scrolled_window.add(m_treeview);
+	m_scrolled_window.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+	m_scrolled_window.set_shadow_type(Gtk::SHADOW_IN);
+	m_vbox.pack_start(m_scrolled_window);
+	m_vbox.set_spacing(3);
 }
+
 </div>
 </body></html>

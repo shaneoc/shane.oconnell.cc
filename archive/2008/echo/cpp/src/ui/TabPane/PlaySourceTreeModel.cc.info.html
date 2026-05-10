@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/ui/TabPane/PlaySourceTreeModel.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,331 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">ui</button>
+<span>/</span>
+<button class="popup-button">TabPane</button>
+<span>/</span>
+<span class="filename">PlaySourceTreeModel.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-21 13:54:12 UTC</div>
+<a class="prev-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/PlaylistTab.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/PlaySourceTreeModel.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "PlaySourceTreeModel.h"
+#include "../../PlaybackManager.h"
 
-namespace Scheduler
+#include &lt;cassert&gt;
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+
+using namespace std;
+
+PlaySourceTreeModel::PlaySourceTreeModel(PlaySourceRef source)
+	:
+	Glib::ObjectBase( typeid(PlaySourceTreeModel) ), //register a custom GType.
+	Glib::Object(), //The custom GType is actually registered here.
+	m_source(source), m_stamp(1)
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	m_source-&gt;signal_track_removed().connect(
+			sigc::mem_fun(*this, &amp;PlaySourceTreeModel::on_source_row_deleted));
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	m_source-&gt;signal_track_inserted().connect(
+			sigc::mem_fun(*this, &amp;PlaySourceTreeModel::on_source_row_inserted));
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
+	m_source-&gt;signal_track_changed().connect(
+			sigc::mem_fun(*this, &amp;PlaySourceTreeModel::on_source_row_changed));
+
+	PlaybackManager::signal_track_started().connect(
+			sigc::mem_fun(*this, &amp;PlaySourceTreeModel::on_track_started));
+
+	PlaybackManager::signal_track_stopped().connect(
+			sigc::mem_fun(*this, &amp;PlaySourceTreeModel::on_track_stopped));
+}
+
+Glib::RefPtr&lt;PlaySourceTreeModel&gt; PlaySourceTreeModel::create(PlaySourceRef source) {
+	return Glib::RefPtr&lt;PlaySourceTreeModel&gt;(new PlaySourceTreeModel(source));
+}
+
+void PlaySourceTreeModel::on_source_row_deleted(int index)
+{
+	m_stamp++;
+	Gtk::TreePath path;
+	path.append_index(index);
+	row_deleted(path);
+}
+
+void PlaySourceTreeModel::on_source_row_inserted(int index)
+{
+	m_stamp++;
+	Gtk::TreePath path;
+	path.append_index(index);
+	Gtk::TreeIter iter;
+	iter.set_stamp(m_stamp);
+	iter.gobj()-&gt;user_data = (void*)index;
+	row_inserted(path, iter);
+}
+
+void PlaySourceTreeModel::on_source_row_changed(int index)
+{
+	Gtk::TreePath path;
+	path.append_index(index);
+	Gtk::TreeIter iter;
+	iter.set_stamp(m_stamp);
+	iter.gobj()-&gt;user_data = (void*)index;
+	row_changed(path, iter);
+}
+
+void PlaySourceTreeModel::on_track_started(
+		PlaySourceRef playlist, int index, bool was_paused)
+{
+	// Update to show the "currently playing" icon next to the track
+	if (playlist == m_source)
+		on_source_row_changed(index);
+}
+
+void PlaySourceTreeModel::on_track_stopped(
+		PlaySourceRef playlist, int index, bool is_paused)
+{
+	if (playlist == m_source)
+		on_source_row_changed(index);
+}
+
+GType PlaySourceTreeModel::get_column_type_vfunc(int index) const
+{
+	assert(index &gt;= 0);
+	assert(index &lt; (int)m_column_records.size());
+
+	switch (index)
 	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+	case 0:
+		return m_column_records.title.type();
+	case 1:
+		return m_column_records.artist.type();
+	case 2:
+		return m_column_records.album.type();
+	case 3:
+		return m_column_records.track_number.type();
+	default:
+		return m_column_records.is_playing.type();
 	}
 }
+
+bool PlaySourceTreeModel::get_iter_vfunc(const Gtk::TreePath&amp; path, Gtk::TreeIter&amp; iter) const
+{
+	assert(path[0] &gt;= 0);
+
+	if (path.size() != 1 || path[0] &gt;= m_source-&gt;get_num_tracks()) {
+		return false;
+	}
+
+	iter = Gtk::TreeIter();
+	iter.set_stamp(m_stamp);
+	iter.gobj()-&gt;user_data = (void*)path[0];
+	return true;
+}
+
+Gtk::TreePath PlaySourceTreeModel::get_path_vfunc(const Gtk::TreeIter&amp; iter) const
+{
+	assert(iter.get_stamp() == m_stamp);
+
+	int index = (int)(iter.gobj()-&gt;user_data);
+
+	//cout &lt;&lt; "get_path for " &lt;&lt; index &lt;&lt; endl;
+
+	assert(index &gt;= 0);
+	assert(index &lt; m_source-&gt;get_num_tracks());
+
+	Gtk::TreePath path;
+	path.append_index((int)iter.gobj()-&gt;user_data);
+	return path;
+}
+
+void PlaySourceTreeModel::get_value_vfunc(const Gtk::TreeIter&amp; iter, int column, Glib::ValueBase&amp; value) const
+{
+	assert(iter.get_stamp() == m_stamp);
+
+	int index = (int)(iter.gobj()-&gt;user_data);
+
+	//if (column == 0)
+	//	cout &lt;&lt; "get_value for " &lt;&lt; index &lt;&lt; endl;
+
+	assert(index &gt;= 0);
+	assert(index &lt; m_source-&gt;get_num_tracks());
+
+	Glib::Value&lt;Glib::ustring&gt; value_ustring;
+	value_ustring.init(Glib::Value&lt;Glib::ustring&gt;::value_type());
+	Glib::Value&lt;int&gt; value_int;
+	value_int.init(Glib::Value&lt;int&gt;::value_type());
+	Glib::Value&lt;bool&gt; value_bool;
+	value_bool.init(Glib::Value&lt;bool&gt;::value_type());
+
+	assert(column &gt;= 0);
+	assert(column &lt; (int)m_column_records.size());
+
+	switch (column)
+	{
+	case 0: // title
+		value.init(Glib::Value&lt;Glib::ustring&gt;::value_type());
+		value_ustring.set(m_source-&gt;get_track(index)-&gt;get_title());
+		value = value_ustring;
+		break;
+	case 1: // artist
+		value.init(Glib::Value&lt;Glib::ustring&gt;::value_type());
+		value_ustring.set(m_source-&gt;get_track(index)-&gt;get_artist());
+		value = value_ustring;
+		break;
+	case 2: // album
+		value.init(Glib::Value&lt;Glib::ustring&gt;::value_type());
+		value_ustring.set(m_source-&gt;get_track(index)-&gt;get_album());
+		value = value_ustring;
+		break;
+	case 3: // track number
+		value.init(Glib::Value&lt;int&gt;::value_type());
+		value_int.set(m_source-&gt;get_track(index)-&gt;get_track_number());
+		value = value_int;
+		break;
+	case 4: // is currently playing
+		value.init(Glib::Value&lt;bool&gt;::value_type());
+		value_bool.set(
+				PlaybackManager::get_playing_source() == m_source &amp;&amp;
+				PlaybackManager::get_playing_index() == index);
+		value = value_bool;
+		break;
+	}
+}
+
+bool PlaySourceTreeModel::iter_next_vfunc(const Gtk::TreeIter&amp; iter, Gtk::TreeIter&amp; iter_next) const
+{
+	assert(iter.get_stamp() == m_stamp);
+
+	int index = (int)(iter.gobj()-&gt;user_data);
+
+	//cout &lt;&lt; "iter_next for " &lt;&lt; index &lt;&lt; " -&gt; " &lt;&lt; (index+1) &lt;&lt; endl;
+
+	assert(index &gt;= 0);
+	assert(index &lt; m_source-&gt;get_num_tracks());
+
+	index++;
+
+	if (index &gt;= m_source-&gt;get_num_tracks()) {
+		return false;
+	}
+
+	iter_next = Gtk::TreeIter();
+	iter_next.set_stamp(m_stamp);
+	iter_next.gobj()-&gt;user_data = (void*)index;
+	return true;
+
+}
+
+bool PlaySourceTreeModel::iter_nth_root_child_vfunc (int n, Gtk::TreeIter&amp; iter) const
+{
+	assert(n &gt;= 0);
+
+	//cout &lt;&lt; "iter_nth_root_child for " &lt;&lt; n &lt;&lt; endl;
+
+	if (n &gt;= m_source-&gt;get_num_tracks()) {
+		return false;
+	}
+
+	iter = Gtk::TreeIter();
+	iter.set_stamp(m_stamp);
+	iter.gobj()-&gt;user_data = (void*)n;
+	return true;
+}
+
+// Drag/drop functions
+
+
+bool PlaySourceTreeModel::row_draggable_vfunc (const Gtk::TreePath&amp; path) const
+{
+	assert(path.size() == 1);
+	assert(path[0] &gt;= 0);
+	assert(path[0] &lt; m_source-&gt;get_num_tracks());
+
+	return true;
+}
+
+bool PlaySourceTreeModel::drag_data_get_vfunc (const Gtk::TreePath&amp; path, Gtk::SelectionData&amp; selection_data) const
+{
+	assert(path.size() == 1);
+	assert(path[0] &gt;= 0);
+	assert(path[0] &lt; m_source-&gt;get_num_tracks());
+
+	if (selection_data.get_target() == "PLAYLIST_ITEM") {
+		DragData drag_data(m_source, path[0]);
+		selection_data.set(selection_data.get_target(), 0, (guint8*)&amp;drag_data, sizeof(drag_data));
+		return true;
+	}
+	return false;
+}
+
+bool PlaySourceTreeModel::drag_data_delete_vfunc (const Gtk::TreePath&amp; path)
+{
+	return false;
+}
+
+bool PlaySourceTreeModel::row_drop_possible_vfunc (const Gtk::TreePath&amp; dest, const Gtk::SelectionData&amp; selection_data) const
+{
+	if (dest.size() != 1) {
+		return false;
+	}
+	assert(dest[0] &gt;= 0);
+
+	return true;
+}
+
+bool PlaySourceTreeModel::drag_data_received_vfunc (const Gtk::TreePath&amp; dest, const Gtk::SelectionData&amp; selection_data)
+{
+	assert(dest.size() == 1);
+	assert(dest[0] &gt;= 0);
+
+	ModPlaySourceRef mod_source = boost::dynamic_pointer_cast&lt;ModPlaySource&gt;(m_source);
+	assert(mod_source); // Make sure the source is a modifiable source
+
+	int index = dest[0];
+	if (index &gt;= m_source-&gt;get_num_tracks())
+		index = m_source-&gt;get_num_tracks();
+
+	if (selection_data.get_data_type() == "PLAYLIST_ITEM") {
+		DragData* drag_data = (DragData*)selection_data.get_data();
+		if (drag_data-&gt;playlist == m_source)
+			mod_source-&gt;move_track(drag_data-&gt;index, index);
+		else {
+			mod_source-&gt;insert_track(index, drag_data-&gt;playlist-&gt;get_track(drag_data-&gt;index));
+			// TODO should we move or copy tracks when dragged from another tab?
+			//drag_data-&gt;playlist-&gt;remove_track(drag_data-&gt;index);
+		}
+		return true;
+	}
+
+	if (selection_data.get_data_type() == "text/uri-list") {
+		mod_source-&gt;insert_from_uris(index, selection_data.get_uris());
+		return true;
+	}
+
+	return false;
+}
+
+
 </div>
 </body></html>

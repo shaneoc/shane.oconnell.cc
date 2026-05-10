@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/PlaybackManager.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,227 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<span class="filename">PlaybackManager.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-22 02:23:35 UTC</div>
+<a class="prev-link active-link" href="../../../../2008/echo/cpp/src/Echo.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../2008/echo/cpp/src/PlaybackManager.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "PlaybackManager.h"
 
-namespace Scheduler
+#include &lt;giomm.h&gt;
+
+#include &lt;gst/gst.h&gt;
+
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+#include &lt;cassert&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+sigc::signal&lt;void, PlaySourceRef, int, bool&gt; PlaybackManager::_signal_track_started;
+sigc::signal&lt;void, PlaySourceRef, int, bool&gt; PlaybackManager::_signal_track_stopped;
+
+static gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data);
+
+GstElement* gst_player;
+PlaySourceRef current_playlist;
+int current_index; // TODO we need to update current_index when tracks are inserted/removed in the playlist
+ShuffleType current_shuffle;
+
+
+void PlaybackManager::init_sound(int *argc, char **argv[])
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	gst_init(argc, argv);
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	// TODO use gconfsink so that we use users settings
+	gst_player = gst_element_factory_make("playbin", "player");
+
+	GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE (gst_player));
+	gst_bus_add_watch(bus, bus_callback, NULL);
+	gst_object_unref(bus);
+}
+
+gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data)
+{
+	switch (GST_MESSAGE_TYPE (message)) {
+	case GST_MESSAGE_ERROR:
+		GError *err;
+		gchar *debug;
+
+		gst_message_parse_error (message, &amp;err, &amp;debug);
+		cout &lt;&lt; "Gstreamer error: " &lt;&lt; err-&gt;message &lt;&lt; endl;
+		g_error_free (err);
+		g_free (debug);
+
+		break;
+
+	case GST_MESSAGE_EOS:
+		PlaybackManager::next();
+		break;
+
+	default:
+
+		break;
 
 	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+
+	return TRUE;
+}
+
+void PlaybackManager::play(PlaySourceRef playlist, int index)
+{
+	assert(index &gt;= 0);
+	assert(index &lt; playlist-&gt;get_num_tracks());
+
+	gst_element_set_state(gst_player, GST_STATE_READY);
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+
+	current_playlist = playlist;
+	current_index = index;
+	g_object_set(G_OBJECT(gst_player), "uri", playlist-&gt;get_track(index)-&gt;get_uri().c_str(), NULL);
+
+	gst_element_set_state(gst_player, GST_STATE_PLAYING);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+}
+
+void PlaybackManager::next()
+{
+	assert(current_playlist);
+
+	if (GST_STATE(gst_player) != GST_STATE_READY)
+		gst_element_set_state(gst_player, GST_STATE_READY);
+
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+	switch (current_shuffle) {
+	case SHUFFLE_NONE:
+		current_index++;
+		break;
+	default:
+		current_index = rand() % current_playlist-&gt;get_num_tracks();
+		break;
+	}
+	if (current_index &lt; current_playlist-&gt;get_num_tracks()) {
+		g_object_set(G_OBJECT(gst_player), "uri", current_playlist-&gt;get_track(current_index)-&gt;get_uri().c_str(), NULL);
+		gst_element_set_state(gst_player, GST_STATE_PLAYING);
+
+		PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	}
+	else
+		current_playlist.reset();
+}
+
+void PlaybackManager::prev()
+{
+	assert(current_playlist);
+
+	if (GST_STATE(gst_player) != GST_STATE_READY)
+		gst_element_set_state(gst_player, GST_STATE_READY);
+
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+	current_index--;
+	if (current_index &gt;= 0) {
+		g_object_set(G_OBJECT(gst_player), "uri", current_playlist-&gt;get_track(current_index)-&gt;get_uri().c_str(), NULL);
+		gst_element_set_state(gst_player, GST_STATE_PLAYING);
+		PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	}
+}
+
+void PlaybackManager::stop()
+{
+	gst_element_set_state(gst_player, GST_STATE_READY);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	current_playlist.reset();
+}
+
+void PlaybackManager::pause()
+{
+	assert(current_playlist);
+	assert(!is_paused());
+
+	gst_element_set_state(gst_player, GST_STATE_PAUSED);
+	PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, true);
+}
+
+void PlaybackManager::unpause()
+{
+	assert(current_playlist);
+	assert(is_paused());
+
+	gst_element_set_state(gst_player, GST_STATE_PLAYING);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, true);
+}
+
+bool PlaybackManager::is_paused()
+{
+	//GstState state;
+	//gst_element_get_state(gst_player, &amp;state, NULL, GST_CLOCK_TIME_NONE);
+	//return (state == GST_STATE_PAUSED);
+	return (GST_STATE(gst_player) == GST_STATE_PAUSED);
+}
+
+int PlaybackManager::get_track_length()
+{
+	GstFormat format = GST_FORMAT_TIME;
+	long long length;
+	if (gst_element_query_duration(gst_player, &amp;format, &amp;length) == TRUE) {
+		if (format == GST_FORMAT_TIME) {
+			return (length / 1000000); // return in ms
 		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
 	}
+	return 0;
+}
+
+int PlaybackManager::get_track_position()
+{
+	GstFormat format = GST_FORMAT_TIME;
+	long long position;
+	if (gst_element_query_position(gst_player, &amp;format, &amp;position) == TRUE) {
+		if (format == GST_FORMAT_TIME) {
+			return (position / 1000000); // return in ms
+		}
+	}
+	return 0;
+}
+
+PlaySourceRef PlaybackManager::get_playing_source()
+{
+	return current_playlist;
+}
+
+int PlaybackManager::get_playing_index()
+{
+	return current_index;
+}
+
+void PlaybackManager::set_shuffle(ShuffleType type)
+{
+	current_shuffle = type;
 }
 </div>
 </body></html>

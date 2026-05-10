@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/mono/echo/UI/MainWindow.cs - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,89 +517,218 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">mono</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">echo</button>
+<span>/</span>
+<button class="popup-button">UI</button>
+<span>/</span>
+<span class="filename">MainWindow.cs</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-11-13 23:23:02 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/mono/echo/PlaySource.cs.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/mono/echo/UI/TabPane.cs.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">// MainWindow.cs is part of Echo Media Player
+// Copyright (C) 2008 Shane O'Connell
+//
+// <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+// <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+// <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+// <span style="background: #ffeeee; ">archive. ]</span>
+//
 
-#include "scheduler.h"
-#include "log.h"
+using System;
+using Echo;
 
-namespace Scheduler
+namespace Echo.UI
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
+	public class MainWindow : Gtk.Window
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
+		private Gtk.StatusIcon status_icon;
 		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
-
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
+		public MainWindow() : base(Gtk.WindowType.Toplevel)
 		{
-			// TODO: Handle error
-			return;
+			Gtk.ActionGroup action_group = new Gtk.ActionGroup("default");
+			
+			Gtk.ActionEntry[] actions = new Gtk.ActionEntry[] {
+				new Gtk.ActionEntry("file-menu", null, "_File", null, null, null),
+				new Gtk.ActionEntry("view-menu", null, "_View", null, null, null),
+				new Gtk.ActionEntry("playback-menu", null, "_Playback", null, null, null),
+				new Gtk.ActionEntry("repeat-menu", null, "_Repeat", null, null, null),
+				new Gtk.ActionEntry("shuffle-menu", null, "_Shuffle", null, null, null),
+				new Gtk.ActionEntry("help-menu", null, "_Help", null, null, null),
+
+				new Gtk.ActionEntry("new-playlist", null, "_New Playlist", null, null, null),
+				new Gtk.ActionEntry("new-smart-playlist", null, "New _Smart Playlist", null, null, null),
+				new Gtk.ActionEntry("open-file", Gtk.Stock.Open, null, null, null, null),
+				new Gtk.ActionEntry("open-url", null, "Open _URL", null, null, null),
+				new Gtk.ActionEntry("refresh-libraries", null, "Refresh _Libraries", null, null, null),
+				new Gtk.ActionEntry("close", Gtk.Stock.Close,
+				                delegate(object o, EventArgs e) { this.Hide(); }),
+				new Gtk.ActionEntry("quit", Gtk.Stock.Quit,
+				                delegate(object o, EventArgs e) { Gtk.Application.Quit(); }),
+				
+				new Gtk.ActionEntry("view-fullscreen", null, "_Full Screen", null, null, null),
+
+				new Gtk.ActionEntry("play-pause", Gtk.Stock.MediaPlay, null),
+				new Gtk.ActionEntry("next-track", Gtk.Stock.MediaNext, null),
+				new Gtk.ActionEntry("previous-track", Gtk.Stock.MediaPrevious, null),
+				new Gtk.ActionEntry("stop-when-finished", null, "_Stop When Finished", null, null, null),
+
+				new Gtk.ActionEntry("about", Gtk.Stock.About, null)
+			};
+			action_group.Add(actions);
+			
+			Gtk.ToggleActionEntry[] toggle_actions = new Gtk.ToggleActionEntry[] {
+				new Gtk.ToggleActionEntry("view-browser", null, "_Browser Pane", null, null, null, true)
+			};
+			action_group.Add(toggle_actions);
+			
+			Gtk.RadioActionEntry[] shuffle_actions = new Gtk.RadioActionEntry[] {
+				new Gtk.RadioActionEntry("shuffle-off", null, "Shuffle _Off", null, null, 0),
+				new Gtk.RadioActionEntry("shuffle-by-song", null, "Shuffle By _Song", null, null, 1),
+				new Gtk.RadioActionEntry("shuffle-by-artist", null, "Shuffle By _Artist", null, null, 2),
+				new Gtk.RadioActionEntry("shuffle-by-album", null, "Shuffle By Al_bum", null, null, 3)
+			};
+			action_group.Add(shuffle_actions, 0, null);
+			
+			Gtk.RadioActionEntry[] repeat_actions = new Gtk.RadioActionEntry[] {
+				new Gtk.RadioActionEntry("repeat-off", null, "Repeat _Off", null, null, 0),
+				new Gtk.RadioActionEntry("repeat-all", null, "Repeat _All", null, null, 1),
+				new Gtk.RadioActionEntry("repeat-single", null, "Repeat _Single", null, null, 2)
+			};
+			action_group.Add(repeat_actions, 0, null);
+			
+			string ui_info = 
+					"&lt;ui&gt;" +
+					"  &lt;menubar name='main-menubar'&gt;" +
+					"    &lt;menu action='file-menu'&gt;" +
+					"      &lt;menuitem action='new-playlist'/&gt;" +
+					"      &lt;menuitem action='new-smart-playlist'/&gt;" +
+					"      &lt;separator/&gt;" +
+					"      &lt;menuitem action='open-file'/&gt;" +
+					"      &lt;menuitem action='open-url'/&gt;" +
+					"      &lt;separator/&gt;" +
+					"      &lt;menuitem action='refresh-libraries'/&gt;" +
+					"      &lt;separator/&gt;" +
+					"      &lt;menuitem action='close'/&gt;" +
+					"      &lt;menuitem action='quit'/&gt;" +
+					"    &lt;/menu&gt;" +
+					"    &lt;menu action='view-menu'&gt;" +
+					"      &lt;menuitem action='view-browser'/&gt;" +
+					"      &lt;menuitem action='view-fullscreen'/&gt;" +
+					"    &lt;/menu&gt;" +
+					"    &lt;menu action='playback-menu'&gt;" +
+					"      &lt;menuitem action='play-pause'/&gt;" +
+					"      &lt;menuitem action='next-track'/&gt;" +
+					"      &lt;menuitem action='previous-track'/&gt;" +
+					"      &lt;separator/&gt;" +
+					"      &lt;menuitem action='stop-when-finished'/&gt;" +
+					"      &lt;menu action='repeat-menu'&gt;" +
+					"        &lt;menuitem action='repeat-off'/&gt;" +
+					"        &lt;separator/&gt;" +
+					"        &lt;menuitem action='repeat-all'/&gt;" +
+					"        &lt;menuitem action='repeat-single'/&gt;" +
+					"      &lt;/menu&gt;" +
+					"      &lt;menu action='shuffle-menu'&gt;" +
+					"        &lt;menuitem action='shuffle-off'/&gt;" +
+					"        &lt;separator/&gt;" +
+					"        &lt;menuitem action='shuffle-by-song'/&gt;" +
+					"        &lt;menuitem action='shuffle-by-artist'/&gt;" +
+					"        &lt;menuitem action='shuffle-by-album'/&gt;" +
+					"      &lt;/menu&gt;" +
+					"    &lt;/menu&gt;" +
+					"    &lt;menu action='help-menu'&gt;" +
+					"      &lt;menuitem action='about'/&gt;" +
+					"    &lt;/menu&gt;" +
+					"  &lt;/menubar&gt;" +
+					"  &lt;toolbar name='main-toolbar'&gt;" +
+					"    &lt;toolitem action='previous-track'/&gt;" +
+					"    &lt;toolitem action='play-pause'/&gt;" +
+					"  &lt;/toolbar&gt;" +
+					"  &lt;popup name='status-icon-popup'&gt;" +
+					"    &lt;menuitem action='play-pause'/&gt;" +
+					"    &lt;menuitem action='previous-track'/&gt;" +
+					"    &lt;menuitem action='next-track'/&gt;" +
+					"    &lt;separator/&gt;" +
+					"    &lt;menuitem action='quit'/&gt;" +
+					"  &lt;/popup&gt;" +
+					"  &lt;popup name='next-track-popup'&gt;" +
+					"    &lt;menuitem action='shuffle-off'/&gt;" +
+					"    &lt;separator/&gt;" +
+					"    &lt;menuitem action='shuffle-by-song'/&gt;" +
+					"    &lt;menuitem action='shuffle-by-artist'/&gt;" +
+					"    &lt;menuitem action='shuffle-by-album'/&gt;" +
+					"  &lt;/popup&gt;" +
+					"&lt;/ui&gt;";
+			
+			Gtk.UIManager ui_manager = new Gtk.UIManager();
+			ui_manager.InsertActionGroup(action_group, 0);
+			ui_manager.AddUiFromString(ui_info);
+			
+			Gtk.Menu status_icon_menu = (Gtk.Menu)ui_manager.GetWidget("/status-icon-popup");
+			this.status_icon = Gtk.StatusIcon.NewFromStock(Gtk.Stock.Execute);
+			this.status_icon.PopupMenu += delegate(object o, Gtk.PopupMenuArgs args)
+			{
+				this.status_icon.PresentMenu(status_icon_menu, (uint)args.Args[0], (uint)args.Args[1]);
+			};
+			this.status_icon.Activate += delegate(object o, EventArgs args)
+			{
+				if (this.Visible)
+					this.Hide();
+				else
+					this.Show();
+			};
+			
+			this.Title = "Echo Media Player";
+			this.DefaultWidth = 800;
+			this.DefaultHeight = 600;
+			
+			Gtk.MenuBar menubar = (Gtk.MenuBar)ui_manager.GetWidget("/main-menubar");
+			Gtk.Statusbar statusbar = new Gtk.Statusbar();
+
+			Gtk.Toolbar toolbar = (Gtk.Toolbar)ui_manager.GetWidget("/main-toolbar");
+			toolbar.ToolbarStyle = Gtk.ToolbarStyle.Icons;
+			Gtk.MenuToolButton next_track_button = new Gtk.MenuToolButton(Gtk.Stock.MediaNext);
+			action_group.GetAction("next-track").ConnectProxy(next_track_button);
+			next_track_button.Menu = ui_manager.GetWidget("/next-track-popup");
+			toolbar.Insert(next_track_button, toolbar.NItems);
+			toolbar.Insert(new Gtk.SeparatorToolItem(), toolbar.NItems);
+
+			Gtk.HPaned browser_sizer = new Gtk.HPaned();
+			browser_sizer.Add1(new Gtk.Label("Browser"));
+			browser_sizer.Add2(new TabPane());
+			browser_sizer.Position = 200;
+			
+			Gtk.HPaned main_sizer = new Gtk.HPaned();
+			main_sizer.Add1(new Gtk.Label("Sources"));
+			main_sizer.Add2(browser_sizer);
+			main_sizer.Position = 160;
+			
+			Gtk.VBox vbox = new Gtk.VBox(false, 0);
+			vbox.PackStart(menubar, false, true, 0);
+			vbox.PackStart(toolbar, false, true, 0);
+			vbox.PackStart(main_sizer, true, true, 0);
+			vbox.PackStart(statusbar, false, true, 0);
+			this.Add(vbox);
+
+			this.ShowAll();
 		}
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		protected override bool OnDeleteEvent (Gdk.Event evnt)
+		{
+			// TODO why do I have to do this?
+			this.Hide();
+			return true;
+		}
+
 	}
 }
 </div>

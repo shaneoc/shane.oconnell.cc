@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.UI/Echo.UI.ActionManager.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,89 +517,128 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.UI</button>
+<span>/</span>
+<span class="filename">Echo.UI.ActionManager.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-11-27 23:48:48 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.Tools/Echo.Tools.URIHandler.vala.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.ContextMenu.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
-
-namespace Scheduler
+public class Echo.UI.ActionManager : GLib.Object
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	private Gtk.UIManager _ui_manager;
+	private Gtk.ActionGroup _action_group;
 	
-	Manager::Manager()
+	public ActionManager()
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+		_action_group = new Gtk.ActionGroup("main-action-group");
+		_ui_manager = new Gtk.UIManager();
+		_ui_manager.insert_action_group(_action_group, 0);
 	}
 	
-	Manager::~Manager()
+	// ------------------------------------------[Actions]------------------------------------------
+	
+	public void add_action(
+			string name, string? label, string? stock_id = null, string? accel = null)
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
+		_action_group.add_action_with_accel(new Gtk.Action(name, label, null, stock_id), accel);
 	}
 	
-	void Manager::start()
+	public void add_toggle_action(
+			string name, bool active, string? label, string? stock_id = null, string? accel = null)
 	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
+		var action = new Gtk.ToggleAction(name, label, null, stock_id);
+		action.set_active(active);
+		_action_group.add_action_with_accel(action, accel);
 	}
 	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
+	public void add_custom_action(Gtk.Action action, string? accel = null)
+	{  
+		_action_group.add_action_with_accel(action, accel);
 	}
+	
+	public weak Gtk.Action? get_action(string name)
+	{
+		return _action_group.get_action(name);
+	}
+	
+	// -------------------------------------------[Menus]-------------------------------------------
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
+	public void add_menubar(string name, string xml)
 	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+		try {
+			_ui_manager.add_ui_from_string(
+				"&lt;menubar name=\"menubar-%s\"&gt;%s&lt;/menubar&gt;".printf(name, xml), -1);
 		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		catch(GLib.Error e) {
+			error("Error processing menubar xml: %s\n\nXML was:\n%s\n\n", e.message, xml);
+		}
+	}
+	
+	public weak Gtk.MenuBar? get_menubar(string name)
+	{
+		return (Gtk.MenuBar)_ui_manager.get_widget("/menubar-%s".printf(name));
+	}
+	
+	public void add_menu(string name, string xml)
+	{
+		try {
+			_ui_manager.add_ui_from_string(
+				"&lt;popup name=\"menu-%s\"&gt;%s&lt;/popup&gt;".printf(name, xml), -1);
+		}
+		catch(GLib.Error e) {
+			error("Error processing menu xml: %s\n\nXML was:\n%s\n\n", e.message, xml);
+		}
+	}
+	
+	public weak Gtk.Menu? get_menu(string name)
+	{
+		return (Gtk.Menu)_ui_manager.get_widget("/menu-%s".printf(name));
+	}
+	
+	// ------------------------------------------[Widgets]------------------------------------------
+	
+	public Gtk.ToolButton get_toolbutton_proxy(string action_name)
+	{
+		var button = new Gtk.ToolButton(null, null);
+		var action = get_action(action_name);
+		assert(action != null);
+		action.connect_proxy(button);
+		return button;
+	}
+
+	public Gtk.MenuToolButton get_menutoolbutton_proxy(string action_name, string menu_name)
+	{
+		var button = new Gtk.MenuToolButton(null, null);
+		var action = get_action(action_name);
+		var menu = get_menu(menu_name);
+		assert(action != null);
+		assert(menu != null);
+		action.connect_proxy(button);
+		button.set_menu(menu);
+		return button;
 	}
 }
 </div>

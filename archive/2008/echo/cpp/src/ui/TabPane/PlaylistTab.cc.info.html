@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/ui/TabPane/PlaylistTab.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,99 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">ui</button>
+<span>/</span>
+<button class="popup-button">TabPane</button>
+<span>/</span>
+<span class="filename">PlaylistTab.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-21 13:54:43 UTC</div>
+<a class="prev-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/NowPlayingTab.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/PlaylistTab.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "PlaylistTab.h"
+#include "../../PlaybackManager.h"
 
-namespace Scheduler
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+boost::shared_ptr&lt;PlaylistTab&gt; PlaylistTab::create_from_uri(const std::string&amp; uri)
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	ModPlaySourceRef source(new Playlist());
+	source-&gt;insert_from_uri(0, uri);
+	boost::shared_ptr&lt;PlaylistTab&gt; tab(new PlaylistTab(source));
+	tab-&gt;m_playlist_name = uri; // TODO take filename, not whole URL
+	return tab;
+}
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+boost::shared_ptr&lt;PlaylistTab&gt; PlaylistTab::create_blank(const Glib::ustring&amp; name)
+{
+	PlaySourceRef source(new Playlist());
+	boost::shared_ptr&lt;PlaylistTab&gt; tab(new PlaylistTab(source));
+	tab-&gt;m_playlist_name = name;
+	return tab;
+}
 
+PlaylistTab::PlaylistTab(PlaySourceRef source) : m_source(source)
+{
+	set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
+	set_shadow_type(Gtk::SHADOW_IN);
+	add(m_treeview);
+
+	m_treemodel = PlaySourceTreeModel::create(source);
+	m_treeview.set_model(m_treemodel);
+	m_treeview.set_rules_hint(true);
+
+	std::vector&lt;Gtk::TargetEntry&gt; targets;
+	targets.push_back(Gtk::TargetEntry("PLAYLIST_ITEM", Gtk::TARGET_SAME_APP, 0));
+	m_treeview.enable_model_drag_source(targets, Gdk::MODIFIER_MASK, Gdk::ACTION_COPY);
+	//m_treeview.drag_source_set_icon(render_icon(Gtk::Stock::OPEN, Gtk::IconSize(-1)));
+	// TODO figure out how to set the drag icon
+	targets.push_back(Gtk::TargetEntry("text/uri-list", Gtk::TARGET_OTHER_APP, 1));
+	m_treeview.enable_model_drag_dest(targets, Gdk::ACTION_COPY);
+
+	m_treeview.append_column("Playing", m_treemodel-&gt;m_column_records.is_playing);
+	m_treeview.append_column("Track", m_treemodel-&gt;m_column_records.track_number);
+	m_treeview.append_column("Artist", m_treemodel-&gt;m_column_records.artist);
+	m_treeview.append_column("Title", m_treemodel-&gt;m_column_records.title);
+	m_treeview.append_column("Album", m_treemodel-&gt;m_column_records.album);
+
+	m_treeview.signal_row_activated().connect(
+			sigc::mem_fun(*this, &amp;PlaylistTab::on_row_activated));
+
+	list&lt;Gtk::TreeViewColumn*&gt; columns = m_treeview.get_columns();
+	for (list&lt;Gtk::TreeViewColumn*&gt;::iterator iter = columns.begin(); iter != columns.end(); iter++) {
+		(*iter)-&gt;set_reorderable(true);
+		(*iter)-&gt;set_resizable(true);
+		(*iter)-&gt;set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
+		(*iter)-&gt;set_fixed_width(60);
 	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
+	m_treeview.set_fixed_height_mode(true);
+}
+
+void PlaylistTab::on_row_activated(const Gtk::TreePath&amp; path, Gtk::TreeViewColumn* column)
+{
+	PlaybackManager::play(m_source, path[0]);
 }
 </div>
 </body></html>

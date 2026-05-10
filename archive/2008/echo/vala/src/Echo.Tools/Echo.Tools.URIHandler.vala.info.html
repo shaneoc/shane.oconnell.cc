@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/vala/src/Echo.Tools/Echo.Tools.URIHandler.vala - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,89 +517,126 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">vala</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">Echo.Tools</button>
+<span>/</span>
+<span class="filename">Echo.Tools.URIHandler.vala</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-12-01 16:11:23 UTC</div>
+<a class="prev-link active-link" href="../../../../../2008/echo/vala/src/Echo.Query/query.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../2008/echo/vala/src/Echo.UI/Echo.UI.ActionManager.vala.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* vim: set noexpandtab tabstop=4 shiftwidth=4 nowrap textwidth=100
+ *
+ * Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+using GLib;
+using Gee;
 
-namespace Scheduler
+using Echo.Core;
+using Echo.Interfaces;
+
+[Compact]
+public class Echo.Tools.URIHandler
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
+	/*
+	TODO change to this interface:
 	
-	Manager::Manager()
+	public URIHandler.from_uri(string uri)
 	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
+	
 	}
 	
-	Manager::~Manager()
+	public URIHandler.from_uris(string[] uris)
 	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
+	
 	}
 	
-	void Manager::start()
+	public Track get_next_track()
 	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
 	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	}*/
+	
+	public delegate void TrackHandler(StubTrack track);
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
+	public static void handle_uris(string[] uris, TrackHandler handler) throws GLib.Error
 	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
+		foreach(string uri in uris) {
+			handle_uri(uri, handler);
 		}
+	}
+
+	public static void handle_uri(string uri, TrackHandler handler,
+		bool playlists_ok = true, bool directories_ok = true) throws GLib.Error
+	{
+		var file = File.new_for_uri(uri);
+		var file_info = file.query_info("standard::type,standard::fast-content-type",
+			FileQueryInfoFlags.NONE, null);
 		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		if (file_info.get_file_type() == FileType.DIRECTORY) {
+			if (directories_ok) {
+				var children = file.enumerate_children("standard::display-name",
+					FileQueryInfoFlags.NONE, null);
+			
+				FileInfo child;
+				var child_names = new ArrayList&lt;string&gt;();
+				while((child = children.next_file(null)) != null)
+					child_names.add(child.get_display_name());
+			
+				// TODO use g_utf8_collate_key_for_filename when vala's library supports it
+				// TODO sort filenames alphabetically when vala gets some kind of sort function...
+				//child_names.sort((a, b) =&gt; {
+				//	return ((string)a).casefold().collate(((string)b).casefold());
+				//});
+			
+				foreach(string child_name in child_names) {
+					if (child_name.length &gt;= 1 &amp;&amp; child_name.get_char() != '.') {
+						// TODO add some kind of protection against infinitely recursive directories
+						handle_uri(file.get_child_for_display_name(child_name).get_uri(),
+							handler, false, true);
+					}
+				}
+			}
+		}
+		else {
+			weak string content_type = 
+				file_info.get_attribute_string("standard::fast-content-type");
+			
+			if (playlists_ok &amp;&amp; content_type == "audio/x-mpegurl") {
+				handle_m3u_playlist(file, handler);
+			}
+			else if (file.is_native() &amp;&amp; content_type == "audio/mpeg") {
+				var file_tags = new TagLib.File(file.get_path());
+				handler(new StubTrack(
+					file_tags.tag().title(),
+					file_tags.tag().artist(),
+					file_tags.tag().album(),
+					(int)file_tags.tag().track(),
+					(int)file_tags.tag().year(), 0, 0,
+					uri));
+			}
+		}
+	}
+
+	private static void handle_m3u_playlist(File file, TrackHandler handler)
+	{
+		
 	}
 }
 </div>

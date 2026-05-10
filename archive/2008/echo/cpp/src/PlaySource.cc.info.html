@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/PlaySource.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,193 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<span class="filename">PlaySource.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-21 13:50:16 UTC</div>
+<a class="prev-link active-link" href="../../../../2008/echo/cpp/src/PlaybackManager.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../2008/echo/cpp/src/PlaySource.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "PlaySource.h"
 
-namespace Scheduler
+#include &lt;mpegfile.h&gt;
+#include &lt;tag.h&gt;
+
+using namespace std;
+
+int ModPlaySource::insert_from_uris(int index, const list&lt;string&gt;&amp; uris)
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	int tracks_added = 0;
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	for (list&lt;string&gt;::const_iterator iter = uris.begin(); iter != uris.end(); iter++)
+		tracks_added += insert_from_uri(index, *iter);
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
+	return tracks_added;
+}
+
+int ModPlaySource::insert_from_uri(int index, const string&amp; uri, bool playlists_ok, bool directories_ok)
+{
+	// TODO set PlaySource to be readonly before this call and unset it after?
+	// (this may or may not be necessary.. need to think about it)
+	while (Glib::MainContext::get_default()-&gt;pending())
+		Glib::MainContext::get_default()-&gt;iteration(false);
+
+	int tracks_added = 0;
+
+	try
 	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
+		Glib::RefPtr&lt;Gio::File&gt; file = Gio::File::create_for_uri(uri);
+		Glib::RefPtr&lt;Gio::FileInfo&gt; file_info = file-&gt;query_info("standard::type,standard::fast-content-type");
+		if (directories_ok &amp;&amp; file_info-&gt;get_file_type() == Gio::FILE_TYPE_DIRECTORY)
 		{
-			// TODO: Handle error
-			return;
+			Glib::RefPtr&lt;Gio::FileEnumerator&gt; children = file-&gt;enumerate_children("standard::display-name");
+
+			Glib::RefPtr&lt;Gio::FileInfo&gt; child;
+			list&lt;Glib::ustring&gt; child_names;
+			while (child = children-&gt;next_file())
+				child_names.push_back(child-&gt;get_display_name());
+
+			child_names.sort(caseless_sort);
+
+			for (list&lt;Glib::ustring&gt;::iterator iter = child_names.begin(); iter != child_names.end(); iter++)
+			{
+				if (iter-&gt;size() &gt;= 1 &amp;&amp; iter-&gt;at(0) != '.')
+				{	// TODO add some kind of protection against infinitely recursive directories
+					int tracks_added_from_child = insert_from_uri(index, file-&gt;get_child_for_display_name(*iter)-&gt;get_uri(), false, true);
+					tracks_added += tracks_added_from_child;
+					index += tracks_added_from_child;
+				}
+			}
+
 		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
+		else
+		{
+			string content_type = file_info-&gt;get_attribute_string("standard::fast-content-type");
+
+			if (playlists_ok &amp;&amp; content_type == "audio/x-mpegurl") { // M3U playlist
+				tracks_added += insert_m3u_playlist(index, file);
+			}
+			else if (file-&gt;is_native() &amp;&amp; content_type == "audio/mpeg") // MP3
+			{
+				// TODO trim whitespace at either side of the mp3 title/artist/album etc.
+				TagLib::MPEG::File file_tags(file-&gt;get_path().c_str());
+				TrackRef track = TrackRef(new Track(
+						uri,
+						file_tags.tag()-&gt;title().to8Bit(true),
+						file_tags.tag()-&gt;artist().to8Bit(true),
+						file_tags.tag()-&gt;album().to8Bit(true),
+						file_tags.tag()-&gt;track()));
+				// TODO make sure tags are okay before accepting
+				// if they aren't okay use the filename as the title
+				insert_track(index, track);
+				tracks_added++;
+			}
+		}
 	}
+	catch (Gio::Error e)
+	{
+		// TODO show error message to user when this happens
+
+		return tracks_added;
+	}
+	return tracks_added;
+}
+
+int ModPlaySource::insert_m3u_playlist(int index, Glib::RefPtr&lt;Gio::File&gt; file)
+{
+	int tracks_added = 0;
+	char buf[512];
+	int buf_filled = 0;
+	int offset = 0;
+	string line = "";
+	string ext_line = "";
+
+	Glib::RefPtr&lt;Gio::FileInputStream&gt; stream = file-&gt;read();
+
+	buf_filled = stream-&gt;read(buf, 512);
+	if (buf_filled &lt; 0)
+		throw Gio::Error(Gio::Error::FAILED, "read() returned -1");
+	if (buf_filled == 0)
+		return 0; // I guess this is an empty file?
+
+
+	while (true) {
+		int line_end;
+		for (line_end = offset;
+			buf[line_end] != '\n' &amp;&amp; buf[line_end] != '\r' &amp;&amp; line_end &lt; buf_filled; line_end++);
+
+		line.append(buf + offset, line_end - offset);
+
+		if (line_end &gt;= buf_filled) {
+			buf_filled = stream-&gt;read(buf, 512);
+			if (buf_filled &lt; 0)
+				throw Gio::Error(Gio::Error::FAILED, "read() returned -1");
+			if (buf_filled == 0)
+				break;
+			offset = 0;
+		} else {
+			// ------------------- Start processing this line ---------------------
+			if (line.substr(0, 8) == "#EXTINF:") {
+				ext_line = line;
+			} else if (line.substr(0, 1) != "#" &amp;&amp; line.size() != 0) {
+				Glib::ustring title;
+				if (ext_line.size() &gt; 0) {
+					int comma = ext_line.find(',');
+					string time = ext_line.substr(8, comma - 8);
+					title = ext_line.substr(comma + 1, ext_line.size() - (comma + 1));
+					ext_line = "";
+				} else {
+					title = line;
+				}
+
+				int tracks_added_from_line = insert_from_uri(index, line, false, false);
+				if (tracks_added_from_line) {
+					// TODO keep M3UEXT info if the file doesn't have tag information
+					index += tracks_added_from_line;
+					tracks_added += tracks_added_from_line;
+				} else {
+					// TODO show a better error message
+					title = string("Error reading: ") + title;
+					insert_track(index, TrackRef(new Track(line, title, "", "", -1)));
+					tracks_added++;
+				}
+			}
+			// ----------------- Finished processing this line --------------
+			line = "";
+
+			// Move to next line
+			for(offset = line_end;
+				(buf[offset] == '\n' || buf[offset] == '\r') &amp;&amp; offset &lt; buf_filled; offset++);
+
+			if (offset &gt;= buf_filled) {
+				buf_filled = stream-&gt;read(buf, 512);
+				if (buf_filled &lt; 0)
+					throw Gio::Error(Gio::Error::FAILED, "read() returned -1");
+				if (buf_filled == 0)
+					break;
+				offset = 0;
+			}
+		}
+	}
+	return tracks_added;
 }
 </div>
 </body></html>

@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/src/ui/TabPane/TabPane.cc - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,159 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<button class="popup-button">ui</button>
+<span>/</span>
+<button class="popup-button">TabPane</button>
+<span>/</span>
+<span class="filename">TabPane.cc</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-06 17:14:44 UTC</div>
+<a class="prev-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/PlaySourceTreeModel.h.info.html">previous</a>
+<a class="next-link active-link" href="../../../../../../2008/echo/cpp/src/ui/TabPane/TabPane.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
 
-#include "scheduler.h"
-#include "log.h"
+#include "TabPane.h"
 
-namespace Scheduler
+#include "LibraryTab.h"
+#include "PlaylistTab.h"
+
+#include &lt;iostream&gt;
+using namespace std;
+
+TabPane::TabPane()
 {
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
+	popup_enable();
+	set_scrollable(true);
+	//set_show_border(true);
 
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
+	//append_page(*Gtk::manage(new Gtk::HBox()), "Now Playing");
+	open_tab(m_now_playing_tab, "Now Playing", "applications-multimedia");
+}
 
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
+void TabPane::open_now_playing()
+{
+	set_current_page(page_num(m_now_playing_tab));
+}
+
+void TabPane::open_library(LibraryRef library)
+{
+	for (list&lt;boost::shared_ptr&lt;LibraryTab&gt; &gt;::iterator iter = m_library_tabs.begin();
+			iter != m_library_tabs.end(); iter++ ) {
+		if ((*iter)-&gt;get_library() == library) {
+			set_current_page(page_num(**iter));
 			return;
 		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
 	}
+
+	m_library_tabs.push_back(LibraryTab::create(library));
+	open_tab(*m_library_tabs.back(),
+			m_library_tabs.back()-&gt;get_tab_name(),
+			m_library_tabs.back()-&gt;get_tab_icon());
+}
+
+void TabPane::add_playlist_from_uri(const std::string&amp; uri)
+{
+	m_playlist_tabs.push_back(PlaylistTab::create_from_uri(uri));
+	open_tab(*m_playlist_tabs.back(), m_playlist_tabs.back()-&gt;get_tab_name(), "");
+}
+
+void TabPane::add_blank_playlist()
+{
+	int untitled_num = 1;
+	Glib::ustring name;
+	while (true) {
+		bool use_num = true;
+		name = Glib::ustring::compose("Untitled %1", untitled_num);
+		for (list&lt;boost::shared_ptr&lt;PlaylistTab&gt; &gt;::iterator iter = m_playlist_tabs.begin();
+				iter != m_playlist_tabs.end(); iter++)
+			if ((*iter)-&gt;get_tab_name() == name) {
+				use_num = false;
+				break;
+			}
+		if (use_num)
+			break;
+		untitled_num++;
+	}
+
+	m_playlist_tabs.push_back(PlaylistTab::create_blank(name));
+	open_tab(*m_playlist_tabs.back(), m_playlist_tabs.back()-&gt;get_tab_name(), "");
+}
+
+void TabPane::open_tab(Gtk::Widget&amp; child, const Glib::ustring&amp; title, const Glib::ustring&amp; icon_name)
+{
+	Gtk::HBox* label = Gtk::manage(new Gtk::HBox());
+	Gtk::HBox* menu_label = Gtk::manage(new Gtk::HBox());
+
+	try {
+		Glib::RefPtr&lt;Gdk::Pixbuf&gt; icon = Gtk::IconTheme::get_default()-&gt;load_icon(icon_name, 16);
+		label-&gt;pack_start(*Gtk::manage(new Gtk::Image(icon)), Gtk::PACK_SHRINK);
+		label-&gt;set_spacing(4);
+
+		menu_label-&gt;pack_start(*Gtk::manage(new Gtk::Image(icon)), Gtk::PACK_SHRINK);
+		menu_label-&gt;set_spacing(4);
+	} catch (Glib::Error &amp;e) {}
+
+	label-&gt;pack_start(*Gtk::manage(new Gtk::Label(title)), Gtk::PACK_SHRINK);
+	label-&gt;show_all();
+
+	menu_label-&gt;pack_start(*Gtk::manage(new Gtk::Label(title)), Gtk::PACK_SHRINK);
+	menu_label-&gt;show_all();
+
+	Gtk::EventBox* label_eventbox = Gtk::manage(new Gtk::EventBox());
+	label_eventbox-&gt;signal_button_release_event().connect(
+			sigc::bind(sigc::mem_fun(*this, &amp;TabPane::on_tab_click), &amp;child));
+	label_eventbox-&gt;add(*label);
+
+	append_page(child, *label_eventbox, *menu_label);
+	//set_tab_label_packing(child, true, true, Gtk::PACK_START);
+	set_tab_reorderable(child, true);
+	show_all_children(true);
+	set_current_page(page_num(child));
+}
+
+bool TabPane::on_tab_click(GdkEventButton* event, Gtk::Widget* child)
+{
+	if (event-&gt;button == 2) {
+		if (child == &amp;m_now_playing_tab)
+			return false;
+
+		for (list&lt;boost::shared_ptr&lt;PlaylistTab&gt; &gt;::iterator iter = m_playlist_tabs.begin();
+				iter != m_playlist_tabs.end(); iter++) {
+			if (iter-&gt;get() == child) {
+				remove_page(*child);
+				m_playlist_tabs.erase(iter);
+				return true;
+			}
+		}
+
+		for (list&lt;boost::shared_ptr&lt;LibraryTab&gt; &gt;::iterator iter = m_library_tabs.begin();
+				iter != m_library_tabs.end(); iter++) {
+			if (iter-&gt;get() == child) {
+				remove_page(*child);
+				m_library_tabs.erase(iter);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 </div>
 </body></html>

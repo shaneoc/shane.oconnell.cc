@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2007/nova/server/scheduler.cpp - Archive - shane.oconnell.cc</title>
+<title>2008/echo/cpp/.settings/org.eclipse.cdt.core.prefs - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -331,7 +331,7 @@ body > input[type="checkbox"]:checked + *:hover {
     background: #dddddd;
 }
 </style>
-<script src="../../../database.js"></script>
+<script src="../../../../database.js"></script>
 <script>
 if (document.location.href.startsWith('file:')) {
     document.addEventListener('DOMContentLoaded', (event) => {
@@ -341,7 +341,7 @@ if (document.location.href.startsWith('file:')) {
         }
     });
 }
-const root_relpath = "../../../";
+const root_relpath = "../../../../";
 let popup_buttons = new Array();
 let popup_stack = new Array();
 let path_stack = new Array();
@@ -517,90 +517,169 @@ window.addEventListener('load', (event) => {
 </script>
 </head><body>
 <div id="file-path" class="file-path">
-<a href="../../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2007</button>
+<a href="../../../../" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
 <span>/</span>
-<button class="popup-button">nova</button>
+<button class="popup-button">echo</button>
 <span>/</span>
-<button class="popup-button">server</button>
+<button class="popup-button">cpp</button>
 <span>/</span>
-<span class="filename">scheduler.cpp</span>
+<button class="popup-button">.settings</button>
+<span>/</span>
+<span class="filename">org.eclipse.cdt.core.prefs</span>
 </div>
-<div class="mtime-info">2007-09-19 19:50:54 UTC</div>
-<a class="prev-link active-link" href="../../../2007/nova/server/notes.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../../2008/echo/cpp/bzrignore.info.html">next</a>
+<div class="mtime-info">2008-10-06 11:18:27 UTC</div>
+<a class="prev-link active-link" href="../../../../2008/echo/cpp/project.info.html">previous</a>
+<a class="next-link active-link" href="../../../../2008/echo/cpp/settings/org.eclipse.cdt.ui.prefs.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">#include &lt;boost/thread.hpp&gt;
-#include &lt;boost/utility.hpp&gt;
-#include &lt;boost/asio.hpp&gt;
-#include &lt;boost/shared_ptr.hpp&gt;
-#include &lt;boost/bind.hpp&gt;
-
-#include "scheduler.h"
-#include "log.h"
-
-namespace Scheduler
-{
-	boost::scoped_ptr&lt;Manager&gt; manager;
-	
-	Manager::Manager()
-	{
-		log::debug("Starting scheduler thread");
-		_thread.reset(new boost::thread(boost::bind(&amp;Manager::start, this)));
-	}
-	
-	Manager::~Manager()
-	{
-		log::debug("Stopping scheduler thread");
-		_io_service_work.reset();
-		_io_service.interrupt();
-		
-		// Thread may not have been created correctly, so check first
-		if (_thread)
-			_thread-&gt;join();
-	}
-	
-	void Manager::start()
-	{
-		_io_service_work.reset(new boost::asio::io_service::work(_io_service));
-		_io_service.run();
-	}
-	
-	void Manager::add_task(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		_io_service.post(boost::bind(&amp;Manager::add_task_int, this, task, time_til_next));
-	}
-
-	void Manager::add_task_int(
-			boost::shared_ptr&lt;Task&gt;						task,
-			boost::posix_time::time_duration			time_til_next)
-	{
-		boost::shared_ptr&lt;boost::asio::deadline_timer&gt; timer(
-				new boost::asio::deadline_timer(_io_service, time_til_next));
-		_tasks.push_back(TaskInfo(task, timer));
-		timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, _tasks.back()));
-
-	}
-	
-	void Manager::execute_task(
-			const boost::asio::error&amp;					error,
-			TaskInfo									task_info)
-	{
-		if (error == boost::asio::error::operation_aborted)
-			return;
-		else if (error)
-		{
-			// TODO: Handle error
-			return;
-		}
-		
-		boost::posix_time::time_duration time_til_next = task_info.task-&gt;start_task();
-		task_info.timer-&gt;expires_from_now(time_til_next);
-		task_info.timer-&gt;async_wait(boost::bind(&amp;Manager::execute_task, this, _1, task_info));
-	}
-}
+<div class="text-view">#Sun Oct 05 16:31:19 NDT 2008
+eclipse.preferences.version=1
+org.eclipse.cdt.core.formatter.alignment_for_arguments_in_method_invocation=16
+org.eclipse.cdt.core.formatter.alignment_for_base_clause_in_type_declaration=80
+org.eclipse.cdt.core.formatter.alignment_for_compact_if=0
+org.eclipse.cdt.core.formatter.alignment_for_conditional_expression=80
+org.eclipse.cdt.core.formatter.alignment_for_declarator_list=16
+org.eclipse.cdt.core.formatter.alignment_for_enumerator_list=48
+org.eclipse.cdt.core.formatter.alignment_for_expression_list=0
+org.eclipse.cdt.core.formatter.alignment_for_expressions_in_array_initializer=16
+org.eclipse.cdt.core.formatter.alignment_for_parameters_in_method_declaration=16
+org.eclipse.cdt.core.formatter.alignment_for_throws_clause_in_method_declaration=16
+org.eclipse.cdt.core.formatter.brace_position_for_array_initializer=next_line_shifted
+org.eclipse.cdt.core.formatter.brace_position_for_block=end_of_line
+org.eclipse.cdt.core.formatter.brace_position_for_block_in_case=end_of_line
+org.eclipse.cdt.core.formatter.brace_position_for_method_declaration=next_line
+org.eclipse.cdt.core.formatter.brace_position_for_namespace_declaration=next_line
+org.eclipse.cdt.core.formatter.brace_position_for_switch=next_line
+org.eclipse.cdt.core.formatter.brace_position_for_type_declaration=next_line
+org.eclipse.cdt.core.formatter.compact_else_if=true
+org.eclipse.cdt.core.formatter.continuation_indentation=2
+org.eclipse.cdt.core.formatter.continuation_indentation_for_array_initializer=2
+org.eclipse.cdt.core.formatter.format_guardian_clause_on_one_line=false
+org.eclipse.cdt.core.formatter.indent_access_specifier_compare_to_type_header=false
+org.eclipse.cdt.core.formatter.indent_body_declarations_compare_to_access_specifier=true
+org.eclipse.cdt.core.formatter.indent_body_declarations_compare_to_namespace_header=false
+org.eclipse.cdt.core.formatter.indent_breaks_compare_to_cases=true
+org.eclipse.cdt.core.formatter.indent_declaration_compare_to_template_header=false
+org.eclipse.cdt.core.formatter.indent_empty_lines=false
+org.eclipse.cdt.core.formatter.indent_statements_compare_to_block=true
+org.eclipse.cdt.core.formatter.indent_statements_compare_to_body=true
+org.eclipse.cdt.core.formatter.indent_switchstatements_compare_to_cases=true
+org.eclipse.cdt.core.formatter.indent_switchstatements_compare_to_switch=false
+org.eclipse.cdt.core.formatter.indentation.size=4
+org.eclipse.cdt.core.formatter.insert_new_line_after_opening_brace_in_array_initializer=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_after_template_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_at_end_of_file_if_missing=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_before_catch_in_try_statement=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_before_closing_brace_in_array_initializer=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_before_else_in_if_statement=insert
+org.eclipse.cdt.core.formatter.insert_new_line_before_identifier_in_function_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_before_while_in_do_statement=do not insert
+org.eclipse.cdt.core.formatter.insert_new_line_in_empty_block=insert
+org.eclipse.cdt.core.formatter.insert_space_after_assignment_operator=insert
+org.eclipse.cdt.core.formatter.insert_space_after_binary_operator=insert
+org.eclipse.cdt.core.formatter.insert_space_after_closing_angle_bracket_in_template_arguments=insert
+org.eclipse.cdt.core.formatter.insert_space_after_closing_angle_bracket_in_template_parameters=insert
+org.eclipse.cdt.core.formatter.insert_space_after_closing_brace_in_block=insert
+org.eclipse.cdt.core.formatter.insert_space_after_closing_paren_in_cast=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_colon_in_base_clause=insert
+org.eclipse.cdt.core.formatter.insert_space_after_colon_in_case=insert
+org.eclipse.cdt.core.formatter.insert_space_after_colon_in_conditional=insert
+org.eclipse.cdt.core.formatter.insert_space_after_colon_in_labeled_statement=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_array_initializer=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_base_types=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_declarator_list=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_enum_declarations=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_expression_list=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_method_declaration_parameters=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_method_declaration_throws=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_method_invocation_arguments=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_template_arguments=insert
+org.eclipse.cdt.core.formatter.insert_space_after_comma_in_template_parameters=insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_angle_bracket_in_template_arguments=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_angle_bracket_in_template_parameters=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_brace_in_array_initializer=insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_bracket=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_cast=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_catch=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_for=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_if=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_method_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_method_invocation=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_parenthesized_expression=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_switch=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_opening_paren_in_while=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_postfix_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_prefix_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_after_question_in_conditional=insert
+org.eclipse.cdt.core.formatter.insert_space_after_semicolon_in_for=insert
+org.eclipse.cdt.core.formatter.insert_space_after_unary_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_assignment_operator=insert
+org.eclipse.cdt.core.formatter.insert_space_before_binary_operator=insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_angle_bracket_in_template_arguments=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_angle_bracket_in_template_parameters=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_brace_in_array_initializer=insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_bracket=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_cast=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_catch=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_for=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_if=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_method_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_method_invocation=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_parenthesized_expression=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_switch=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_closing_paren_in_while=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_colon_in_base_clause=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_colon_in_case=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_colon_in_conditional=insert
+org.eclipse.cdt.core.formatter.insert_space_before_colon_in_default=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_colon_in_labeled_statement=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_array_initializer=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_base_types=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_declarator_list=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_enum_declarations=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_expression_list=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_method_declaration_parameters=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_method_declaration_throws=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_method_invocation_arguments=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_template_arguments=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_comma_in_template_parameters=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_angle_bracket_in_template_arguments=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_angle_bracket_in_template_parameters=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_array_initializer=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_block=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_method_declaration=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_namespace_declaration=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_switch=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_brace_in_type_declaration=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_bracket=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_catch=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_for=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_if=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_method_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_method_invocation=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_parenthesized_expression=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_switch=insert
+org.eclipse.cdt.core.formatter.insert_space_before_opening_paren_in_while=insert
+org.eclipse.cdt.core.formatter.insert_space_before_postfix_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_prefix_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_question_in_conditional=insert
+org.eclipse.cdt.core.formatter.insert_space_before_semicolon=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_semicolon_in_for=do not insert
+org.eclipse.cdt.core.formatter.insert_space_before_unary_operator=do not insert
+org.eclipse.cdt.core.formatter.insert_space_between_empty_braces_in_array_initializer=do not insert
+org.eclipse.cdt.core.formatter.insert_space_between_empty_brackets=do not insert
+org.eclipse.cdt.core.formatter.insert_space_between_empty_parens_in_method_declaration=do not insert
+org.eclipse.cdt.core.formatter.insert_space_between_empty_parens_in_method_invocation=do not insert
+org.eclipse.cdt.core.formatter.keep_else_statement_on_same_line=false
+org.eclipse.cdt.core.formatter.keep_empty_array_initializer_on_one_line=false
+org.eclipse.cdt.core.formatter.keep_imple_if_on_one_line=false
+org.eclipse.cdt.core.formatter.keep_then_statement_on_same_line=false
+org.eclipse.cdt.core.formatter.lineSplit=80
+org.eclipse.cdt.core.formatter.number_of_empty_lines_to_preserve=1
+org.eclipse.cdt.core.formatter.put_empty_statement_on_new_line=true
+org.eclipse.cdt.core.formatter.tabulation.char=tab
+org.eclipse.cdt.core.formatter.tabulation.size=4
+org.eclipse.cdt.core.formatter.use_tabs_only_for_leading_indentations=false
 </div>
 </body></html>
