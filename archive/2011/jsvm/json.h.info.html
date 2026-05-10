@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2010/notes/grad-planning.txt - Archive - shane.oconnell.cc</title>
+<title>2011/jsvm/json.h - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -518,71 +518,152 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2010</button>
+<button class="popup-button">2011</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">jsvm</button>
 <span>/</span>
-<span class="filename">grad-planning.txt</span>
+<span class="filename">json.h</span>
 </div>
-<div class="mtime-info">2010-04-12 19:08:04 UTC</div>
-<a class="prev-link active-link" href="../../2010/notes/cars.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../2011/jsvm/compile-jsvmc.sh.info.html">next</a>
+<div class="mtime-info">2011-05-29 19:42:57 UTC</div>
+<a class="prev-link active-link" href="../../2011/jsvm/compile-jsvmc.sh.info.html">previous</a>
+<a class="next-link active-link" href="../../2011/jsvm/JsonModule.cpp.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">search for info on nexus one leaked firmware
-find T4, log into tax canada site
-buy bong
-buy anti-hangover pills?
-do imv report
-download old finals
+<div class="text-view">
+#include &lt;string&gt;
+#include &lt;sstream&gt;
+#include &lt;map&gt;
+#include &lt;vector&gt;
 
-* pay credit card bill
-* pay phone bill
+namespace json {
+
+  // TODO add error handling
+  class JsonObject {
+    public:
+      enum Type {
+        AssocArray,
+        Array,
+        String,
+        Integer,
+        True,
+        False,
+        Null
+      };
+      
+      JsonObject() {
+        _type = Null;
+      }
+      
+      JsonObject(Type type) {
+        _type = type;
+      }
+      
+      JsonObject(std::string str) {
+        _type = String;
+        _string = str;
+      }
+      
+      JsonObject(bool b) {
+        if (b) _type = True;
+        else   _type = False;
+      }
+      
+      JsonObject(int i) {
+        _type = Integer;
+        _integer = i;
+      }
+      
+      std::string to_string() {
+        std::ostringstream result;
+        bool first;
+        std::map&lt;std::string, JsonObject&gt;::iterator assoc_iter;
+        std::vector&lt;JsonObject&gt;::iterator array_iter;
+        
+        switch (_type) {
+        case AssocArray:
+          first = true;
+          result &lt;&lt; "{";
+          for (assoc_iter = _assoc_items.begin(); assoc_iter != _assoc_items.end(); assoc_iter++) {
+            if (first) first = false;
+            else       result &lt;&lt; ",";
+            // TODO escape the key
+            result &lt;&lt; "\"" &lt;&lt; assoc_iter-&gt;first &lt;&lt; "\":" &lt;&lt; assoc_iter-&gt;second.to_string();
+          }
+          result &lt;&lt; "}";
+          break;
+        
+        case Array:
+          first = true;
+          result &lt;&lt; "[";
+          for (array_iter = _array_items.begin(); array_iter != _array_items.end(); array_iter++) {
+            if (first) first = false;
+            else       result &lt;&lt; ",";
+            result &lt;&lt; array_iter-&gt;to_string();
+          }
+          result &lt;&lt; "]";
+          break;
+        
+        case String:
+          // TODO escape this string
+          result &lt;&lt; "\"" &lt;&lt; _string &lt;&lt; "\"";
+          break;
+        
+        case Integer:
+          result &lt;&lt; _integer;
+          break;
+        
+        case True:
+          result &lt;&lt; "true";
+          break;
+        
+        case False:
+          result &lt;&lt; "false";
+          break;
+        
+        case Null:
+          result &lt;&lt; "null";
+          break;
+        }
+        
+        return result.str();
+      }
+    
+      JsonObject&amp; operator[](const std::string&amp; str) {
+        return _assoc_items[str];
+      }
+      
+      JsonObject&amp; operator[](const int index) {
+        return _array_items[index];
+      }
+      
+      JsonObject&amp; operator=(const int integer) {
+        _type = Integer;
+        _integer = integer;
+        return *this;
+      }
+      
+      JsonObject&amp; operator=(const std::string str) {
+        _type = String;
+        _string = str;
+        return *this;
+      }
+      
+      JsonObject&amp; operator=(const bool b) {
+        _type = (b) ? True : False;
+        return *this;
+      }
+      
+    private:
+      Type _type;
+      
+      std::map&lt;std::string, JsonObject&gt; _assoc_items;
+      std::vector&lt;JsonObject&gt; _array_items;
+      std::string _string;
+      int _integer;
+  };
+  
 
 
-		Monday			Tuesday			Wednesday		Thursday		Friday			Saturday
-------------------------------------------------------------------------------------------------------------------------------------------------
-8:00 am
-
-9:00 am
-
-10:00 am
-
-11:00 am
-
-12:00 am	| Lunch			| Lunch			| Lunch
-		|			|			|
-1:00 pm		|			|			|
-		|			|			|
-2:00 pm								** Study RTOS **
-								|
-3:00 pm		| Hair Appointment				|
-		|						|
-4:00 pm								|
-
-5:00 pm
-
-6:00 pm		| Meet parents
-		| for supper
-7:00 pm
-
-8:00 pm
-
-9:00 pm
-
-10:00 pm
-
-
-
---- stuff to bring ---
-* phone
-* sunscreen (spray-on)
-* fly repellant
-* headache pills
-* anti-diarria pills
-* anti-hangover pills?
-* mexican cash
-
-* find out if I need any immunizations
+}
 </div>
 </body></html>

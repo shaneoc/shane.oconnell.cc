@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2010/notes/grad-planning.txt - Archive - shane.oconnell.cc</title>
+<title>2011/netos/index.html - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -293,6 +293,7 @@ body > .next-link {
 
 body > .text-view {
     grid-area: content;
+    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -306,13 +307,21 @@ body > input[type="checkbox"] {
     display: none;
 }
 
-body > .view-img {
+body > .view-iframe {
     grid-area: content;
+    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    background: #f3f3f3;
-    object-fit: scale-down;
+    border: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: block;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
 }
 
 body > #wrap-text-checkbox:not(:checked) + * + * {
@@ -518,71 +527,55 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2010</button>
+<button class="popup-button">2011</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">netos</button>
 <span>/</span>
-<span class="filename">grad-planning.txt</span>
+<span class="filename">index.html</span>
 </div>
-<div class="mtime-info">2010-04-12 19:08:04 UTC</div>
-<a class="prev-link active-link" href="../../2010/notes/cars.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../2011/jsvm/compile-jsvmc.sh.info.html">next</a>
+<div class="mtime-info">2011-05-28 00:46:41 UTC</div>
+<a class="prev-link active-link" href="../../2011/netos/coffee-go.sh.info.html">previous</a>
+<a class="next-link active-link" href="../../2011/netos/src/netos.coffee.info.html">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<iframe class="view-iframe" srcdoc="<!doctype html>
+<html>
+  <head>
+    <title>Test 123</title>
+    <style type=&quot;text/css&quot;>
+      #terminal {
+        background: #000000;
+        color: #ffffff;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <script src=&quot;closure-library/closure/goog/base.js&quot;></script> -->
+    <script src=&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js&quot;></script>
+    <script src=&quot;lib/netos.js&quot;></script>
+    <canvas id=&quot;terminal&quot; width=&quot;640&quot; height=&quot;480&quot;></canvas>
+  </body>
+</html>
+"></iframe>
 <input type="checkbox" id="wrap-text-checkbox" checked />
-<label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">search for info on nexus one leaked firmware
-find T4, log into tax canada site
-buy bong
-buy anti-hangover pills?
-do imv report
-download old finals
-
-* pay credit card bill
-* pay phone bill
-
-
-		Monday			Tuesday			Wednesday		Thursday		Friday			Saturday
-------------------------------------------------------------------------------------------------------------------------------------------------
-8:00 am
-
-9:00 am
-
-10:00 am
-
-11:00 am
-
-12:00 am	| Lunch			| Lunch			| Lunch
-		|			|			|
-1:00 pm		|			|			|
-		|			|			|
-2:00 pm								** Study RTOS **
-								|
-3:00 pm		| Hair Appointment				|
-		|						|
-4:00 pm								|
-
-5:00 pm
-
-6:00 pm		| Meet parents
-		| for supper
-7:00 pm
-
-8:00 pm
-
-9:00 pm
-
-10:00 pm
-
-
-
---- stuff to bring ---
-* phone
-* sunscreen (spray-on)
-* fly repellant
-* headache pills
-* anti-diarria pills
-* anti-hangover pills?
-* mexican cash
-
-* find out if I need any immunizations
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view">&lt;!doctype html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Test 123&lt;/title&gt;
+    &lt;style type="text/css"&gt;
+      #terminal {
+        background: #000000;
+        color: #ffffff;
+      }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- &lt;script src="closure-library/closure/goog/base.js"&gt;&lt;/script&gt; --&gt;
+    &lt;script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"&gt;&lt;/script&gt;
+    &lt;script src="lib/netos.js"&gt;&lt;/script&gt;
+    &lt;canvas id="terminal" width="640" height="480"&gt;&lt;/canvas&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
 </div>
 </body></html>

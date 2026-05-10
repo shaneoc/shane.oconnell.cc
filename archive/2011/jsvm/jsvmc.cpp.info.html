@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2010/notes/grad-planning.txt - Archive - shane.oconnell.cc</title>
+<title>2011/jsvm/jsvmc.cpp - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -518,71 +518,138 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2010</button>
+<button class="popup-button">2011</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">jsvm</button>
 <span>/</span>
-<span class="filename">grad-planning.txt</span>
+<span class="filename">jsvmc.cpp</span>
 </div>
-<div class="mtime-info">2010-04-12 19:08:04 UTC</div>
-<a class="prev-link active-link" href="../../2010/notes/cars.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../2011/jsvm/compile-jsvmc.sh.info.html">next</a>
+<div class="mtime-info">2011-05-31 10:15:04 UTC</div>
+<a class="prev-link active-link" href="../../2011/jsvm/jsvm.js.info.html">previous</a>
+<a class="next-link active-link" href="../../2011/jsvm/test.c.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">search for info on nexus one leaked firmware
-find T4, log into tax canada site
-buy bong
-buy anti-hangover pills?
-do imv report
-download old finals
+<div class="text-view">#include &lt;iostream&gt;
 
-* pay credit card bill
-* pay phone bill
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/Type.h"
+#include "llvm/Bitcode/ReaderWriter.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/MemoryBuffer.h"
+using namespace llvm;
 
+#include "json.h"
+using namespace json;
 
-		Monday			Tuesday			Wednesday		Thursday		Friday			Saturday
-------------------------------------------------------------------------------------------------------------------------------------------------
-8:00 am
-
-9:00 am
-
-10:00 am
-
-11:00 am
-
-12:00 am	| Lunch			| Lunch			| Lunch
-		|			|			|
-1:00 pm		|			|			|
-		|			|			|
-2:00 pm								** Study RTOS **
-								|
-3:00 pm		| Hair Appointment				|
-		|						|
-4:00 pm								|
-
-5:00 pm
-
-6:00 pm		| Meet parents
-		| for supper
-7:00 pm
-
-8:00 pm
-
-9:00 pm
-
-10:00 pm
+cl::opt&lt;std::string&gt; input_filename(cl::Positional, cl::desc("&lt;input file&gt;"), cl::init("-"));
+cl::opt&lt;std::string&gt; output_filename("o", cl::desc("Specify output filename"), cl::value_desc("filename"));
 
 
 
---- stuff to bring ---
-* phone
-* sunscreen (spray-on)
-* fly repellant
-* headache pills
-* anti-diarria pills
-* anti-hangover pills?
-* mexican cash
+class JsonGen {
+public:
 
-* find out if I need any immunizations
+
+  JsonObject get_json_for_module(Module* m) {
+
+    JsonObject root(JsonObject::AssocArray);
+  
+    root["jsvm-json-version"] = 1;
+    root["module-id"] = module-&gt;getModuleIdentifier();
+    root["data-layout"] = module-&gt;getDataLayout();
+    root["target-triple"] = module-&gt;getTargetTriple();
+  
+  
+    root["functions"] = JsonObject(JsonObject::Array);
+    std::map&lt;Function*, int&gt; func_ptr_to_js_index;
+    int current_func_js_index = 0;
+  
+    Module::iterator func_iter;
+    for (func_iter = module-&gt;begin(); func_iter != module-&gt;end(); func_iter++) {
+      func_ptr_to_js_index[&amp;*func_iter] = current_func_js_index;
+      root["functions"][current_func_js_index] = JsonObject(JsonObject::AssocArray);
+      root["functions"][current_func_js_index]["basic-blocks"] = JsonObject(JsonObject::Array);
+    
+      Function::iterator basic_block_iter;
+      std::map&lt;BasicBlock*, int&gt; basic_block_ptr_to_js_index;
+      int current_basic_block_js_index = 0;
+      for (basic_block_iter = func_iter-&gt;begin(); basic_block_iter != func_iter-&gt;end(); basic_block_iter++) {
+	basic_block_ptr_to_js_index[&amp;*basic_block_iter] = current_basic_block_js_index;
+	root["functions"][current_func_js_index]["basic-blocks"][current_basic_block_js_index]
+	  }
+    
+    }
+  
+    return root;
+  }
+  
+  JsonObject get_json_for_function(Function* f) {
+  
+  }
+  
+  JsonObject get_json_for_basic_block(BasicBlock* b) {
+  
+  }
+  
+  JsonObject get_json_for_instruction
+
+
+}
+
+
+
+int main(int argc, char **argv) {
+  cl::ParseCommandLineOptions(argc, argv);
+  LLVMContext &amp;context = getGlobalContext();
+  
+  if (output_filename.empty()) {
+    if (input_filename == "-") {
+      output_filename = "-";
+    } else {
+      const std::string &amp;IFN = input_filename;
+      int len = IFN.length();
+      // If the source ends in .bc, strip it off.
+      if (IFN[len-3] == '.' &amp;&amp; IFN[len-2] == 'b' &amp;&amp; IFN[len-1] == 'c')
+        output_filename = std::string(IFN.begin(), IFN.end()-3)+".jsvm.json";
+      else
+        output_filename = IFN+".jsvm.json";
+    }
+  }
+  
+  
+  std::cout &lt;&lt; "input file: " &lt;&lt; input_filename &lt;&lt; std::endl;
+  std::cout &lt;&lt; "output file: " &lt;&lt; output_filename &lt;&lt; std::endl;
+  
+  std::string error_message;
+  std::auto_ptr&lt;Module&gt; module;
+  {
+    OwningPtr&lt;MemoryBuffer&gt; buffer_ptr;
+    buffer_ptr.reset(MemoryBuffer::getFileOrSTDIN(input_filename, &amp;error_message));
+    if (buffer_ptr.get() == 0) {
+      std::cout &lt;&lt; "error opening " &lt;&lt; input_filename &lt;&lt; ": " &lt;&lt; error_message &lt;&lt; std::endl;
+      return 0;
+    }
+    
+    module.reset(ParseBitcodeFile(buffer_ptr.get(), getGlobalContext(), &amp;error_message));
+    
+    if (module.get() == 0) {
+      std::cout &lt;&lt; "error parsing " &lt;&lt; input_filename &lt;&lt; ": " &lt;&lt; error_message &lt;&lt; std::endl;
+      return 0;
+    }
+  }
+  
+  
+
+  
+  
+  
+  std::cout &lt;&lt; root.to_string() &lt;&lt; std::endl;
+  
+  return 0;
+}
+
+
+
 </div>
 </body></html>

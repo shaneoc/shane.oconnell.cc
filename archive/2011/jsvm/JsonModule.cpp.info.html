@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>2010/notes/grad-planning.txt - Archive - shane.oconnell.cc</title>
+<title>2011/jsvm/JsonModule.cpp - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -518,71 +518,76 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">2010</button>
+<button class="popup-button">2011</button>
 <span>/</span>
-<button class="popup-button">notes</button>
+<button class="popup-button">jsvm</button>
 <span>/</span>
-<span class="filename">grad-planning.txt</span>
+<span class="filename">JsonModule.cpp</span>
 </div>
-<div class="mtime-info">2010-04-12 19:08:04 UTC</div>
-<a class="prev-link active-link" href="../../2010/notes/cars.txt.info.html">previous</a>
-<a class="next-link active-link" href="../../2011/jsvm/compile-jsvmc.sh.info.html">next</a>
+<div class="mtime-info">2011-05-31 10:15:06 UTC</div>
+<a class="prev-link active-link" href="../../2011/jsvm/json.h.info.html">previous</a>
+<a class="next-link active-link" href="../../2011/jsvm/JsonModule.h.info.html">next</a>
 <input type="checkbox" id="wrap-text-checkbox" checked />
 <label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">search for info on nexus one leaked firmware
-find T4, log into tax canada site
-buy bong
-buy anti-hangover pills?
-do imv report
-download old finals
+<div class="text-view">#include "JsonModule.h"
 
-* pay credit card bill
-* pay phone bill
+namespace {
+  class JsonFunction {
+  public:
+    JsonFunction
+
+}
+
+JsonObject JsonGen::get_json_for_module(Module* m) {
+
+    JsonObject root(JsonObject::AssocArray);
+  
+    root["jsvm-json-version"] = 1;
+    root["module-id"] = module-&gt;getModuleIdentifier();
+    root["data-layout"] = module-&gt;getDataLayout();
+    root["target-triple"] = module-&gt;getTargetTriple();
+  
+  
+    root["functions"] = JsonObject(JsonObject::Array);
+    std::map&lt;Function*, int&gt; func_ptr_to_js_index;
+    int current_func_js_index = 0;
+  
+    Module::iterator func_iter;
+    for (func_iter = module-&gt;begin(); func_iter != module-&gt;end(); func_iter++) {
+      func_ptr_to_js_index[&amp;*func_iter] = current_func_js_index;
+      root["functions"][current_func_js_index] = JsonObject(JsonObject::AssocArray);
+      root["functions"][current_func_js_index]["basic-blocks"] = JsonObject(JsonObject::Array);
+    
+      Function::iterator basic_block_iter;
+      std::map&lt;BasicBlock*, int&gt; basic_block_ptr_to_js_index;
+      int current_basic_block_js_index = 0;
+      for (basic_block_iter = func_iter-&gt;begin(); basic_block_iter != func_iter-&gt;end(); basic_block_iter++) {
+	basic_block_ptr_to_js_index[&amp;*basic_block_iter] = current_basic_block_js_index;
+	root["functions"][current_func_js_index]["basic-blocks"][current_basic_block_js_index]
+	  }
+    
+    }
+  
+    return root;
+  }
+  
+  JsonObject get_json_for_function(Function* f) {
+    JsonObject json_obj(JsonObject::AssocArray);
+    
+    json_object["basic-blocks"] = JsonObject(JsonObject::Array);
+
+    Function::iterator iter;
+    for (iter = f-&gt;begin(); iter != f-&gt;end(); iter++) {
+      json_object["basic-blocks"]
+  }
+  
+  JsonObject get_json_for_basic_block(BasicBlock* b) {
+  
+  }
+  
+  JsonObject get_json_for_instruction
 
 
-		Monday			Tuesday			Wednesday		Thursday		Friday			Saturday
-------------------------------------------------------------------------------------------------------------------------------------------------
-8:00 am
-
-9:00 am
-
-10:00 am
-
-11:00 am
-
-12:00 am	| Lunch			| Lunch			| Lunch
-		|			|			|
-1:00 pm		|			|			|
-		|			|			|
-2:00 pm								** Study RTOS **
-								|
-3:00 pm		| Hair Appointment				|
-		|						|
-4:00 pm								|
-
-5:00 pm
-
-6:00 pm		| Meet parents
-		| for supper
-7:00 pm
-
-8:00 pm
-
-9:00 pm
-
-10:00 pm
-
-
-
---- stuff to bring ---
-* phone
-* sunscreen (spray-on)
-* fly repellant
-* headache pills
-* anti-diarria pills
-* anti-hangover pills?
-* mexican cash
-
-* find out if I need any immunizations
+}
 </div>
 </body></html>
