@@ -3,7 +3,7 @@
 <html><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>1998/animorph90.hypermart.net/info.txt - Archive - shane.oconnell.cc</title>
+<title>1999/ani-morphs.com/index.html - Archive - shane.oconnell.cc</title>
 <style>
 body {
     display: grid;
@@ -293,6 +293,7 @@ body > .next-link {
 
 body > .text-view {
     grid-area: content;
+    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -306,13 +307,21 @@ body > input[type="checkbox"] {
     display: none;
 }
 
-body > .view-img {
+body > .view-iframe {
     grid-area: content;
+    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    background: #f3f3f3;
-    object-fit: scale-down;
+    border: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: block;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
 }
 
 body > #wrap-text-checkbox:not(:checked) + * + * {
@@ -518,69 +527,91 @@ window.addEventListener('load', (event) => {
 </head><body>
 <div id="file-path" class="file-path">
 <a href="../../" class="archive-link index-link">Archive</a>
-<button class="popup-button">1998</button>
+<button class="popup-button">1999</button>
 <span>/</span>
-<button class="popup-button">animorph90.hypermart.net</button>
+<button class="popup-button">ani-morphs.com</button>
 <span>/</span>
-<span class="filename">info.txt</span>
+<span class="filename">index.html</span>
 </div>
-<div class="mtime-info">2024-05-26 12:01:59 UTC</div>
-<a class="prev-link active-link" href="../../1998/animorph90.hypermart.net/index.html.info.html">previous</a>
-<a class="next-link active-link" href="../../1999/ani-morphs.com/index.html.info.html">next</a>
-<input type="checkbox" id="wrap-text-checkbox" checked />
-<label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
-<div class="text-view">url http://animorph90.hypermart.net:80/
-api_timestamp 19981111190116
-api_url_key net,hypermart,animorph90)/
-api_digest 56TN5EC7VAR5GRY6ZNAPZ5VYIO7MTPNT
-api_length 1115
-api_mime_type text/html
-api_status_code 200
-http_status_code 200 OK
-file_size 2002
-md5 914673ff24acc5620917677327759233
+<div class="mtime-info">2024-05-26 11:41:14 UTC</div>
+<a class="prev-link active-link" href="../../1998/animorph90.hypermart.net/info.txt.info.html">previous</a>
+<a class="next-link active-link" href="../../1999/ani-morphs.com/info.txt.info.html">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<iframe class="view-iframe" sandbox="allow-scripts" srcdoc="<HTML>
+<HEAD>
+<TITLE>Ani-Morphs.com - Your source for Animorphs news!</TITLE>
+</HEAD>
+<FRAMESET ROWS=&quot;*,28&quot; BORDER=&quot;0&quot;>
+	<FRAME SRC=&quot;home.html&quot; NAME=&quot;mainframe&quot; BORDER=&quot;0&quot; MARGINWIDTH=&quot;0&quot; MARGINHEIGHT=&quot;0&quot;>
+	<FRAME SRC=&quot;ticker.html&quot; BORDER=&quot;0&quot; MARGINWIDTH=&quot;0&quot; MARGINHEIGHT=&quot;0&quot; SCROLLING=&quot;no&quot;>
+</FRAMESET>
+</HTML></noscript>
+<!-- -->
+</noscript>
+<SCRIPT LANGUAGE=&quot;JavaScript&quot;>
 
-Server: nginx
-Date: Sun, 26 May 2024 12:01:59 GMT
-Content-Type: text/html
-Transfer-Encoding: chunked
-Connection: close
-x-archive-orig-date: Wed, 11 Nov 1998 20:01:36 GMT
-x-archive-orig-server: Apache/1.2.4 FrontPage/3.0.3
-x-archive-orig-connection: close
-cache-control: max-age=1800
-memento-datetime: Wed, 11 Nov 1998 19:01:16 GMT
-link: &lt;http://animorph90.hypermart.net:80/&gt;;
- rel="original", &lt;https://web.archive.org/web/timemap/link/http://animorph90.hypermart.net:80/&gt;;
- rel="timemap";
- type="application/link-format", &lt;https://web.archive.org/web/http://animorph90.hypermart.net:80/&gt;;
- rel="timegate",
- &lt;https://web.archive.org/web/19981111190116/http://animorph90.hypermart.net:80/&gt;;
- rel="first memento";
- datetime="Wed, 11 Nov 1998 19:01:16 GMT", &lt;https://web.archive.org/web/19981111190116/http://animorph90.hypermart.net:80/&gt;;
- rel="memento";
- datetime="Wed, 11 Nov 1998 19:01:16 GMT", &lt;https://web.archive.org/web/19981212012554/http://animorph90.hypermart.net:80/&gt;;
- rel="next memento";
- datetime="Sat, 12 Dec 1998 01:25:54 GMT", &lt;https://web.archive.org/web/20190908142147/http://animorph90.hypermart.net/&gt;;
- rel="last memento"; datetime="Sun, 08 Sep 2019 14:21:47 GMT"
-content-security-policy: default-src 'self' 'unsafe-eval' 'unsafe-inline'
- data: blob: archive.org web.archive.org web-static.archive.org
- wayback-api.archive.org analytics.archive.org pragma.archivelab.org
-x-archive-src: 0_history-c/foo-910810857.arc.gz
-server-timing: captures_list;dur=0.622954, exclusion.robots;dur=0.184862,
- exclusion.robots.policy;dur=0.175142, esindex;dur=0.010245,
- cdx.remote;dur=5.551925, LoadShardBlock;dur=149.524897,
- PetaboxLoader3.resolve;dur=119.757154, PetaboxLoader3.datanode;dur=75.011769,
- load_resource;dur=61.683439
-x-app-server: wwwb-app213
-x-ts: 200
-x-tr: 260
-X-location: All
-X-RL: 0
-X-NA: 0
-X-Page-Cache: MISS
-X-NID: -
-Referrer-Policy: no-referrer-when-downgrade
-Permissions-Policy: interest-cohort=()
+<!--
+browser = (((navigator.appName == &quot;Netscape&quot;) &amp;&amp; (parseInt(navigator.appVersion) >= 2 )) || ((navigator.appName == &quot;Microsoft Internet Explorer&quot;) &amp;&amp; (parseInt(navigator.appVersion) >= 2 )));
+if (browser) {
+if (self.height) {
+   if (parseInt(self.height) < 167) {
+      var height = '167';
+   }
+} else {
+   var height = '167';
+}
+if (!self.url) {
+   self.url = '';
+}
+if (parent.name != 'test') {
+   test = window.open(&quot;http://click.go2net.com/magic/adpopup?site=HM&amp;shape=banner&amp;border=1&amp;area=users.Entertainment.Books_and_Literature&quot;, &quot;test&quot;, &quot;resizable=yes,width=520,height=&quot; + self.height);
+   // setTimeout(&quot;test.opener = self;&quot;, 3000);
+   // test.opener = self;
+}
+}
+//-->
+
+</SCRIPT>
+
+"></iframe>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view">&lt;HTML&gt;
+&lt;HEAD&gt;
+&lt;TITLE&gt;Ani-Morphs.com - Your source for Animorphs news!&lt;/TITLE&gt;
+&lt;/HEAD&gt;
+&lt;FRAMESET ROWS="*,28" BORDER="0"&gt;
+	&lt;FRAME SRC="home.html" NAME="mainframe" BORDER="0" MARGINWIDTH="0" MARGINHEIGHT="0"&gt;
+	&lt;FRAME SRC="ticker.html" BORDER="0" MARGINWIDTH="0" MARGINHEIGHT="0" SCROLLING="no"&gt;
+&lt;/FRAMESET&gt;
+&lt;/HTML&gt;&lt;/noscript&gt;
+&lt;!-- --&gt;
+&lt;/noscript&gt;
+&lt;SCRIPT LANGUAGE="JavaScript"&gt;
+
+&lt;!--
+browser = (((navigator.appName == "Netscape") &amp;&amp; (parseInt(navigator.appVersion) &gt;= 2 )) || ((navigator.appName == "Microsoft Internet Explorer") &amp;&amp; (parseInt(navigator.appVersion) &gt;= 2 )));
+if (browser) {
+if (self.height) {
+   if (parseInt(self.height) &lt; 167) {
+      var height = '167';
+   }
+} else {
+   var height = '167';
+}
+if (!self.url) {
+   self.url = '';
+}
+if (parent.name != 'test') {
+   test = window.open("http://click.go2net.com/magic/adpopup?site=HM&amp;shape=banner&amp;border=1&amp;area=users.Entertainment.Books_and_Literature", "test", "resizable=yes,width=520,height=" + self.height);
+   // setTimeout("test.opener = self;", 3000);
+   // test.opener = self;
+}
+}
+//--&gt;
+
+&lt;/SCRIPT&gt;
+
 </div>
 </body></html>
