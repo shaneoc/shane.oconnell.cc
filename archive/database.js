@@ -602,5 +602,10 @@ const archive_database = [
 ["file", "washing-machine-cycle.txt", "washing machine cycle.txt"],
 "up",
 "up",
+["dir", "2026"],
+["dir", "notes"],
+["file", "2026-07-22-tenstorrent-groq-dream.md"],
+"up",
+"up",
 "up",
 ];
