@@ -88,6 +88,10 @@ if (document.location.href.startsWith('file:')) {
         for (let i = 0; i < index_links.length; i++) {
             index_links[i].href += 'index.html';
         }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
     });
 }
 </script>
@@ -107,13 +111,14 @@ Heterosexual</p>
 <div class="entry-description">
 <p>I spent the initial part of my life without a girlfriend. I did have female
 friends, however usually I hung out with them as part of a group.</p>
-<p>When I was very young I ran <a href="https://animorph90.shaneoc.net/">a website</a> for
-fans of the <a href="https://en.wikipedia.org/wiki/Animorphs">Animorphs</a> book series
-which was popular enough that I was able to make friends over the Internet
-using the website. This was an interesting experience, however it did not
-result in finding a girlfriend at the time. It may, however, be the case that
-there are women my age who read the same book series when they were young, and
-might remember reading my website. My screen name was Animorph90.</p>
+<p>When I was very young I ran <a href="https://animorph90.shaneoc.net/" class="index-link">a
+website</a> for fans of the
+<a href="https://en.wikipedia.org/wiki/Animorphs">Animorphs</a> book series which was
+popular enough that I was able to make friends over the Internet using the
+website. This was an interesting experience, however it did not result in
+finding a girlfriend at the time. It may, however, be the case that there are
+women my age who read the same book series when they were young, and might
+remember reading my website. My screen name was Animorph90.</p>
 </div></div>
 <div><strong>First Girlfriend</strong>
 <div class="entry-date">April 2004</div>

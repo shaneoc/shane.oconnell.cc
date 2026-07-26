@@ -70,6 +70,10 @@ if (document.location.href.startsWith('file:')) {
         for (let i = 0; i < index_links.length; i++) {
             index_links[i].href += 'index.html';
         }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
     });
 }
 </script>

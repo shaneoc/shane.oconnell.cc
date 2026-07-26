@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2008/echo/cpp/src/PlaybackManager.cc - Archive - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .view-img {
+    grid-area: content;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #f3f3f3;
+    object-fit: scale-down;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2008</button>
+<span>/</span>
+<button class="popup-button">echo</button>
+<span>/</span>
+<button class="popup-button">cpp</button>
+<span>/</span>
+<button class="popup-button">src</button>
+<span>/</span>
+<span class="filename">PlaybackManager.cc</span>
+</div>
+<div class="mtime-info">2008-10-22 02:23:35 UTC</div>
+<a class="prev-link active-link html-link" href="../../../../2008/echo/cpp/src/Echo.h.info">previous</a>
+<a class="next-link active-link html-link" href="../../../../2008/echo/cpp/src/PlaybackManager.h.info">next</a>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
+<div class="text-view">/* Echo Media Player
+ * Copyright (C) 2008 Shane O'Connell
+ *
+ * <span style="background: #ffeeee; ">[ The original file includes a copyright header in this location describing</span>
+ * <span style="background: #ffeeee; ">the file as being released under the terms of the GNU General Public</span>
+ * <span style="background: #ffeeee; ">License. It has been removed in order to display the file as part of the</span>
+ * <span style="background: #ffeeee; ">archive. ]</span>
+ */
+
+#include "PlaybackManager.h"
+
+#include &lt;giomm.h&gt;
+
+#include &lt;gst/gst.h&gt;
+
+#include &lt;list&gt;
+#include &lt;iostream&gt;
+#include &lt;cassert&gt;
+#include &lt;cstdlib&gt;
+using namespace std;
+
+sigc::signal&lt;void, PlaySourceRef, int, bool&gt; PlaybackManager::_signal_track_started;
+sigc::signal&lt;void, PlaySourceRef, int, bool&gt; PlaybackManager::_signal_track_stopped;
+
+static gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data);
+
+GstElement* gst_player;
+PlaySourceRef current_playlist;
+int current_index; // TODO we need to update current_index when tracks are inserted/removed in the playlist
+ShuffleType current_shuffle;
+
+
+void PlaybackManager::init_sound(int *argc, char **argv[])
+{
+	gst_init(argc, argv);
+
+	// TODO use gconfsink so that we use users settings
+	gst_player = gst_element_factory_make("playbin", "player");
+
+	GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE (gst_player));
+	gst_bus_add_watch(bus, bus_callback, NULL);
+	gst_object_unref(bus);
+}
+
+gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data)
+{
+	switch (GST_MESSAGE_TYPE (message)) {
+	case GST_MESSAGE_ERROR:
+		GError *err;
+		gchar *debug;
+
+		gst_message_parse_error (message, &amp;err, &amp;debug);
+		cout &lt;&lt; "Gstreamer error: " &lt;&lt; err-&gt;message &lt;&lt; endl;
+		g_error_free (err);
+		g_free (debug);
+
+		break;
+
+	case GST_MESSAGE_EOS:
+		PlaybackManager::next();
+		break;
+
+	default:
+
+		break;
+
+	}
+
+	return TRUE;
+}
+
+void PlaybackManager::play(PlaySourceRef playlist, int index)
+{
+	assert(index &gt;= 0);
+	assert(index &lt; playlist-&gt;get_num_tracks());
+
+	gst_element_set_state(gst_player, GST_STATE_READY);
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+
+	current_playlist = playlist;
+	current_index = index;
+	g_object_set(G_OBJECT(gst_player), "uri", playlist-&gt;get_track(index)-&gt;get_uri().c_str(), NULL);
+
+	gst_element_set_state(gst_player, GST_STATE_PLAYING);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+}
+
+void PlaybackManager::next()
+{
+	assert(current_playlist);
+
+	if (GST_STATE(gst_player) != GST_STATE_READY)
+		gst_element_set_state(gst_player, GST_STATE_READY);
+
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+	switch (current_shuffle) {
+	case SHUFFLE_NONE:
+		current_index++;
+		break;
+	default:
+		current_index = rand() % current_playlist-&gt;get_num_tracks();
+		break;
+	}
+	if (current_index &lt; current_playlist-&gt;get_num_tracks()) {
+		g_object_set(G_OBJECT(gst_player), "uri", current_playlist-&gt;get_track(current_index)-&gt;get_uri().c_str(), NULL);
+		gst_element_set_state(gst_player, GST_STATE_PLAYING);
+
+		PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	}
+	else
+		current_playlist.reset();
+}
+
+void PlaybackManager::prev()
+{
+	assert(current_playlist);
+
+	if (GST_STATE(gst_player) != GST_STATE_READY)
+		gst_element_set_state(gst_player, GST_STATE_READY);
+
+	if (current_playlist)
+		PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, false);
+
+	current_index--;
+	if (current_index &gt;= 0) {
+		g_object_set(G_OBJECT(gst_player), "uri", current_playlist-&gt;get_track(current_index)-&gt;get_uri().c_str(), NULL);
+		gst_element_set_state(gst_player, GST_STATE_PLAYING);
+		PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	}
+}
+
+void PlaybackManager::stop()
+{
+	gst_element_set_state(gst_player, GST_STATE_READY);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, false);
+	current_playlist.reset();
+}
+
+void PlaybackManager::pause()
+{
+	assert(current_playlist);
+	assert(!is_paused());
+
+	gst_element_set_state(gst_player, GST_STATE_PAUSED);
+	PlaybackManager::signal_track_stopped().emit(current_playlist, current_index, true);
+}
+
+void PlaybackManager::unpause()
+{
+	assert(current_playlist);
+	assert(is_paused());
+
+	gst_element_set_state(gst_player, GST_STATE_PLAYING);
+	PlaybackManager::signal_track_started().emit(current_playlist, current_index, true);
+}
+
+bool PlaybackManager::is_paused()
+{
+	//GstState state;
+	//gst_element_get_state(gst_player, &amp;state, NULL, GST_CLOCK_TIME_NONE);
+	//return (state == GST_STATE_PAUSED);
+	return (GST_STATE(gst_player) == GST_STATE_PAUSED);
+}
+
+int PlaybackManager::get_track_length()
+{
+	GstFormat format = GST_FORMAT_TIME;
+	long long length;
+	if (gst_element_query_duration(gst_player, &amp;format, &amp;length) == TRUE) {
+		if (format == GST_FORMAT_TIME) {
+			return (length / 1000000); // return in ms
+		}
+	}
+	return 0;
+}
+
+int PlaybackManager::get_track_position()
+{
+	GstFormat format = GST_FORMAT_TIME;
+	long long position;
+	if (gst_element_query_position(gst_player, &amp;format, &amp;position) == TRUE) {
+		if (format == GST_FORMAT_TIME) {
+			return (position / 1000000); // return in ms
+		}
+	}
+	return 0;
+}
+
+PlaySourceRef PlaybackManager::get_playing_source()
+{
+	return current_playlist;
+}
+
+int PlaybackManager::get_playing_index()
+{
+	return current_index;
+}
+
+void PlaybackManager::set_shuffle(ShuffleType type)
+{
+	current_shuffle = type;
+}
+</div>
+</body></html>

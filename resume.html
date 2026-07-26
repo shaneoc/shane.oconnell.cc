@@ -117,6 +117,10 @@ if (document.location.href.startsWith('file:')) {
         for (let i = 0; i < index_links.length; i++) {
             index_links[i].href += 'index.html';
         }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
     });
 }
 </script>
@@ -331,17 +335,17 @@ machines to a central server</li>
 <div class="job-description">
 <ul>
 <li>Became interested in operating systems and assembly language while in high school</li>
-<li>Created a website <a href="archive/2002/zark.sock.ath.cx/docs/outline_0.1b0.html.info.html">describing my
+<li>Created a website <a href="2002/zark.sock.ath.cx/docs/outline_0.1b0.html.info" class="html-link">describing my
 plan</a> to
-create an operating system which was able to <a href="archive/2002/zark.sock.ath.cx/docs/zarkos_goals_20-01-2002.html.info.html">compete with Microsoft
+create an operating system which was able to <a href="2002/zark.sock.ath.cx/docs/zarkos_goals_20-01-2002.html.info" class="html-link">compete with Microsoft
 Windows</a></li>
 <li>The project did not proceed very far, however it did reach the point where
-the operating system was able to <a href="archive/2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.info.html">boot and print a
+the operating system was able to <a href="2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.info" class="html-link">boot and print a
 message</a></li>
 </ul>
 <figure>
-<a href="archive/2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.jpg">
-<img src="archive/2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.jpg" loading="lazy" /></a>
+<a href="2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.jpg">
+<img src="2002/kryptOS/Old-Source/os.2002.06.17/screenshot.bmp.jpg" loading="lazy" /></a>
 <figcaption>Photo 5 - Message printed when my boot code was executed containing
 an obvious buffer overflow</figcaption>
 </figure>
@@ -351,8 +355,8 @@ an obvious buffer overflow</figcaption>
 <div class="job-date">~1997</div>
 <div class="job-description">
 <ul>
-<li>Created <a href="https://animorph90.shaneoc.net/">a website</a> which provided
-information for fans of the
+<li>Created <a href="https://animorph90.shaneoc.net/" class="index-link">a website</a> which
+provided information for fans of the
 <a href="https://en.wikipedia.org/wiki/Animorphs">Animorphs</a> book series</li>
 <li>Wrote JavaScript code to implement interactive browser-based quizzes and
 short stories which allowed arbitrary words to be replaced (<a href="https://en.wikipedia.org/wiki/Mad_Libs">mad
