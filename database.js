@@ -606,6 +606,9 @@ const archive_database = [
 ["dir", "journal"],
 ["file", "2026-07-22-the-tenstorrent-groq-dream", "2026-07-22-the-tenstorrent-groq-dream.md"],
 "up",
+["dir", "pages"],
+["file", "2026-06-12-printing-money", "2026-06-12-printing-money.md"],
+"up",
 "up",
 "up",
 ];
