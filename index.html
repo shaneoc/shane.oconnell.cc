@@ -7,13 +7,11 @@
 <style>
 body {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
   justify-content: center;
   background: #000000;
   color: #999999;
   font-family: sans-serif;
-  min-height: 90vh;
   margin: 0;
 }
 
@@ -37,78 +35,50 @@ a:active {
   color: #ffffff;
 }
 
+#main {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  gap: 1.5rem;
+  width: 60ch;
+  max-width: 100dvw;
+}
+
+#main > div:not(#al-jazeera-player) {
+  margin-inline: 0.5rem;
+}
+
 #title {
-  font-size: 3em;
+  font-size: 3rem;
   color: #00ff00;
 }
 
-#trapped-in-my-apartment {
-  padding-top: 1em;
-  font-size: 1.3em;
+#page-links {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.3rem;
+  gap: 0.5rem;
 }
 
-#palestine-linkedin {
-  padding-top: 0.5em;
-  font-size: 1.3em;
+#al-jazeera-player {
+  display: flex;
+  flex-direction: column;
 }
 
-#peace-plan {
-  padding-top: 0.5em;
-  font-size: 1.3em;
+#youtube-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
-#printing-money {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#artificial-intelligence {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#resume {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#dating-profile {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#archive {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#animorph90 {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#kr4z {
-  padding-top: 0.5em;
-  font-size: 1.3em;
-}
-
-#social-links {
-  padding-top: 2em;
-}
-
-#youtube-player {
+#youtube-iframe {
   aspect-ratio: 16 / 9;
-  padding-top: 3em;
-  flex-shrink: 1;
-  flex-grow: 1;
-  max-height: 20em;
-  max-width: 100vw;
+  width: min(100%, calc(100dvh * (16 / 9)));
 }
 
-#buy-links {
-  padding-top: 2em;
-  font-size: 1em;
-  text-align: center;
+#info-links {
+  display: flex;
+  flex-direction: column;
 }
 </style>
 <script>
@@ -126,41 +96,44 @@ if (document.location.href.startsWith('file:')) {
 }
 </script>
 </head><body>
-<div id="title">Shane's Website</div>
-<div id="trapped-in-my-apartment"><a href="trapped-in-my-apartment/" class="index-link"><strong>Trapped in My Apartment</strong></a></div>
-<div id="palestine-linkedin"><a href="palestine-linkedin/" class="index-link">My LinkedIn Posts on Palestine</a></div>
-<div id="peace-plan"><a href="israel-palestine-peace-plan.html">An Israel-Palestine Peace Plan</a></div>
-<div id="printing-money"><a href="2026/pages/2026-06-12-printing-money" class="html-link">Printing Money</a></div>
-<div id="artificial-intelligence"><a href="ai/" class="index-link">Artificial Intelligence</a></div>
-<div id="resume"><a href="resume.html">Resume</a></div>
-<div id="dating-profile"><a href="dating-profile.html">Dating Profile</a></div>
-<div id="archive"><a href="archive/" class="index-link">Archive</a></div>
-<div id="animorph90"><a href="https://animorph90.shaneoc.net/" class="index-link">animorph90.shaneoc.net</a></div>
-<div id="kr4z"><a href="https://kr4z.com/" class="index-link">kr4z.com</a></div>
-<div id="social-links">
-  <a href="https://www.linkedin.com/in/shaneoconnell">LinkedIn</a> |
-  <a href="https://x.com/ShaneOConnell">X</a> |
-  <a href="https://bsky.app/profile/shane.kr4z.com">Bluesky</a> |
-  <a href="https://mastodon.social/@shaneoc" rel="me">Mastodon</a> |
-  <a href="https://github.com/shaneoc">GitHub</a>
-</div>
-<iframe id="youtube-player" src="https://www.youtube-nocookie.com/embed/gCNeDWCI0vo?si=W-HJ709yFpLsjw9d" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-<div id="instructions">
-  <a href="https://www.aljazeera.com/live">Watch Al Jazeera</a> to understand what is happening
-</div>
-<div id="buy-links">
-  <a href="https://www.mapart.com/Toronto-Pocket-Street-Atlas--20073_p_342.html">Paper map of Toronto</a> |
-  <a href="https://www.mapart.com/Maps-Atlases_c_7.html">Other cities</a><br>
-  For voice: <a href="https://en.wikipedia.org/wiki/Baofeng_UV-5R">Baofeng UV-5R</a>
-  (<a href="https://www.amazon.ca/BAOFENG-5RH-430-450MHz-Rechargeable-Frequency/dp/B0D4K8TCVW">Amazon</a> |
-  <a href="https://www.amazon.ca/BAOFENG-Handheld-144-148Mhz-430-450Mhz-Receiving/dp/B0D45T2KKJ">Alternate</a>)<br>
-  For the computer:
-  <a href="https://www.rtl-sdr.com/about-rtl-sdr/">RTL-SDR</a>
-  (<a href="https://www.amazon.ca/RTL-SDR-Blog-RTL2832U-Software-Defined/dp/B0CD7558GT">Amazon</a> |
-  <a href="https://www.amazon.ca/Nooelec-NESDR-SMArt-Bundle-R820T2-Based/dp/B01GDN1T4S">Alternate</a>)<br>
-  <a href="palestine-linkedin/2024-09-17-baofeng-uv-5r.html">Radio Information</a> |
-  <a href="palestine-linkedin/2025-04-13-food-delivery-drones.html">Food Delivery Drones</a><br>
-  Online chat:
-  <a href="https://kiwiirc.hybridirc.com/#toronto">#toronto on HybridIRC</a>
-</div>
+  <div id="main">
+    <div id="title">Shane's Website</div>
+    <div id="page-links">
+      <div><a href="trapped-in-my-apartment/" class="index-link"><strong>Trapped in My Apartment</strong></a></div>
+      <div><a href="palestine-linkedin/" class="index-link">My LinkedIn Posts on Palestine</a></div>
+      <div><a href="israel-palestine-peace-plan.html">An Israel-Palestine Peace Plan</a></div>
+      <div><a href="2026/pages/2026-06-12-printing-money" class="html-link">Printing Money</a></div>
+      <div><a href="ai/" class="index-link">Artificial Intelligence</a></div>
+      <div><a href="resume.html">Resume</a></div>
+      <div><a href="dating-profile.html">Dating Profile</a></div>
+      <div><a href="archive/" class="index-link">Archive</a></div>
+      <div><a href="https://animorph90.shaneoc.net/" class="index-link">animorph90.shaneoc.net</a></div>
+      <div><a href="https://kr4z.com/" class="index-link">kr4z.com</a></div>
+    </div>
+    <div>
+      <a href="https://www.linkedin.com/in/shaneoconnell">LinkedIn</a> |
+      <a href="https://x.com/ShaneOConnell">X</a> |
+      <a href="https://bsky.app/profile/shane.kr4z.com">Bluesky</a> |
+      <a href="https://mastodon.social/@shaneoc" rel="me">Mastodon</a> |
+      <a href="https://github.com/shaneoc">GitHub</a>
+    </div>
+    <div id="al-jazeera-player">
+      <div id="youtube-wrapper">
+        <iframe id="youtube-iframe" src="https://www.youtube-nocookie.com/embed/gCNeDWCI0vo?si=W-HJ709yFpLsjw9d" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+      <div>
+        <a href="https://www.aljazeera.com/live">Watch Al Jazeera</a> to understand what is happening
+      </div>
+    </div>
+    <div id="info-links">
+      <div>Online chat: <a href="https://kiwiirc.hybridirc.com/#toronto">#toronto on HybridIRC</a></div>
+      <div><a href="https://github.com/shaneoc/shane.oconnell.cc/commits/main/">Website Updates</a></div>
+    </div>
+    <div>
+      Aside from the exceptions noted in
+      <a href="https://github.com/shaneoc/shane.oconnell.cc?tab=License-1-ov-file">the license</a>,
+      the content and source code of this website were manually written by a
+      human and were not generated using AI
+    </div>
+  </div>
 </body></html>
