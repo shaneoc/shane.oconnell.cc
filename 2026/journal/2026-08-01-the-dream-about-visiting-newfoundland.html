@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>The Dream About Visiting Newfoundland - 2026/journal - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .html-view {
+    grid-area: content;
+    display: none;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: auto;
+}
+
+body > .html-view > div {
+    width: clamp(50ch, 50%, 80ch);
+    max-width: 100%;
+    margin: 0.5rem;
+}
+
+body > .html-view > div a {
+    color: #0000DD;
+}
+
+body > .html-view > div a:visited {
+    color: #000099;
+}
+
+body > .html-view > div img {
+    max-width: 100%;
+    height: auto;
+}
+
+body > .html-view > div details {
+    margin: 0.3em 0;
+}
+
+body > .html-view > div details > p {
+    padding-left: 1em;
+}
+
+body > .html-view > div details > p:first-of-type {
+    margin-top: 0.5em;
+}
+
+body > .html-view > div summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+body > .html-view > div .indent-paragraph {
+    padding-inline-start: 1rem;
+}
+
+body > .html-view > div .margin-top-zero {
+    margin-top: 0;
+}
+
+body > .html-view > div .margin-bottom-zero {
+    margin-bottom: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: flex;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">journal</button>
+<span>/</span>
+<span class="filename">2026-08-01-the-dream-about-visiting-newfoundland.md</span>
+</div>
+<div class="mtime-info">2026-08-01 23:20:38.274614 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/journal/2026-07-22-the-tenstorrent-groq-dream">previous</a>
+<a class="next-link active-link html-link" href="../../2026/pages/2026-06-12-printing-money">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<div class="html-view"><div><h1>The Dream About Visiting Newfoundland</h1>
+<p><strong>Date:</strong> 2026-08-01<br>
+<strong>Time:</strong> 10:52 am</p>
+<p>I just woke up from a dream that I partially remember.</p>
+<p>I was visiting Newfoundland. I cannot remember why I was there exactly. At the
+start of the dream, I was walking through a rural part of Newfoundland, and I
+was looking at a map while I walked. I passed by a small town that for some
+reason was called &quot;fries&quot; on the map. While I was walking through a wooded area
+next to the town, I encountered some young people, who were friendly. When I
+talked to them, they told me that they wanted to help immigrants.</p>
+<p>After I returned from my walk, I hung out with my family at a hotel. I was
+sharing a room with <span style="background: #ffeeee; ">[redacted]</span>, and our cousins were also often hanging out with us
+in our room. At one point, I somehow prepared a meal in our room, which I think
+was actually pieces of breaded chicken. I am not sure how I prepared this in
+our hotel room. Some time after this, someone asked me if I wanted to go to
+church that day. I said yes, just to be nice, and because I was visiting
+Newfoundland and people probably wanted me to go. I then left the room and did
+some other things.</p>
+<p>After a while, I came back to the room and noticed that <span style="background: #ffeeee; ">[redacted]</span> and my cousins
+had made a big mess, and had moved my stuff around. My stuff was now on the
+floor, and the food that I had made had gotten dirty so it was no longer
+edible. I was very frustrated about this. Also, for some reason, while I was in
+the hotel room, I could see that someone who worked in the hotel was helping
+<span style="background: #ffeeee; ">[redacted]</span> and my cousins manually create Coca-Cola to drink, and for some reason it
+involved leaving containers of water to settle for a long time before using the
+water, which they had left in various places in the hotel room. I found this
+strange at first, though after I thought about it I realized that I kind of
+wanted some Coca-Cola. After observing this for a while I left the hotel room.</p>
+<p>In addition to this, either before or after coming back to the hotel room, I am
+not quite sure which, I changed my mind about going to church. I realized that
+<span style="background: #ffeeee; ">[redacted]</span> and my cousins were not going, and I realized that people appeared to
+have thought that I had agreed to go to church because I was religious, which
+was not true. I wanted it to be clear that I was not religious. After I left
+the room, and some time passed, I ended up somewhere else where I was
+explaining to my parents and a few other people why I was not going to go to
+church. While I was explaining this, I started to get really angry at a male
+stranger about the fact that I had been <a href="../../trapped-in-my-apartment/" class="index-link">trapped in my apartment in
+Toronto</a> for a long time. I got
+angry at them as if they were one of my parents, and I am not sure why I did
+that given that they were a stranger. I started to think about things a bit
+more, and it started to occur to me that I could not actually remember how I
+had ended up leaving my apartment in Toronto in order to visit Newfoundland.
+This started to make me feel very concerned.</p>
+<p>I kept trying to remember how I had left my apartment in Toronto. I suddenly
+found myself riding on a bus, and I do not remember how I got there. I asked
+someone who was with me about it, who appeared to somehow simultaneously be
+<span style="background: #ffeeee; ">[redacted]</span> and my cousin <span style="background: #ffeeee; ">[redacted]</span> at the same time, though I felt like it was mostly
+<span style="background: #ffeeee; ">[redacted]</span>. He claimed not to know, though eventually he started to hint that a
+company had brought me to Newfoundland, and it started to seem possible that
+maybe my family had hired a company to force me to leave my apartment. I found
+this very alarming.</p>
+<p>I started trying to access my website on my phone in order to see if I had
+written some kind of explanation on my website, however I was not able to
+access the Internet. I realized that I had to go back to the hotel in order to
+access the Internet, which was where the bus was going anyway, so I thought
+about it a bit more while I was on the bus. I felt increasingly anxious about
+the fact that I could not remember how I had left my apartment in Toronto, and
+I became worried about my property in the apartment. I also started to think
+that maybe it was possible that I did have a mental illness because of the fact
+that I could not remember how I had left the apartment. I started to think
+about the fact that I did not have a girlfriend, and how it seemed likely that
+it would now become even more difficult to find a girlfriend, because it seemed
+like women would not want to date someone with a mental illness. I felt sad
+about this. I thought about the female patient that I had met at CAMH when I
+was there who gave me her phone number, and I started to want to contact her,
+because it seemed like she might be the only person I knew who might have
+sympathy for me and might want to be my girlfriend even though I had a mental
+illness.</p>
+<p>A short while after this, I woke up. I suddenly realized that the reason that I
+could not remember how I had left the apartment was because I was actually
+still in the apartment and had been having a dream. I was relieved, and I
+verbally said &quot;Oh, it was just a dream&quot;.</p>
+<hr />
+<h2>Interpretation</h2>
+<p>I found this dream particularly interesting because of the fact that at one
+point during the dream I started to become anxious about the fact that I could
+not remember how I had left my apartment in Toronto. Even though I was having a
+dream in which a lot of other strange and unusual things had happened that seem
+like they should have caused me to suspect that I was having a dream, I did not
+realize that I was having a dream. However, despite the fact that I was not
+able to realize that I was having a dream, I was able to realize that I had no
+memory of leaving my apartment in Toronto, which actually makes sense because
+that memory does not exist due to the fact that I was having the dream while
+still physically inside that apartment. When I woke up and realized that I was
+having a dream and was still in my apartment, and that this was the explanation
+for why I could not remember leaving the apartment, I was relieved. This meant
+that I was back to feeling sane and no longer had any reason to believe that I
+had a mental illness.</p>
+<p>If you have read the page on my website about being trapped in my apartment, a
+lot of the dream probably makes sense without very much explanation. My family
+mostly lives in Newfoundland, and I have been frustrated with them for filling
+out forms to have me forcibly brought to a psychiatric facility, and so it
+makes sense that I would express this frustration in the dream.</p>
+<p>The reference to immigration at the beginning of the dream was interesting. I
+have never really had much discussion with people I know in Newfoundland about
+immigration, so I do not really know what their opinions actually are. However,
+Newfoundland has had a problem for a long time with young people moving away,
+and I have a feeling that if I was a young person living in rural Newfoundland
+that I would want people to immigrate to the province. It would mean having
+more options when trying to meet people to date.</p>
+<p>At the end of the dream, I mentioned the female patient who gave me her phone
+number while I was at CAMH. This is something that I also described on the page
+about being trapped in my apartment, in the section about the third visit to a
+psychiatric facility. I have thought about this person a few times because I
+very much like that she gave me her phone number as soon as she saw me, while
+apparently not knowing anything else about me besides my appearance. We only
+had a short conversation while I was at CAMH, so I do not really know very much
+about her personality or her interests or whether we would actually be a good
+match as a couple. I would be willing to be friends though, and to see if we
+would get along.</p>
+<p>As for the reference to Coca-Cola, I actually have in my waking life recently
+been thinking about the fact that I have not had any carbonated drinks in a
+long time. I used to drink Coke Zero fairly often while I worked. Maybe it was
+the fact that I had been thinking about it recently that caused me to dream
+about it. The other thing that might be related is the fact that in my waking
+life I actually had an accident a number of years ago in which I fell down some
+stairs at a restaurant and landed on my face, which caused me to have a
+<a href="https://en.wikipedia.org/wiki/Nasal_septum_deviation">deviated septum</a>. Ever
+since then, I have found it difficult to sleep with my mouth closed because I
+find it difficult to inhale enough air through my nose in order to sleep
+comfortably. This causes my mouth to become dry while I sleep. I had another
+dream a while ago in which my mouth was very dry in the dream, and so I suspect
+that this is something that I sometimes notice in my dreams.</p>
+<p>Personally, I find the deviated septum frustrating, however it is one of the
+things that I hope to eventually fix as a consequence of improved technology in
+the future after the <a href="https://en.wikipedia.org/wiki/Technological_singularity">AI
+singularity</a> happens,
+which should improve many technologies very quickly. I am planning to try to
+fix my deviated septum myself using some combination of AI, robotics, and the
+technology that allows humanity to create perfect <a href="https://en.wikipedia.org/wiki/Cultured_meat">lab grown
+meat</a>. I have also been
+specifically <a href="../../ai/chatgpt/0008-relaxation-and-snack-time.html#artificial-meat">thinking about trying to create lab grown
+meat</a>
+recently. Maybe this is one of the reasons why in my dream I made some breaded
+chicken in the hotel room.</p>
+<hr />
+<p>Dream description last updated: 2026-08-01<br>
+Dream interpretation last updated: 2026-08-01</p>
+</div></div>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view"># The Dream About Visiting Newfoundland
+
+**Date:** 2026-08-01&lt;br&gt;
+**Time:** 10:52 am
+
+I just woke up from a dream that I partially remember.
+
+I was visiting Newfoundland. I cannot remember why I was there exactly. At the
+start of the dream, I was walking through a rural part of Newfoundland, and I
+was looking at a map while I walked. I passed by a small town that for some
+reason was called "fries" on the map. While I was walking through a wooded area
+next to the town, I encountered some young people, who were friendly. When I
+talked to them, they told me that they wanted to help immigrants.
+
+After I returned from my walk, I hung out with my family at a hotel. I was
+sharing a room with <span style="background: #ffeeee; ">[redacted]</span>, and our cousins were also often hanging out with us
+in our room. At one point, I somehow prepared a meal in our room, which I think
+was actually pieces of breaded chicken. I am not sure how I prepared this in
+our hotel room. Some time after this, someone asked me if I wanted to go to
+church that day. I said yes, just to be nice, and because I was visiting
+Newfoundland and people probably wanted me to go. I then left the room and did
+some other things.
+
+After a while, I came back to the room and noticed that <span style="background: #ffeeee; ">[redacted]</span> and my cousins
+had made a big mess, and had moved my stuff around. My stuff was now on the
+floor, and the food that I had made had gotten dirty so it was no longer
+edible. I was very frustrated about this. Also, for some reason, while I was in
+the hotel room, I could see that someone who worked in the hotel was helping
+<span style="background: #ffeeee; ">[redacted]</span> and my cousins manually create Coca-Cola to drink, and for some reason it
+involved leaving containers of water to settle for a long time before using the
+water, which they had left in various places in the hotel room. I found this
+strange at first, though after I thought about it I realized that I kind of
+wanted some Coca-Cola. After observing this for a while I left the hotel room.
+
+In addition to this, either before or after coming back to the hotel room, I am
+not quite sure which, I changed my mind about going to church. I realized that
+<span style="background: #ffeeee; ">[redacted]</span> and my cousins were not going, and I realized that people appeared to
+have thought that I had agreed to go to church because I was religious, which
+was not true. I wanted it to be clear that I was not religious. After I left
+the room, and some time passed, I ended up somewhere else where I was
+explaining to my parents and a few other people why I was not going to go to
+church. While I was explaining this, I started to get really angry at a male
+stranger about the fact that I had been [trapped in my apartment in
+Toronto](../../trapped-in-my-apartment/){.index-link} for a long time. I got
+angry at them as if they were one of my parents, and I am not sure why I did
+that given that they were a stranger. I started to think about things a bit
+more, and it started to occur to me that I could not actually remember how I
+had ended up leaving my apartment in Toronto in order to visit Newfoundland.
+This started to make me feel very concerned.
+
+I kept trying to remember how I had left my apartment in Toronto. I suddenly
+found myself riding on a bus, and I do not remember how I got there. I asked
+someone who was with me about it, who appeared to somehow simultaneously be
+<span style="background: #ffeeee; ">[redacted]</span> and my cousin <span style="background: #ffeeee; ">[redacted]</span> at the same time, though I felt like it was mostly
+<span style="background: #ffeeee; ">[redacted]</span>. He claimed not to know, though eventually he started to hint that a
+company had brought me to Newfoundland, and it started to seem possible that
+maybe my family had hired a company to force me to leave my apartment. I found
+this very alarming.
+
+I started trying to access my website on my phone in order to see if I had
+written some kind of explanation on my website, however I was not able to
+access the Internet. I realized that I had to go back to the hotel in order to
+access the Internet, which was where the bus was going anyway, so I thought
+about it a bit more while I was on the bus. I felt increasingly anxious about
+the fact that I could not remember how I had left my apartment in Toronto, and
+I became worried about my property in the apartment. I also started to think
+that maybe it was possible that I did have a mental illness because of the fact
+that I could not remember how I had left the apartment. I started to think
+about the fact that I did not have a girlfriend, and how it seemed likely that
+it would now become even more difficult to find a girlfriend, because it seemed
+like women would not want to date someone with a mental illness. I felt sad
+about this. I thought about the female patient that I had met at CAMH when I
+was there who gave me her phone number, and I started to want to contact her,
+because it seemed like she might be the only person I knew who might have
+sympathy for me and might want to be my girlfriend even though I had a mental
+illness.
+
+A short while after this, I woke up. I suddenly realized that the reason that I
+could not remember how I had left the apartment was because I was actually
+still in the apartment and had been having a dream. I was relieved, and I
+verbally said "Oh, it was just a dream".
+
+---
+
+## Interpretation
+
+I found this dream particularly interesting because of the fact that at one
+point during the dream I started to become anxious about the fact that I could
+not remember how I had left my apartment in Toronto. Even though I was having a
+dream in which a lot of other strange and unusual things had happened that seem
+like they should have caused me to suspect that I was having a dream, I did not
+realize that I was having a dream. However, despite the fact that I was not
+able to realize that I was having a dream, I was able to realize that I had no
+memory of leaving my apartment in Toronto, which actually makes sense because
+that memory does not exist due to the fact that I was having the dream while
+still physically inside that apartment. When I woke up and realized that I was
+having a dream and was still in my apartment, and that this was the explanation
+for why I could not remember leaving the apartment, I was relieved. This meant
+that I was back to feeling sane and no longer had any reason to believe that I
+had a mental illness.
+
+If you have read the page on my website about being trapped in my apartment, a
+lot of the dream probably makes sense without very much explanation. My family
+mostly lives in Newfoundland, and I have been frustrated with them for filling
+out forms to have me forcibly brought to a psychiatric facility, and so it
+makes sense that I would express this frustration in the dream.
+
+The reference to immigration at the beginning of the dream was interesting. I
+have never really had much discussion with people I know in Newfoundland about
+immigration, so I do not really know what their opinions actually are. However,
+Newfoundland has had a problem for a long time with young people moving away,
+and I have a feeling that if I was a young person living in rural Newfoundland
+that I would want people to immigrate to the province. It would mean having
+more options when trying to meet people to date.
+
+At the end of the dream, I mentioned the female patient who gave me her phone
+number while I was at CAMH. This is something that I also described on the page
+about being trapped in my apartment, in the section about the third visit to a
+psychiatric facility. I have thought about this person a few times because I
+very much like that she gave me her phone number as soon as she saw me, while
+apparently not knowing anything else about me besides my appearance. We only
+had a short conversation while I was at CAMH, so I do not really know very much
+about her personality or her interests or whether we would actually be a good
+match as a couple. I would be willing to be friends though, and to see if we
+would get along.
+
+As for the reference to Coca-Cola, I actually have in my waking life recently
+been thinking about the fact that I have not had any carbonated drinks in a
+long time. I used to drink Coke Zero fairly often while I worked. Maybe it was
+the fact that I had been thinking about it recently that caused me to dream
+about it. The other thing that might be related is the fact that in my waking
+life I actually had an accident a number of years ago in which I fell down some
+stairs at a restaurant and landed on my face, which caused me to have a
+[deviated septum](https://en.wikipedia.org/wiki/Nasal_septum_deviation). Ever
+since then, I have found it difficult to sleep with my mouth closed because I
+find it difficult to inhale enough air through my nose in order to sleep
+comfortably. This causes my mouth to become dry while I sleep. I had another
+dream a while ago in which my mouth was very dry in the dream, and so I suspect
+that this is something that I sometimes notice in my dreams.
+
+Personally, I find the deviated septum frustrating, however it is one of the
+things that I hope to eventually fix as a consequence of improved technology in
+the future after the [AI
+singularity](https://en.wikipedia.org/wiki/Technological_singularity) happens,
+which should improve many technologies very quickly. I am planning to try to
+fix my deviated septum myself using some combination of AI, robotics, and the
+technology that allows humanity to create perfect [lab grown
+meat](https://en.wikipedia.org/wiki/Cultured_meat). I have also been
+specifically [thinking about trying to create lab grown
+meat](../../ai/chatgpt/0008-relaxation-and-snack-time.html#artificial-meat)
+recently. Maybe this is one of the reasons why in my dream I made some breaded
+chicken in the hotel room.
+
+---
+
+Dream description last updated: 2026-08-01&lt;br&gt;
+Dream interpretation last updated: 2026-08-01
+</div>
+</body></html>
