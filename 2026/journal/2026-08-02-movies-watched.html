@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Movies Watched - 2026/journal - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .html-view {
+    grid-area: content;
+    display: none;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: auto;
+}
+
+body > .html-view > div {
+    width: clamp(50ch, 50%, 80ch);
+    max-width: 100%;
+    margin: 0.5rem;
+}
+
+body > .html-view > div a {
+    color: #0000DD;
+}
+
+body > .html-view > div a:visited {
+    color: #000099;
+}
+
+body > .html-view > div img {
+    max-width: 100%;
+    height: auto;
+}
+
+body > .html-view > div details {
+    margin: 0.3em 0;
+}
+
+body > .html-view > div details > p {
+    padding-left: 1em;
+}
+
+body > .html-view > div details > p:first-of-type {
+    margin-top: 0.5em;
+}
+
+body > .html-view > div summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+body > .html-view > div .indent-paragraph {
+    padding-inline-start: 1rem;
+}
+
+body > .html-view > div .margin-top-zero {
+    margin-top: 0;
+}
+
+body > .html-view > div .margin-bottom-zero {
+    margin-bottom: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: flex;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">journal</button>
+<span>/</span>
+<span class="filename">2026-08-02-movies-watched.md</span>
+</div>
+<div class="mtime-info">2026-08-02 19:11:34.517951 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/journal/2026-08-01-the-dream-about-visiting-newfoundland">previous</a>
+<a class="next-link active-link html-link" href="../../2026/pages/2026-06-12-printing-money">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<div class="html-view"><div><h1>Movies Watched</h1>
+<p><strong>Date:</strong> 2026-08-02</p>
+<h2>The Martian (2015)</h2>
+<p>I watched <a href="https://en.wikipedia.org/wiki/The_Martian_(film)">The Martian</a> a few
+days ago. It was on the <a href="https://en.wikipedia.org/wiki/AMC_(TV_channel)">AMC
+channel</a> and I started watching
+it part-way through. The movie is about a guy stranded on
+<a href="https://en.wikipedia.org/wiki/Mars">Mars</a> who is saved due to the efforts of
+people on Earth and his fellow crew members who had accidentally left him
+behind when they left Mars. I have seen the movie before, however I decided to
+watch it again after I started watching it on the AMC channel because the
+situation of the guy stranded on Mars reminded me of my situation of being
+<a href="../../trapped-in-my-apartment/" class="index-link">trapped in my apartment</a>. I also
+sometimes wonder if, in real life, we are actually living in a computer
+simulation, and I thought perhaps it was not a coincidence that I happened to
+be seeing this movie on television while being trapped in my apartment.</p>
+<p>It was a reasonably good movie. I felt a bit emotional watching the guy being
+rescued at the end because it made me wonder if this was a sign that I would
+eventually be rescued.</p>
+<h2>The Butterfly Effect (2004)</h2>
+<p>Immediately after watching The Martian, I decided to watch <a href="https://en.wikipedia.org/wiki/The_Butterfly_Effect">The Butterfly
+Effect</a> on Netflix. I
+realized that I had enjoyed watching a movie after not having watched one in a
+while, and The Butterfly Effect was suggested by the Netflix algorithm. I
+believe I have actually seen this movie before, around when it first came out
+in 2004, however I liked the idea of rewatching it for nostalgia reasons. The
+movie is about a guy who experienced trauma when he was young and at various
+points in his life had periods of time during which he had lost his memories.
+The movie is a sci-fi movie, and the name of the movie comes from the
+<a href="https://en.wikipedia.org/wiki/Butterfly_effect">butterfly effect</a>, which is
+the idea that a small change in something that happens at the beginning of a
+complex series of events can have a big impact on the events that happen later
+on.</p>
+<p>While I watched this movie, I tried to consider each thing that happened in the
+movie and whether or not it might be the case that I was seeing it because I
+actually live in a computer simulation and the movie was supposed to contain
+clues that I was supposed to notice. It was difficult to tell if this was the
+case. In my own life, I had an <a href="https://animorph90.shaneoc.net/" class="index-link">Animorphs
+website</a> a long time ago. I
+unfortunately have lost all of the files for the website and do not remember
+how I lost them. I sometimes wonder if I had a traumatic event which I have
+forgotten which explains what happened to the files. Maybe this was something
+that made the movie similar to my life, since the guy in the movie also
+experienced traumatic events. The other thing that I considered was related to
+some events that occurred in the movie in which the guy figures out a way to
+change some of the things that happened in the past which then causes big
+changes in the present. The guy in the movie uses some of his journals in order
+to do so. I wondered if maybe this was supposed to be similar to my life,
+because I have recently been wondering if there are people who have had a
+negative impression of me for a long time, and if maybe the reference in the
+movie was a clue that I was going to be able to change that using the journals
+on my website.</p>
+<p>I enjoyed watching the movie. While the guy is in university, he stays in a
+dorm room which has some computers that were modern around the time that the
+movie came out in 2004, with large <a href="https://en.wikipedia.org/wiki/Cathode_ray_tube">CRT
+displays</a>, which I thought was
+interesting to see for nostalgia reasons.</p>
+<p>I made popcorn using my <a href="https://en.wikipedia.org/wiki/Popcorn_maker">Whirley-Pop
+machine</a> to eat while watching the
+movie. It tasted great at the time, however I think I might have added too much
+salt. I woke up the next day with a headache and I suspect that it might have
+been because I had somehow dehydrated myself due to the large amount of salt.</p>
+<h2>Slingshot (2024)</h2>
+<p>The day after watching The Butterfly Effect, I decided to watch the movie
+<a href="https://en.wikipedia.org/wiki/Slingshot_(2024_film)">Slingshot</a>. Before
+watching it, I briefly considered watching <a href="https://en.wikipedia.org/wiki/The_Mothman_Prophecies_(film)">The Mothman
+Prophecies</a>,
+because Netflix suggested it and it came out around the same time as The
+Butterfly Effect, which I had enjoyed watching due to nostalgia associated with
+the time period. However, after I started it I decided that I did not feel like
+watching a horror movie, and so I started watching Slingshot instead.</p>
+<p>Slingshot is a sci-fi movie about three astronauts that have been sent on a
+mission to visit <a href="https://en.wikipedia.org/wiki/Titan_(moon)">Titan</a>, one of
+the moons orbiting <a href="https://en.wikipedia.org/wiki/Saturn">Saturn</a>. They use a
+method to get there which involves a slingshot maneuver around
+<a href="https://en.wikipedia.org/wiki/Jupiter">Jupiter</a>, which is where the title of
+the movie comes from.</p>
+<p>In the movie, the astronauts start having psychological issues due to the
+stress of the isolation, and I enjoyed this aspect of the movie because it
+reminded me somewhat of my own personal isolation as a consequence of being
+trapped in my apartment. I have not been experiencing anything similar to the
+psychological issues that they experience in the movie, like hallucinations,
+though I can understand their anxiety. I am trying not to give away any
+important plot points, however at one point one of the astronauts starts to
+wonder if his fellow astronauts actually really exist. When this started to
+occur, I felt like it reminded me of my personal situation, because at that
+point it seemed to him like he might be totally alone on the spaceship, like I
+am in my apartment. I enjoyed the creepy, anxiety-inducing feeling of the
+movie.</p>
+<p>Aside from the fact that one of the guys suspected that he was alone, there
+were a few other things that seemed similar to my situation. One of the guys
+kept checking some hand-held radios to see if they were still functional. On my
+website, I have a page where <a href="../../palestine-linkedin/2024-09-17-baofeng-uv-5r.html">I suggested that people should buy a specific
+kind of hand-held
+radio</a>, and this part
+of the movie reminded me of my suggestion. When I personally suggested this on
+my website, one of the reasons that I suggested it was because I thought it
+might be a way that I could communicate with people outside of my apartment,
+which I had been inside for a long time at that point. In the movie, the guy
+actually tries to use the radios to communicate with people outside of the
+spaceship, which seemed similar. Also, the guy with the radios often thought
+about a woman that he had dated. This reminded me of <a href="../../dating-profile.html">my personal desire to
+have a girlfriend</a>.</p>
+<p>I enjoyed this movie quite a bit, and I clicked the button on Netflix to give
+it the maximum approval rating so that the algorithm would suggest similar
+movies. I read online afterwords that it received mixed reviews, which I found
+strange because I liked it.</p>
+<h2>Spaceman (2024)</h2>
+<p>Yesterday, the day after watching Slingshot, I decided to watch the movie
+<a href="https://en.wikipedia.org/wiki/Spaceman_(2024_film)">Spaceman</a>. Spaceman is
+another sci-fi movie that takes place in space, similar to Slingshot. Given
+that I had enjoyed Slingshot I felt like watching another similar movie.</p>
+<p>Slingshot is about an astronaut that had been sent on a mission to examine a
+strange space phenomenon that had been observed from Earth, which consisted of
+a cloud of purple particles that were floating in space beyond Jupiter. The
+astronaut had been sent to examine the particles by himself and was the only
+person on the spaceship. While on the journey to examine the particles, he
+encounters an alien being which appears inside his spaceship. The alien is very
+strange looking, and looks similar to a large spider, though it speaks English
+perfectly. The astronaut does not tell the people on Earth about the alien.
+Instead, he makes friends with the alien, and they often have discussions about
+the life of the astronaut. In particular, they often talk about relationship
+problems that exist between the astronaut and his wife on Earth.</p>
+<p>The movie has a creepy, anxiety-inducing feeling to it, somewhat similar to
+Slingshot, though with an even stranger feeling due to the presence of the very
+strange looking alien. After finishing the movie, I felt that I enjoyed it,
+however during the middle of the movie the alien made me feel very
+uncomfortable. It was also somewhat depressing in the middle of the movie,
+because the storyline kept emphasizing how lonely the astronaut was. I
+personally feel lonely as a consequence of being trapped in my apartment, and I
+liked that the movie was portraying emotions that were similar to how I felt,
+however it made me feel a bit sad to be reminded of my personal situation.
+Nonetheless, I felt like it was a good movie. Sometimes it is strangely
+enjoyable to experience different kinds of emotions, even if they are sometimes
+negative emotions.</p>
+<p>After the movie was over, I considered whether the movie might contain any
+intentional clues from the creator of a potential computer simulation that I
+might be living inside. There did not seem to be as many potential clues as
+there appeared to have been with The Martian and in particular The Butterfly
+Effect, which had specific references like the journals. The experiences of the
+astronaut did seem similar to my own experiences due to the fact that he was
+very lonely. I spent some time wondering whether his relationship with his wife
+on Earth was something that I was supposed to consider to be similar to any
+relationships that I had in my life. This seemed like it could be possible,
+though it was not a precise match for my own experiences. However, there are
+probably a lot of people who are able to relate to the movie in that way, so it
+seems less likely to be an intentional reference from the creator of a
+potential computer simulation that I might be living inside.</p>
+<p>I tried again making popcorn to eat while watching this movie, and this time I
+used a lot less salt. The popcorn did not taste quite as good, though I woke up
+this morning without a headache, so maybe it worked.</p>
+<p>For this movie I also clicked the button on Netflix to give it the maximum
+approval rating.</p>
+</div></div>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view"># Movies Watched
+
+**Date:** 2026-08-02
+
+## The Martian (2015)
+
+I watched [The Martian](https://en.wikipedia.org/wiki/The_Martian_(film)) a few
+days ago. It was on the [AMC
+channel](https://en.wikipedia.org/wiki/AMC_(TV_channel)) and I started watching
+it part-way through. The movie is about a guy stranded on
+[Mars](https://en.wikipedia.org/wiki/Mars) who is saved due to the efforts of
+people on Earth and his fellow crew members who had accidentally left him
+behind when they left Mars. I have seen the movie before, however I decided to
+watch it again after I started watching it on the AMC channel because the
+situation of the guy stranded on Mars reminded me of my situation of being
+[trapped in my apartment](../../trapped-in-my-apartment/){.index-link}. I also
+sometimes wonder if, in real life, we are actually living in a computer
+simulation, and I thought perhaps it was not a coincidence that I happened to
+be seeing this movie on television while being trapped in my apartment.
+
+It was a reasonably good movie. I felt a bit emotional watching the guy being
+rescued at the end because it made me wonder if this was a sign that I would
+eventually be rescued.
+
+## The Butterfly Effect (2004)
+
+Immediately after watching The Martian, I decided to watch [The Butterfly
+Effect](https://en.wikipedia.org/wiki/The_Butterfly_Effect) on Netflix. I
+realized that I had enjoyed watching a movie after not having watched one in a
+while, and The Butterfly Effect was suggested by the Netflix algorithm. I
+believe I have actually seen this movie before, around when it first came out
+in 2004, however I liked the idea of rewatching it for nostalgia reasons. The
+movie is about a guy who experienced trauma when he was young and at various
+points in his life had periods of time during which he had lost his memories.
+The movie is a sci-fi movie, and the name of the movie comes from the
+[butterfly effect](https://en.wikipedia.org/wiki/Butterfly_effect), which is
+the idea that a small change in something that happens at the beginning of a
+complex series of events can have a big impact on the events that happen later
+on.
+
+While I watched this movie, I tried to consider each thing that happened in the
+movie and whether or not it might be the case that I was seeing it because I
+actually live in a computer simulation and the movie was supposed to contain
+clues that I was supposed to notice. It was difficult to tell if this was the
+case. In my own life, I had an [Animorphs
+website](https://animorph90.shaneoc.net/){.index-link} a long time ago. I
+unfortunately have lost all of the files for the website and do not remember
+how I lost them. I sometimes wonder if I had a traumatic event which I have
+forgotten which explains what happened to the files. Maybe this was something
+that made the movie similar to my life, since the guy in the movie also
+experienced traumatic events. The other thing that I considered was related to
+some events that occurred in the movie in which the guy figures out a way to
+change some of the things that happened in the past which then causes big
+changes in the present. The guy in the movie uses some of his journals in order
+to do so. I wondered if maybe this was supposed to be similar to my life,
+because I have recently been wondering if there are people who have had a
+negative impression of me for a long time, and if maybe the reference in the
+movie was a clue that I was going to be able to change that using the journals
+on my website.
+
+I enjoyed watching the movie. While the guy is in university, he stays in a
+dorm room which has some computers that were modern around the time that the
+movie came out in 2004, with large [CRT
+displays](https://en.wikipedia.org/wiki/Cathode_ray_tube), which I thought was
+interesting to see for nostalgia reasons.
+
+I made popcorn using my [Whirley-Pop
+machine](https://en.wikipedia.org/wiki/Popcorn_maker) to eat while watching the
+movie. It tasted great at the time, however I think I might have added too much
+salt. I woke up the next day with a headache and I suspect that it might have
+been because I had somehow dehydrated myself due to the large amount of salt.
+
+## Slingshot (2024)
+
+The day after watching The Butterfly Effect, I decided to watch the movie
+[Slingshot](https://en.wikipedia.org/wiki/Slingshot_(2024_film)). Before
+watching it, I briefly considered watching [The Mothman
+Prophecies](https://en.wikipedia.org/wiki/The_Mothman_Prophecies_(film)),
+because Netflix suggested it and it came out around the same time as The
+Butterfly Effect, which I had enjoyed watching due to nostalgia associated with
+the time period. However, after I started it I decided that I did not feel like
+watching a horror movie, and so I started watching Slingshot instead.
+
+Slingshot is a sci-fi movie about three astronauts that have been sent on a
+mission to visit [Titan](https://en.wikipedia.org/wiki/Titan_(moon)), one of
+the moons orbiting [Saturn](https://en.wikipedia.org/wiki/Saturn). They use a
+method to get there which involves a slingshot maneuver around
+[Jupiter](https://en.wikipedia.org/wiki/Jupiter), which is where the title of
+the movie comes from.
+
+In the movie, the astronauts start having psychological issues due to the
+stress of the isolation, and I enjoyed this aspect of the movie because it
+reminded me somewhat of my own personal isolation as a consequence of being
+trapped in my apartment. I have not been experiencing anything similar to the
+psychological issues that they experience in the movie, like hallucinations,
+though I can understand their anxiety. I am trying not to give away any
+important plot points, however at one point one of the astronauts starts to
+wonder if his fellow astronauts actually really exist. When this started to
+occur, I felt like it reminded me of my personal situation, because at that
+point it seemed to him like he might be totally alone on the spaceship, like I
+am in my apartment. I enjoyed the creepy, anxiety-inducing feeling of the
+movie.
+
+Aside from the fact that one of the guys suspected that he was alone, there
+were a few other things that seemed similar to my situation. One of the guys
+kept checking some hand-held radios to see if they were still functional. On my
+website, I have a page where [I suggested that people should buy a specific
+kind of hand-held
+radio](../../palestine-linkedin/2024-09-17-baofeng-uv-5r.html), and this part
+of the movie reminded me of my suggestion. When I personally suggested this on
+my website, one of the reasons that I suggested it was because I thought it
+might be a way that I could communicate with people outside of my apartment,
+which I had been inside for a long time at that point. In the movie, the guy
+actually tries to use the radios to communicate with people outside of the
+spaceship, which seemed similar. Also, the guy with the radios often thought
+about a woman that he had dated. This reminded me of [my personal desire to
+have a girlfriend](../../dating-profile.html).
+
+I enjoyed this movie quite a bit, and I clicked the button on Netflix to give
+it the maximum approval rating so that the algorithm would suggest similar
+movies. I read online afterwords that it received mixed reviews, which I found
+strange because I liked it.
+
+## Spaceman (2024)
+
+Yesterday, the day after watching Slingshot, I decided to watch the movie
+[Spaceman](https://en.wikipedia.org/wiki/Spaceman_(2024_film)). Spaceman is
+another sci-fi movie that takes place in space, similar to Slingshot. Given
+that I had enjoyed Slingshot I felt like watching another similar movie.
+
+Slingshot is about an astronaut that had been sent on a mission to examine a
+strange space phenomenon that had been observed from Earth, which consisted of
+a cloud of purple particles that were floating in space beyond Jupiter. The
+astronaut had been sent to examine the particles by himself and was the only
+person on the spaceship. While on the journey to examine the particles, he
+encounters an alien being which appears inside his spaceship. The alien is very
+strange looking, and looks similar to a large spider, though it speaks English
+perfectly. The astronaut does not tell the people on Earth about the alien.
+Instead, he makes friends with the alien, and they often have discussions about
+the life of the astronaut. In particular, they often talk about relationship
+problems that exist between the astronaut and his wife on Earth.
+
+The movie has a creepy, anxiety-inducing feeling to it, somewhat similar to
+Slingshot, though with an even stranger feeling due to the presence of the very
+strange looking alien. After finishing the movie, I felt that I enjoyed it,
+however during the middle of the movie the alien made me feel very
+uncomfortable. It was also somewhat depressing in the middle of the movie,
+because the storyline kept emphasizing how lonely the astronaut was. I
+personally feel lonely as a consequence of being trapped in my apartment, and I
+liked that the movie was portraying emotions that were similar to how I felt,
+however it made me feel a bit sad to be reminded of my personal situation.
+Nonetheless, I felt like it was a good movie. Sometimes it is strangely
+enjoyable to experience different kinds of emotions, even if they are sometimes
+negative emotions.
+
+After the movie was over, I considered whether the movie might contain any
+intentional clues from the creator of a potential computer simulation that I
+might be living inside. There did not seem to be as many potential clues as
+there appeared to have been with The Martian and in particular The Butterfly
+Effect, which had specific references like the journals. The experiences of the
+astronaut did seem similar to my own experiences due to the fact that he was
+very lonely. I spent some time wondering whether his relationship with his wife
+on Earth was something that I was supposed to consider to be similar to any
+relationships that I had in my life. This seemed like it could be possible,
+though it was not a precise match for my own experiences. However, there are
+probably a lot of people who are able to relate to the movie in that way, so it
+seems less likely to be an intentional reference from the creator of a
+potential computer simulation that I might be living inside.
+
+I tried again making popcorn to eat while watching this movie, and this time I
+used a lot less salt. The popcorn did not taste quite as good, though I woke up
+this morning without a headache, so maybe it worked.
+
+For this movie I also clicked the button on Netflix to give it the maximum
+approval rating.
+</div>
+</body></html>
