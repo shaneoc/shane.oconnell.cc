@@ -293,7 +293,6 @@ body > .next-link {
 
 body > .text-view {
     grid-area: content;
-    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
@@ -307,21 +306,13 @@ body > input[type="checkbox"] {
     display: none;
 }
 
-body > .view-iframe {
+body > .view-img {
     grid-area: content;
-    display: none;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
-    border: 0;
-}
-
-body > #view-source-checkbox:not(:checked) + * + * {
-    display: block;
-}
-
-body > #view-source-checkbox:checked + * + * + * + * + * {
-    display: block;
+    background: #f3f3f3;
+    object-fit: scale-down;
 }
 
 body > #wrap-text-checkbox:not(:checked) + * + * {
@@ -543,19 +534,8 @@ window.addEventListener('load', (event) => {
 <div class="mtime-info">2024-05-26 11:41:14 UTC</div>
 <a class="prev-link active-link html-link" href="../../1998/animorph90.hypermart.net/index.html.info.txt.info">previous</a>
 <a class="next-link active-link html-link" href="../../1999/ani-morphs.com/index.html.info.txt.info">next</a>
-<input type="checkbox" id="view-source-checkbox" />
-<label class="view-source-label" for="view-source-checkbox">view source</label>
-<iframe class="view-iframe" sandbox="allow-scripts" srcdoc="<HTML>
-<HEAD>
-<TITLE>Ani-Morphs.com - Your source for Animorphs news!</TITLE>
-</HEAD>
-<FRAMESET ROWS=&quot;*,28&quot; BORDER=&quot;0&quot;>
-	<FRAME SRC=&quot;home.html&quot; NAME=&quot;mainframe&quot; BORDER=&quot;0&quot; MARGINWIDTH=&quot;0&quot; MARGINHEIGHT=&quot;0&quot;>
-	<FRAME SRC=&quot;ticker.html&quot; BORDER=&quot;0&quot; MARGINWIDTH=&quot;0&quot; MARGINHEIGHT=&quot;0&quot; SCROLLING=&quot;no&quot;>
-</FRAMESET>
-</HTML>"></iframe>
 <input type="checkbox" id="wrap-text-checkbox" checked />
-<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
 <div class="text-view">&lt;HTML&gt;
 &lt;HEAD&gt;
 &lt;TITLE&gt;Ani-Morphs.com - Your source for Animorphs news!&lt;/TITLE&gt;
