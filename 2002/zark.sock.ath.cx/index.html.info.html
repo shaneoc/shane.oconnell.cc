@@ -545,14 +545,25 @@ window.addEventListener('load', (event) => {
 <a class="next-link active-link html-link" href="../../2002/zark.sock.ath.cx/source/boot-loader.asm.info">next</a>
 <input type="checkbox" id="view-source-checkbox" />
 <label class="view-source-label" for="view-source-checkbox">view source</label>
-<iframe class="view-iframe" sandbox="allow-scripts" srcdoc="<HTML>
+<iframe class="view-iframe" sandbox="allow-scripts allow-same-origin allow-top-navigation" srcdoc="<HTML>
 <HEAD>
 <TITLE>.:[zark!OS] [Latest version: 0.1b0]</TITLE>
 <STYLE TYPE=&quot;text/css&quot;>
 A {text-decoration:none;}
 A:hover {text-decoration:underline;{
 </STYLE>
+<SCRIPT>
+if (window.parent.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+</SCRIPT>
 </HEAD>
+
 <BODY BGCOLOR=&quot;#FFFFFF&quot; TEXT=&quot;#000000&quot; LINK=&quot;#0000FF&quot; VLINK=&quot;#0000FF&quot; ALINK=&quot;#0000FF&quot; STYLE=&quot;font-family:verdana,arial;font-size:8pt;&quot;>
 <BLOCKQUOTE><SPAN STYLE=&quot;font-size:13pt;&quot;><B>.:<U>zark!OS development</U></B></SPAN><P>
 
@@ -561,10 +572,10 @@ Latest version: 0.1b0<P>
 <B>.:<U>Documents</U></B><P>
 
 <BLOCKQUOTE>
-[January 20, 2002 | Shane] - <A HREF=&quot;/docs/timeline_20-01-2002.html&quot;>timeline of planned features</A><BR>
-[January 19, 2002 | Shane] - <A HREF=&quot;/docs/zarkos_goals.html&quot;>Long term goals/features for zark!OS</A><BR>
+[January 20, 2002 | Shane] - <A HREF=&quot;docs/timeline_20-01-2002.html.info&quot; TARGET=&quot;_parent&quot; CLASS=&quot;html-link&quot;>timeline of planned features</A><BR>
+[January 19, 2002 | Shane] - <A HREF=&quot;docs/zarkos_goals.html.info&quot; TARGET=&quot;_parent&quot; CLASS=&quot;html-link&quot;>Long term goals/features for zark!OS</A><BR>
 <!-- [January 19, 2002 | Shane] - <A HREF=&quot;/docs/zarksoft_goals.html&quot;>Long term goals/features for zark!soft</A><BR> -->
-[January 19, 2002 | Shane] - <A HREF=&quot;/docs/outline_0.1b0.html&quot;>Outline and planning for version 0.1b0</A> (unfinished)<BR>
+[January 19, 2002 | Shane] - <A HREF=&quot;docs/outline_0.1b0.html.info&quot; TARGET=&quot;_parent&quot; CLASS=&quot;html-link&quot;>Outline and planning for version 0.1b0</A> (unfinished)<BR>
 </BLOCKQUOTE>
 
 <B>.:<U>Dates</U></B><P>
