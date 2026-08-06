@@ -310,18 +310,18 @@ body > input[type="checkbox"] {
 body > .html-view {
     grid-area: content;
     display: none;
-    justify-content: center;
     box-sizing: border-box;
     width: 100%;
     height: 100%;
     background: #ffffff;
     overflow: auto;
+    padding: 0.3rem;
 }
 
 body > .html-view > div {
     width: clamp(50ch, 50%, 80ch);
     max-width: 100%;
-    margin: 0.5rem;
+    margin: 0 auto;
 }
 
 body > .html-view > div a {
@@ -368,7 +368,7 @@ body > .html-view > div .margin-bottom-zero {
 }
 
 body > #view-source-checkbox:not(:checked) + * + * {
-    display: flex;
+    display: block;
 }
 
 body > #view-source-checkbox:checked + * + * + * + * + * {
