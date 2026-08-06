@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Movies Watched 2 - 2026/journal - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .html-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > .html-view > div {
+    width: clamp(50ch, 50%, 80ch);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+body > .html-view > div a {
+    color: #0000DD;
+}
+
+body > .html-view > div a:visited {
+    color: #000099;
+}
+
+body > .html-view > div img {
+    max-width: 100%;
+    height: auto;
+}
+
+body > .html-view > div details {
+    margin: 0.3em 0;
+}
+
+body > .html-view > div details > p {
+    padding-left: 1em;
+}
+
+body > .html-view > div details > p:first-of-type {
+    margin-top: 0.5em;
+}
+
+body > .html-view > div summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+body > .html-view > div .indent-paragraph {
+    padding-inline-start: 1rem;
+}
+
+body > .html-view > div .margin-top-zero {
+    margin-top: 0;
+}
+
+body > .html-view > div .margin-bottom-zero {
+    margin-bottom: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: block;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">journal</button>
+<span>/</span>
+<span class="filename">2026-08-06-movies-watched-2.md</span>
+</div>
+<div class="mtime-info">2026-08-06 20:31:10.970168 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/journal/2026-08-02-movies-watched">previous</a>
+<a class="next-link active-link html-link" href="../../2026/pages/2026-06-12-printing-money">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<div class="html-view"><div><h1>Movies Watched 2</h1>
+<p><strong>Date:</strong> 2026-08-06</p>
+<h2>The Woman in the Window (2021)</h2>
+<p>The day after watching
+<a href="https://en.wikipedia.org/wiki/Spaceman_(2024_film)">Spaceman</a>, as I described
+in <a href="2026-08-02-movies-watched" class="html-link">my last journal entry</a>, I was not
+sure if I would watch another movie, as I felt that if I did then I would feel
+obligated to describe it in another journal entry. I therefore felt that if I
+watched a movie that I would feel some pressure to pick an interesting movie to
+describe, which felt like it would be a bunch of work, and so I was reluctant
+to do it.</p>
+<p>When the end of the day came, however, I started looking through the options on
+Netflix, and I was inspired to watch the movie <a href="https://en.wikipedia.org/wiki/The_Woman_in_the_Window_(2021_film)">The Woman in the
+Window</a>.
+This is a movie that is about a woman who is afraid to leave her house.
+Apparently the Netflix algorithm felt that I might enjoy it if I had enjoyed
+<a href="https://en.wikipedia.org/wiki/The_Butterfly_Effect">The Butterfly Effect</a>.
+This seemed like an appropriate movie to watch considering that I personally am
+currently afraid of leaving my apartment. I actually have a big sign in the
+window of my apartment right now with my website address, asking my neighbours
+for help, which they have been ignoring. It is possible that my neighbours
+might believe that I have a mental illness, which might be why they are
+ignoring the sign, and so perhaps they believe that I am similar to the woman
+in the movie.  Therefore, it seemed like it might be interesting to watch the
+movie in order to compare her situation to mine.</p>
+<p>In addition to those normal reasons, while I was considering watching the movie
+I was reheating some <a href="https://en.wikipedia.org/wiki/Samosa">vegetable samosas</a>,
+I had a timer counting down on my watch, and I happened to look at my watch
+just as the timer was showing 33 for the seconds that were left on the timer. A
+little while later, I looked again and the timer was showing 23 for the
+seconds. If you have read the page on my website about being <a href="../../trapped-in-my-apartment/" class="index-link">trapped in my
+apartment</a>, then you know that
+these are numbers that I have been thinking might be associated with the brain
+hemisphere language. In addition to that, as I have described elsewhere on my
+website, I have a theory that we all might currently be <a href="../../2025/journal/2025-01-02-ai-singularity-computer-simulation" class="html-link">living in a computer
+simulation generated using
+AI</a>,
+which is why we are alive at the time when the <a href="https://en.wikipedia.org/wiki/Technological_singularity">AI
+singularity</a> appears
+to be just about to occur. If we are actually living in a computer simulation,
+then it is possible that any coincidence that I observe might actually be an
+intentional message from whoever created the simulation. Therefore, I felt that
+perhaps the fact that I saw those numbers was a sign that I should watch the
+movie.</p>
+<p>I enjoyed watching this movie. I definitely sympathized with the woman who was
+afraid to leave her house. Her situation seemed similar to mine in a few ways.
+In particular, at one point in the movie, she tried to contact the police
+because she believed that a crime had been committed, and the police assumed
+that she was wrong or was making things up and ignored her concerns because
+they felt that she had a mental illness. There was one point when she said a
+bunch of stuff to the police and a few other people that sounded crazy because
+she was getting overwhelmed, and they all just looked at her with empty
+expressions without saying anything. I empathized with her so much at that
+point. This part of the movie, when she was freaking out and the police were
+treating her like she was crazy, makes me think of the time that <a href="../../2025/journal/2025-12-14-strange-2021" class="html-link">I thought my
+computer had been
+hacked</a>, contacted the
+police, and then had the police not believe me. The police in the movie were
+slightly more understanding than they were in my case, because at least in her
+case they did not at any point <a href="2026-01-22-battering-ram" class="html-link">force her out of her house in
+handcuffs</a> and force her to spend
+multiple days in a psychiatric facility against her will. I do not want to
+spoil the end of the movie, however in the end we find out that she was not
+entirely wrong about her concerns. The part of the movie where we learn this
+was gratifying to watch.</p>
+<p>Her psychological situation seemed like it differed from mine in a few
+significant ways, however. She appeared to actually have visual hallucinations,
+which is something that has never occurred in my case. Also, she seemed to
+believe that she would feel less anxious if she left the house while hiding
+under an umbrella. This differs from my case, in which my anxiety is mostly
+related to concerns about the safety of my property inside my apartment,
+combined with a small amount of concern that my family might actually try to
+physically harm me if they were near me, neither of which would be addressed
+using an umbrella. I have described the reasons for my concerns on my page
+about being trapped in my apartment, so you have to read that page for the full
+details.</p>
+<h2>Prometheus (2012)</h2>
+<p><a href="https://en.wikipedia.org/wiki/Prometheus_(2012_film)">Prometheus</a> is a movie
+that I have seen before, however I decided to watch it again. I had not seen it
+in a long time, had forgotten many details, and was in the mood to watch
+another sci-fi movie that takes place in space. Netflix told me that the movie
+would be leaving Netflix soon, so I figured this was a good time to watch it
+again.</p>
+<p>Prometheus is a prequel to the well-known sci-fi horror movie
+<a href="https://en.wikipedia.org/wiki/Alien_(film)">Alien</a>, which I have also seen
+before. Prometheus is about a scientific expedition to a planet far away from
+Earth which is being investigated because the people in the movie believe that
+they have found ancient references all over Earth to a constellation which
+contains the planet. They suspect that aliens from the planet might have
+visited Earth a long time ago, and might have originally created humanity. They
+visit the planet in order to try to determine if this was the case.</p>
+<p>One thing that I noticed about the people in this movie is that they are
+strangely comfortable with taking enormous risks. At one point they are
+exploring a strange, empty alien structure that they find on the planet and
+their sensors tell them that the atmosphere is breathable, so they immediately
+decide to take the helmets off of their space suits and breath the mysterious
+alien air. It made no sense to me, as it seemed pretty obvious to me that this
+was a bad idea. If I were on that expedition, I would have refused to leave the
+spaceship in the first place.</p>
+<p>Prometheus is a <a href="https://en.wikipedia.org/wiki/Horror_film">horror movie</a>, and
+it was visually a bit disturbing at certain points with people being physically
+injured in ways that look painful, including having alien organisms occupying
+spaces inside their bodies. Personally, I can handle this kind of movie
+occasionally, however for scary movies I usually prefer movies that are more
+psychologically scary and do not have these kinds of scenes. People often get
+shot in <a href="https://en.wikipedia.org/wiki/Action_film">action movies</a>, and that
+usually does not make me uncomfortable when I watch it, however usually the
+camera does not focus on the injury and it ends quickly, which was not the case
+in Prometheus. Regardless, I enjoyed watching Prometheus on this occasion. The
+automated surgery machine was an impressive example of a potential future
+technology.</p>
+<p>In addition to the Alien and Prometheus movies, which I have seen, <a href="https://animorph90.shaneoc.net/games.html">I have also
+tried to play</a> the video game
+<a href="https://en.wikipedia.org/wiki/Alien:_Isolation">Alien: Isolation</a>, which takes
+place in the same fictional universe as the movies. I found the video game to
+be way more anxiety-inducing than the movies. I was not able to get very far
+before I had to stop playing. The aliens are terrifying, and you can die very
+quickly before having a chance to do anything to stop them once they are
+chasing you.</p>
+<h2>The Fifth Element (1997)</h2>
+<p>I decided to watch <a href="https://en.wikipedia.org/wiki/The_Fifth_Element">The Fifth
+Element</a> the day after
+watching Prometheus. The Fifth Element is one of my favourite movies of all
+time. I have seen it multiple times and so I knew what to expect. The Fifth
+Element is similar to Prometheus in the sense that it is a sci-fi movie with a
+storyline that is based around the idea that aliens came to Earth a long time
+ago, and that there are ancient artefacts on Earth which reference this fact.
+However, unlike Prometheus, it is more of an action movie.</p>
+<p>There are a lot of things that I like about The Fifth Element. One of the lead
+characters, Leeloo, is woman that I find very attractive. Leeloo is actually
+created by a machine at one point during the movie from some DNA that was found
+after an alien spaceship was destroyed, and her background is mysterious. She
+is often referred to as a weapon, though it is not clear what that means until
+the end of the movie. At the beginning of the movie, she does not speak English
+and has to learn it as the movie progresses, which she does by reading
+information on a computer. It almost seems like she is reading Wikipedia, as
+she apparently learns various concepts by reading articles in alphabetical
+order. Once she gets to the article about
+<a href="https://en.wikipedia.org/wiki/War">War</a>, she becomes sad. One of the themes of
+the movie is about the concept of good fighting evil, and her character is one
+of the characters representing good, so it makes sense that she does not like
+the concept of war.</p>
+<p>Another thing that I particularly like about this movie is the setting and the
+technology that is portrayed in the movie. The movie takes place in the future,
+with the parts on Earth taking place in a dense urban metropolis with cars
+flying between the buildings. The main male character, Korben Dallas, lives
+alone in a small apartment. Before he meets Leeloo he references the fact that
+he is single and is trying to find a girlfriend, so I empathize with his
+situation. His apartment has a bunch of interesting technologies, with various
+parts that move around and slide in and out from the wall in order to save
+space. It seems like it could be a condo in Toronto in the distant future.</p>
+<p>One thing that is interesting about how technology is portrayed in the movie is
+that despite the fact that a lot of advanced technologies appear to exist, many
+things have not changed which you might have expected to have changed as a
+consequence of the advanced technology. For example, Korben works as a cab
+driver. Even though he drives a flying car, and the car appears to have the
+ability to drive itself autonomously if the feature is enabled, Korben still
+apparently manually drives his car a lot of the time, and his job is still
+apparently useful and required. Similarly, at one point Korben wants food, and
+he obtains the food by ordering it from a guy who appears to be operating a
+kind of flying restaurant, which parks itself outside of his window. The person
+operating the restaurant chats with Korben and serves him the food himself,
+even though clearly with the technology available it seems likely that there is
+probably also a way of obtaining food that would not require interacting with a
+human. It appears that in the future, interacting with humans is still
+considered valuable enough that people are willing to pay for it even when it
+is not required.</p>
+<p>Another technology that I found interesting was that Korben has a tube inside
+his apartment which physically delivers mail directly to him. This tube is used
+even though clearly they could use some kind of electronic system similar to
+email to send messages. Personally, now that I have <a href="../../2025/journal/2025-12-14-strange-2021" class="html-link">had the experience of my
+computer appearing to have been
+hacked</a>, I can
+understand why people in the future might still value messages being printed in
+a physical form and being delivered to them. It seems like it would make it
+much more difficult for a computer hacker to change or delete the message.</p>
+<p>Aside from the technologies in the apartment that Korben lives in, I also find
+the technologies involved when he travels to a space station designed for
+relaxation to be highly interesting. He travels on a spaceship which appears
+similar to a kind of luxury airplane, with a physically attractive, all-female
+cabin crew tending to the people who are travelling. Once he arrives at the
+space station, he is told about all the luxurious features of the space
+station, which apparently somehow has beaches, and it seems somewhat similar to
+a kind of resort hotel. It seems like a nice place to go on vacation. While he
+is on the station, he attends an opera with a singer that appears to be some
+kind of alien. The scene in which the singer is singing is epic, and is highly
+enjoyable to watch. I hope that in the future, our civilization is able to
+build similar kinds of space stations.</p>
+<p>With the exception of the aspects of the future in which it appears that people
+still require a job to survive, I very much enjoy the way that the future is
+depicted in The Fifth Element. I like to imagine that the jobs that people have
+<a href="../pages/2026-06-12-printing-money" class="html-link">are actually optional</a> and
+that they are doing them by choice, and that Korben is actually intentionally
+role-playing a certain kind of character that his customers are voluntarily
+choosing to interact with rather than use an automated taxi. I like the idea
+that for each type of service, like with the cab driven by a human or with the
+flying restaurant operated by a human, that customers have the option of either
+using a fully-automated method or to pay extra in order to have a human provide
+the service if that is what they prefer. If our society evolves in this way,
+however, personally I think people should be able to choose the gender of the
+person providing the service. I would feel uncomfortable having some random guy
+operating a flying restaurant looking into my apartment window and expecting to
+chat with me, however if the service was going to be provided by a woman I
+think I could see myself wanting to pay the extra money in order to have a
+human provide it. I am not sure if that would be sexist or unfair. Hopefully
+there are other people besides me who would want to pay the men to do those
+jobs and interact with them, especially given that I am male.</p>
+</div></div>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view"># Movies Watched 2
+
+**Date:** 2026-08-06
+
+## The Woman in the Window (2021)
+
+The day after watching
+[Spaceman](https://en.wikipedia.org/wiki/Spaceman_(2024_film)), as I described
+in [my last journal entry](2026-08-02-movies-watched){.html-link}, I was not
+sure if I would watch another movie, as I felt that if I did then I would feel
+obligated to describe it in another journal entry. I therefore felt that if I
+watched a movie that I would feel some pressure to pick an interesting movie to
+describe, which felt like it would be a bunch of work, and so I was reluctant
+to do it.
+
+When the end of the day came, however, I started looking through the options on
+Netflix, and I was inspired to watch the movie [The Woman in the
+Window](https://en.wikipedia.org/wiki/The_Woman_in_the_Window_(2021_film)).
+This is a movie that is about a woman who is afraid to leave her house.
+Apparently the Netflix algorithm felt that I might enjoy it if I had enjoyed
+[The Butterfly Effect](https://en.wikipedia.org/wiki/The_Butterfly_Effect).
+This seemed like an appropriate movie to watch considering that I personally am
+currently afraid of leaving my apartment. I actually have a big sign in the
+window of my apartment right now with my website address, asking my neighbours
+for help, which they have been ignoring. It is possible that my neighbours
+might believe that I have a mental illness, which might be why they are
+ignoring the sign, and so perhaps they believe that I am similar to the woman
+in the movie.  Therefore, it seemed like it might be interesting to watch the
+movie in order to compare her situation to mine.
+
+In addition to those normal reasons, while I was considering watching the movie
+I was reheating some [vegetable samosas](https://en.wikipedia.org/wiki/Samosa),
+I had a timer counting down on my watch, and I happened to look at my watch
+just as the timer was showing 33 for the seconds that were left on the timer. A
+little while later, I looked again and the timer was showing 23 for the
+seconds. If you have read the page on my website about being [trapped in my
+apartment](../../trapped-in-my-apartment/){.index-link}, then you know that
+these are numbers that I have been thinking might be associated with the brain
+hemisphere language. In addition to that, as I have described elsewhere on my
+website, I have a theory that we all might currently be [living in a computer
+simulation generated using
+AI](../../2025/journal/2025-01-02-ai-singularity-computer-simulation){.html-link},
+which is why we are alive at the time when the [AI
+singularity](https://en.wikipedia.org/wiki/Technological_singularity) appears
+to be just about to occur. If we are actually living in a computer simulation,
+then it is possible that any coincidence that I observe might actually be an
+intentional message from whoever created the simulation. Therefore, I felt that
+perhaps the fact that I saw those numbers was a sign that I should watch the
+movie.
+
+I enjoyed watching this movie. I definitely sympathized with the woman who was
+afraid to leave her house. Her situation seemed similar to mine in a few ways.
+In particular, at one point in the movie, she tried to contact the police
+because she believed that a crime had been committed, and the police assumed
+that she was wrong or was making things up and ignored her concerns because
+they felt that she had a mental illness. There was one point when she said a
+bunch of stuff to the police and a few other people that sounded crazy because
+she was getting overwhelmed, and they all just looked at her with empty
+expressions without saying anything. I empathized with her so much at that
+point. This part of the movie, when she was freaking out and the police were
+treating her like she was crazy, makes me think of the time that [I thought my
+computer had been
+hacked](../../2025/journal/2025-12-14-strange-2021){.html-link}, contacted the
+police, and then had the police not believe me. The police in the movie were
+slightly more understanding than they were in my case, because at least in her
+case they did not at any point [force her out of her house in
+handcuffs](2026-01-22-battering-ram){.html-link} and force her to spend
+multiple days in a psychiatric facility against her will. I do not want to
+spoil the end of the movie, however in the end we find out that she was not
+entirely wrong about her concerns. The part of the movie where we learn this
+was gratifying to watch.
+
+Her psychological situation seemed like it differed from mine in a few
+significant ways, however. She appeared to actually have visual hallucinations,
+which is something that has never occurred in my case. Also, she seemed to
+believe that she would feel less anxious if she left the house while hiding
+under an umbrella. This differs from my case, in which my anxiety is mostly
+related to concerns about the safety of my property inside my apartment,
+combined with a small amount of concern that my family might actually try to
+physically harm me if they were near me, neither of which would be addressed
+using an umbrella. I have described the reasons for my concerns on my page
+about being trapped in my apartment, so you have to read that page for the full
+details.
+
+## Prometheus (2012)
+
+[Prometheus](https://en.wikipedia.org/wiki/Prometheus_(2012_film)) is a movie
+that I have seen before, however I decided to watch it again. I had not seen it
+in a long time, had forgotten many details, and was in the mood to watch
+another sci-fi movie that takes place in space. Netflix told me that the movie
+would be leaving Netflix soon, so I figured this was a good time to watch it
+again.
+
+Prometheus is a prequel to the well-known sci-fi horror movie
+[Alien](https://en.wikipedia.org/wiki/Alien_(film)), which I have also seen
+before. Prometheus is about a scientific expedition to a planet far away from
+Earth which is being investigated because the people in the movie believe that
+they have found ancient references all over Earth to a constellation which
+contains the planet. They suspect that aliens from the planet might have
+visited Earth a long time ago, and might have originally created humanity. They
+visit the planet in order to try to determine if this was the case.
+
+One thing that I noticed about the people in this movie is that they are
+strangely comfortable with taking enormous risks. At one point they are
+exploring a strange, empty alien structure that they find on the planet and
+their sensors tell them that the atmosphere is breathable, so they immediately
+decide to take the helmets off of their space suits and breath the mysterious
+alien air. It made no sense to me, as it seemed pretty obvious to me that this
+was a bad idea. If I were on that expedition, I would have refused to leave the
+spaceship in the first place.
+
+Prometheus is a [horror movie](https://en.wikipedia.org/wiki/Horror_film), and
+it was visually a bit disturbing at certain points with people being physically
+injured in ways that look painful, including having alien organisms occupying
+spaces inside their bodies. Personally, I can handle this kind of movie
+occasionally, however for scary movies I usually prefer movies that are more
+psychologically scary and do not have these kinds of scenes. People often get
+shot in [action movies](https://en.wikipedia.org/wiki/Action_film), and that
+usually does not make me uncomfortable when I watch it, however usually the
+camera does not focus on the injury and it ends quickly, which was not the case
+in Prometheus. Regardless, I enjoyed watching Prometheus on this occasion. The
+automated surgery machine was an impressive example of a potential future
+technology.
+
+In addition to the Alien and Prometheus movies, which I have seen, [I have also
+tried to play](https://animorph90.shaneoc.net/games.html) the video game
+[Alien: Isolation](https://en.wikipedia.org/wiki/Alien:_Isolation), which takes
+place in the same fictional universe as the movies. I found the video game to
+be way more anxiety-inducing than the movies. I was not able to get very far
+before I had to stop playing. The aliens are terrifying, and you can die very
+quickly before having a chance to do anything to stop them once they are
+chasing you.
+
+## The Fifth Element (1997)
+
+I decided to watch [The Fifth
+Element](https://en.wikipedia.org/wiki/The_Fifth_Element) the day after
+watching Prometheus. The Fifth Element is one of my favourite movies of all
+time. I have seen it multiple times and so I knew what to expect. The Fifth
+Element is similar to Prometheus in the sense that it is a sci-fi movie with a
+storyline that is based around the idea that aliens came to Earth a long time
+ago, and that there are ancient artefacts on Earth which reference this fact.
+However, unlike Prometheus, it is more of an action movie.
+
+There are a lot of things that I like about The Fifth Element. One of the lead
+characters, Leeloo, is woman that I find very attractive. Leeloo is actually
+created by a machine at one point during the movie from some DNA that was found
+after an alien spaceship was destroyed, and her background is mysterious. She
+is often referred to as a weapon, though it is not clear what that means until
+the end of the movie. At the beginning of the movie, she does not speak English
+and has to learn it as the movie progresses, which she does by reading
+information on a computer. It almost seems like she is reading Wikipedia, as
+she apparently learns various concepts by reading articles in alphabetical
+order. Once she gets to the article about
+[War](https://en.wikipedia.org/wiki/War), she becomes sad. One of the themes of
+the movie is about the concept of good fighting evil, and her character is one
+of the characters representing good, so it makes sense that she does not like
+the concept of war.
+
+Another thing that I particularly like about this movie is the setting and the
+technology that is portrayed in the movie. The movie takes place in the future,
+with the parts on Earth taking place in a dense urban metropolis with cars
+flying between the buildings. The main male character, Korben Dallas, lives
+alone in a small apartment. Before he meets Leeloo he references the fact that
+he is single and is trying to find a girlfriend, so I empathize with his
+situation. His apartment has a bunch of interesting technologies, with various
+parts that move around and slide in and out from the wall in order to save
+space. It seems like it could be a condo in Toronto in the distant future.
+
+One thing that is interesting about how technology is portrayed in the movie is
+that despite the fact that a lot of advanced technologies appear to exist, many
+things have not changed which you might have expected to have changed as a
+consequence of the advanced technology. For example, Korben works as a cab
+driver. Even though he drives a flying car, and the car appears to have the
+ability to drive itself autonomously if the feature is enabled, Korben still
+apparently manually drives his car a lot of the time, and his job is still
+apparently useful and required. Similarly, at one point Korben wants food, and
+he obtains the food by ordering it from a guy who appears to be operating a
+kind of flying restaurant, which parks itself outside of his window. The person
+operating the restaurant chats with Korben and serves him the food himself,
+even though clearly with the technology available it seems likely that there is
+probably also a way of obtaining food that would not require interacting with a
+human. It appears that in the future, interacting with humans is still
+considered valuable enough that people are willing to pay for it even when it
+is not required.
+
+Another technology that I found interesting was that Korben has a tube inside
+his apartment which physically delivers mail directly to him. This tube is used
+even though clearly they could use some kind of electronic system similar to
+email to send messages. Personally, now that I have [had the experience of my
+computer appearing to have been
+hacked](../../2025/journal/2025-12-14-strange-2021){.html-link}, I can
+understand why people in the future might still value messages being printed in
+a physical form and being delivered to them. It seems like it would make it
+much more difficult for a computer hacker to change or delete the message.
+
+Aside from the technologies in the apartment that Korben lives in, I also find
+the technologies involved when he travels to a space station designed for
+relaxation to be highly interesting. He travels on a spaceship which appears
+similar to a kind of luxury airplane, with a physically attractive, all-female
+cabin crew tending to the people who are travelling. Once he arrives at the
+space station, he is told about all the luxurious features of the space
+station, which apparently somehow has beaches, and it seems somewhat similar to
+a kind of resort hotel. It seems like a nice place to go on vacation. While he
+is on the station, he attends an opera with a singer that appears to be some
+kind of alien. The scene in which the singer is singing is epic, and is highly
+enjoyable to watch. I hope that in the future, our civilization is able to
+build similar kinds of space stations.
+
+With the exception of the aspects of the future in which it appears that people
+still require a job to survive, I very much enjoy the way that the future is
+depicted in The Fifth Element. I like to imagine that the jobs that people have
+[are actually optional](../pages/2026-06-12-printing-money){.html-link} and
+that they are doing them by choice, and that Korben is actually intentionally
+role-playing a certain kind of character that his customers are voluntarily
+choosing to interact with rather than use an automated taxi. I like the idea
+that for each type of service, like with the cab driven by a human or with the
+flying restaurant operated by a human, that customers have the option of either
+using a fully-automated method or to pay extra in order to have a human provide
+the service if that is what they prefer. If our society evolves in this way,
+however, personally I think people should be able to choose the gender of the
+person providing the service. I would feel uncomfortable having some random guy
+operating a flying restaurant looking into my apartment window and expecting to
+chat with me, however if the service was going to be provided by a woman I
+think I could see myself wanting to pay the extra money in order to have a
+human provide it. I am not sure if that would be sexist or unfair. Hopefully
+there are other people besides me who would want to pay the men to do those
+jobs and interact with them, especially given that I am male.
+</div>
+</body></html>
