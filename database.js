@@ -687,6 +687,7 @@ const archive_database = [
 ["dir", "pages"],
 ["file", "2026-06-12-printing-money", "2026-06-12-printing-money.md"],
 ["file", "2026-07-26-automating-work", "2026-07-26-automating-work.md"],
+["file", "2026-08-15-subconscious-language", "2026-08-15-subconscious-language.md"],
 "up",
 "up",
 "up",

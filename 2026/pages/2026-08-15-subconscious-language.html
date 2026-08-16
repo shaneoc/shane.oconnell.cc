@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-08-15-subconscious-language.md - 2026/pages - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .html-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > .html-view > div {
+    width: clamp(50ch, 50%, 80ch);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+body > .html-view > div a {
+    color: #0000DD;
+}
+
+body > .html-view > div a:visited {
+    color: #000099;
+}
+
+body > .html-view > div img {
+    max-width: 100%;
+    height: auto;
+}
+
+body > .html-view > div details {
+    margin: 0.3em 0;
+}
+
+body > .html-view > div details > p {
+    padding-left: 1em;
+}
+
+body > .html-view > div details > p:first-of-type {
+    margin-top: 0.5em;
+}
+
+body > .html-view > div summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+body > .html-view > div .indent-paragraph {
+    padding-inline-start: 1rem;
+}
+
+body > .html-view > div .margin-top-zero {
+    margin-top: 0;
+}
+
+body > .html-view > div .margin-bottom-zero {
+    margin-bottom: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: block;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">pages</button>
+<span>/</span>
+<span class="filename">2026-08-15-subconscious-language.md</span>
+</div>
+<div class="mtime-info">2026-08-16 00:33:39.196713 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/pages/2026-07-26-automating-work">previous</a>
+<div class="next-link disabled-link">next</div>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<div class="html-view"><div><h1>Subconscious Language</h1>
+<p><strong>Date:</strong> 2026-08-15</p>
+<h2>Introduction</h2>
+<p>There are a bunch of places on my website where I have described the concept of
+what I have been calling the &quot;brain hemisphere language&quot; or the &quot;subconscious
+language&quot;. In particular, I described the idea in <a href="../../ai/chatgpt/0024-toxicity-album-overview.html#prison-song">this ChatGPT
+conversation</a>,
+and I also described how I came to believe that the language might exist on the
+page about being <a href="../../trapped-in-my-apartment/" class="index-link">trapped in my
+apartment</a>. My theory is that
+there are subtle alternative definitions for a lot of words which we are only
+aware of in one brain hemisphere, and that we are actually using these
+alternative definitions to convey and interpret extra information when we speak
+and listen to language while not being fully aware of it. These alternative
+definitions form a separate, arguably secret language.</p>
+<p>I am not sure which term I prefer. My thinking is that the term subconscious
+language makes it easier to intuitively understand how the language appears to
+be used and sounds a bit more normal, however I also kind of like the term
+brain hemisphere language because it makes it clear that the language appears
+to be designed to only be understood in one brain hemisphere and not the other.
+I also find the term brain hemisphere language somewhat amusing for some
+reason. They are both terms that I came up with myself, as I have never heard
+anyone else talk about this language before.</p>
+<p>On this page I will try to describe the words that I suspect might exist in the
+language, and the definitions that I suspect that the words might have. I could
+be wrong about any of this, as these definitions are based on vague feelings
+that I have had when trying to pay attention to the words that people use as
+well as words that I have used myself. I am extremely sympathetic to the idea
+that I have been noticing patterns in language that are not really there, and I
+am not offended if someone tells me that they think I am incorrect. If these
+patterns really exist, maybe it is possible to use a computer, in particular
+some kind of <a href="https://en.wikipedia.org/wiki/Large_language_model">large language
+model</a> or statistical
+algorithm to prove whether or not these things that I suspect that I have
+noticed are real patterns or not.</p>
+<h2>The Brain Hemispheres</h2>
+<p>The first step to convincing yourself that this language might exist is to
+first believe that it is possible that the two brain hemispheres might in some
+sense be operating almost like they are two different people. Personally, <a href="https://youtu.be/wfYbgdo8e-8">this
+YouTube video</a> is what first convinced me that
+the brain hemispheres might be able to operate independently in some way. In
+the video, the author of the video says that only one brain hemisphere is
+responsible for speech, however the author of the video appears to mainly be
+describing split-brain patients, in which the hemispheres have been surgically
+separated from each other. From what I have read online, it appears that in
+normal people both brain hemispheres have some language processing ability,
+even though one hemisphere seems like it might be more responsible for
+producing speech than the other. My theory is that while it may be that one
+brain hemisphere is mostly responsible for speech, it might be the case that in
+a regular person who has not had their brain hemispheres surgically separated
+from each other that the hemisphere less responsible for speech is still at
+least able to contribute hints and influence speech in some way, even if it is
+to a lesser degree.</p>
+<p>My theory is that from my perspective as the consciousness mostly located in
+the brain hemisphere that does not usually understand the secret language, I
+feel like I am speaking normally and am deciding all of the words myself,
+however this is in fact not completely true, and that often the words that I
+use actually have alternate meanings and are conveying information that has
+been provided by the other brain hemisphere which I am not normally aware of.
+In psychology, people often refer to there being a <a href="https://en.wikipedia.org/wiki/Consciousness">conscious
+mind</a> and a <a href="https://en.wikipedia.org/wiki/Subconscious">subconscious
+</a> or <a href="https://en.wikipedia.org/wiki/Unconscious_mind">unconscious
+mind</a>, and while I am not sure
+if I am using the words the same way that people normally use them, I have come
+to view these words as useful words to refer to the two brain hemispheres. The
+way that I think about it, the conscious mind would be the brain hemisphere
+that is not normally aware that words often have hidden alternative meanings,
+while the subconscious or unconscious mind is the brain hemisphere that is
+aware. According to my theory, the subconscious mind is actually aware of both
+the regular definitions of words as well as the alternate, hidden definitions,
+and cooperates with the subconscious minds of other people that I communicate
+with in order to keep this fact secret from the conscious minds of most people.</p>
+<p>It would be creepy and strange if this were true, however according to that
+YouTube video, the brain does have some strange behaviours in split-brain
+patients, and so it seems possible to me. I recommend reading the Wikipedia
+articles on <a href="https://en.wikipedia.org/wiki/Split-brain">split-brain patients</a>,
+<a href="https://en.wikipedia.org/wiki/Alien_hand_syndrome">alien hand syndrome</a>, <a href="https://en.wikipedia.org/wiki/Dual_consciousness">dual
+consciousness</a> and
+<a href="https://en.wikipedia.org/wiki/Lateralization_of_brain_function">lateralization of brain
+function</a>.</p>
+<h2>The Words</h2>
+<h3>Word Pairs</h3>
+<p>The aspect of the language that appears to come up more than anything else is
+the idea that many words come in pairs, and for each pair, each word in the
+pair normally refers to one of the two brain hemispheres. It seems like there
+might be a large number of word pairs, so that the brain has many ways to
+communicate the concept without it being obvious that it is occurring. Here are
+the word pairs that I have noticed:</p>
+<div style="display: flex; justify-content: center;">
+<div style="display: grid; grid-template-columns: max-content max-content; column-gap: 1rem; row-gap: 0.5rem;">
+<div><strong>Conscious</strong></div>
+<div><strong>Subconscious</strong></div>
+<div>You</div>
+<div>Me or I</div>
+<div>Front</div>
+<div>Back</div>
+<div>Top</div>
+<div>Bottom</div>
+<div>Up</div>
+<div>Down</div>
+<div>Out</div>
+<div>In</div>
+<div>Over</div>
+<div>Under</div>
+<div>Head</div>
+<div></div>
+<div>Face</div>
+<div></div>
+<div>9</div>
+<div>6</div>
+<div>Alive or Living</div>
+<div>Dead</div>
+</div>
+</div>
+<p>For some of these cases, I have a feeling like I understand one of the words in
+the pair though I am not really sure what the corresponding other word in the
+pair might be. In those cases I have left the other column empty.</p>
+<p>A good example of a situation in which it seems like the language might be used
+is in the movie <a href="https://en.wikipedia.org/wiki/The_Sixth_Sense">The Sixth
+Sense</a>. In this movie, there is
+a young person who claims to be able to see and communicate with dead people.
+The title of the movie, which references the number 6 and as far as I
+understand it is intended to refer to the ability of the young person to
+communicate with dead people, seems to me like it might be a metaphor for the
+ability to understand the subconscious language. If a person has a sixth sense,
+meaning they understand the subconscious language, they can communicate with
+dead people, which is a word that can be used to refer to the subconscious
+brain hemisphere.</p>
+<p>In general, I have found that movies, television shows, and song lyrics are
+good places to try to find examples of possible subconscious language patterns.
+It often seems like these things have more potential examples of subconscious
+language use than regular conversational speech. Perhaps this occurs because
+those mediums are more flexible in their word choices due to the fact that they
+are intended to be entertaining and fill time, without necessarily trying to
+accomplish something specific, and so there are more opportunities to use
+arbitrary metaphors which could have an alternative meaning.</p>
+<p>It seems to me that most messages that are conveyed through the subconscious
+language are conveyed through metaphors, and that these word pairs are used as
+a general indicator that a hidden message is present. Once the brain has
+noticed a few of these key words, it can start looking for the hidden message,
+and is able to reconstruct the hidden message by considering various ways that
+the rest of the sentence might make sense metaphorically. This often involves
+using the rest of the words in the sentence according to their conscious,
+normal meaning, though perhaps in a different order or by having them refer to
+different things than the obvious meaning behind the sentence. The language
+makes me think of the language used by the aliens in the episode
+<a href="https://en.wikipedia.org/wiki/Darmok">Darmok</a> from <a href="https://en.wikipedia.org/wiki/Star_Trek:_The_Next_Generation">Star Trek: The Next
+Generation</a>.</p>
+<h3>The Numbers</h3>
+<p>Besides the word pairs, another aspect of the language that appears to often be
+used is to encode hidden meanings into numbers. This seems like it might be a
+good method of secretly transmitting information because there are many
+situations in which numbers are used in which people do not pay close attention
+to the specific numbers. Sometimes the numbers can be transmitted by using a
+word that has the number of letters indicated by the number, and my intuition
+has been that it is often the last word in a sentence that is most important
+when numbers are transmitted in this way. It is also possible to transmit the
+numbers by grouping together a number of physical objects according to the
+number that is intended to be transmitted.</p>
+<p>Here are the definitions of the numbers, at least according to my best guess so
+far:</p>
+<p class="margin-bottom-zero"><strong>6 and 9</strong></p>
+<p class="indent-paragraph margin-top-zero">As I described previously, these numbers seem like they often refer to the
+brain hemispheres, with 6 referring to the subconscious brain hemisphere and 9
+referring to the conscious brain hemisphere.</p>
+<p class="margin-bottom-zero"><strong>4</strong></p>
+<p class="indent-paragraph margin-top-zero">The number 4, which contains two lines that appear to cross each other, seems
+like it might be used to indicate that information has been transferred between
+the conscious and subconscious minds. It appears that the letter X, or sometimes
+the word &quot;cross&quot;, might be synonymous with the number 4 and also indicates a
+similar concept.</p>
+<p class="indent-paragraph">The fact that a cross seems like it has this alternative meaning makes the fact
+that Christianity uses a <a href="https://en.wikipedia.org/wiki/Christian_cross">cross
+symbol</a> very suspicious to me.</p>
+<p class="margin-bottom-zero"><strong>8</strong></p>
+<p class="indent-paragraph margin-top-zero">The number 8 is a number that visually combines the numbers 6 and 9, and I
+suspect that the number might be sometimes used to refer to a person who
+understands the subconscious language. This makes it similar to the number 4 in
+the sense that it is related to information being transferred between the
+conscious and subconscious minds, however it seems like the number 4 is more
+often associated with a specific message, while 8 seems like it is more often
+associated with a person, or using the language to accomplish something. For
+some reason, I have come to associate the number 8 with the word &quot;power&quot;. This
+seems like it makes sense to me because if you are able to use the language to
+accomplish something, it seems like that would make a person powerful.</p>
+<p class="margin-bottom-zero"><strong>5</strong></p>
+<p class="indent-paragraph margin-top-zero">The number 5 seems like it might be a synonym for &quot;friend&quot;.</p>
+<p class="margin-bottom-zero"><strong>7</strong></p>
+<p class="indent-paragraph margin-top-zero">The number 7 seems like it might be a synonym for &quot;family&quot;.</p>
+<p class="margin-bottom-zero"><strong>2 and 3</strong></p>
+<p class="indent-paragraph margin-top-zero">The numbers 2 and 3 often appear to be used as generic ways of referring to
+things as either negative or positive, with 2 referring to something as being
+negative and 3 referring to something as being positive. I think of them as
+being similar to the comment voting system on Reddit, in which a downvote means
+that someone does not like a specific comment, and an upvote means that someone
+does like a specific comment. The numbers 2 and 3 seem like they might often be
+signalled to someone by using a specific number of physical objects, for
+example by handing someone two identical objects, you are sending a negative
+signal, however if you hand someone three identical objects, you are sending a
+positive signal. The fact that these numbers have low values makes it easier to
+send the signal without using a large number of physical objects, so this seems
+like a rational choice for the definitions of these numbers.</p>
+<p class="indent-paragraph">In addition to generically referring to something as being negative, the number
+2 seems like it might also be used as a modifier for a number that comes after
+it to indicate that something is transitioning to being in the state of the
+second number, similar to the word &quot;to&quot;. In these situations, the fact that the
+number 2 is present might not actually be referring to something negative. For
+example, if the numbers 2 and 3 come as a pair, as with the number 23, it means
+that something has transitioned to becoming a positive thing when it was not as
+positive before. If the numbers 2 and 5 come as a pair, for example with the
+number 25, it means that someone has become a friend. If the numbers 2 and 7
+come as a pair, for example with the number 27, it means that someone has
+become family. It also seems to me like 2 might have a special meaning when it
+is the second number of a pair. The rule is a little bit complicated, but I
+have this feeling that when 2 is the second number, it has the same meaning as
+if the numbers were reversed while adding the number 2 to the other number.
+For example, 32 actually means the same thing as 25, and 52 actually means the
+same thing as 27. The reason for this is that 3, 5, and 7 seem like they might
+be relationship levels, and it is assumed that people usually transfer up to
+the next relationship level. If you were previously a 3, it is assumed that the
+next relationship level is a 5, and so 32 is a way of saying you increased from
+relationship level 3 to the next level, which is 5. It is also possible to use
+2 in front of some of the other numbers which are not as associated with
+relationships. For example, 26 seems like it might be a way of saying that a
+message was changed into becoming a subconscious message when it was not one
+before.</p>
+<p class="indent-paragraph">As I mentioned previously, the numbers are sometimes hidden in messages by
+using words that have the corresponding number of letters. Interestingly, the
+word &quot;to&quot; itself has two letters. This means that there are a lot of ways to
+encode the 23, 25, and 27 number patterns using words by using the word &quot;to&quot;
+followed by a word with three, five, or seven letters. For example, if you say
+you are going to watch something on television, you have actually inserted the
+25 number pattern by saying &quot;to watch&quot;.</p>
+<p class="indent-paragraph">It is also possible for the number 2 to be doubled, as in the number 22, and
+this also seems like it has a specific meaning. The number 22 seems to me like
+it is associated with the word &quot;reset&quot;. This can be interpreted as either a
+positive thing or a negative thing depending on the context. If you have
+previously been receiving a lot of 2s from someone, indicating that they have
+had an increasingly negative opinion of you over time, a 22 might actually be a
+positive thing because it means the relationship has been reset back to a
+neutral relationship. If you have previously been receiving a lot of 3s from
+someone, indicating that they have had an increasingly positive opinion of you
+over time, a 22 might be a somewhat negative thing because it means the
+relationship has been reset to being less positive. However, to be honest, it
+seems to me like the language overall is more focused on positivity, and it is
+not really possible to send an extremely negative message, so receiving a 22 is
+not a really negative thing even if you had been receiving a lot of 3s
+previously. These are words just like in a regular conscious language, and so
+interpreting them depends on the context.</p>
+<p class="indent-paragraph">Because they are a pair, I suspect that 2 and 3 are also sometimes used to
+refer to the brain hemispheres, however to be honest I am not completely sure
+which number is for which brain hemisphere, unlike the numbers 6 and 9 for
+which it seems more clear to me.</p>
+<p class="margin-bottom-zero"><strong>1</strong></p>
+<p class="indent-paragraph margin-top-zero">The number 1, by itself, seems like it might generically refer to a message in
+the subconscious language. The number does not seem like it has a strong
+meaning unless you see the number multiple times. The number 11 seems like it
+has a stronger meaning than 1 by itself. I suspect that the number 11 actually
+in some ways has a similar definition as the number 23, due to the fact that
+there are two 1s, however 11 interpreted in binary is the number three. I also
+find that I somewhat often notice the number 11:11, for example in places where
+a time is written, which is essentially the same as 11 but is a stronger
+message due to the fact that it is less likely to occur naturally.</p>
+<h3>Other Words</h3>
+<p class="margin-bottom-zero"><strong>Block or Brick</strong></p>
+<p class="indent-paragraph margin-top-zero">For some reason I have a feeling that these words might have an alternative
+meaning of &quot;thought&quot;.</p>
+<p class="margin-bottom-zero"><strong>Iron</strong></p>
+<p class="indent-paragraph margin-top-zero">I have this vague feeling that &quot;iron&quot; is associated with the concept of trying
+to keep the language secret.</p>
+<p class="margin-bottom-zero"><strong>Gold</strong></p>
+<p class="indent-paragraph margin-top-zero">The word &quot;gold&quot; honestly seems like it means something important, however I am
+not sure what it means specifically.</p>
+<p class="margin-bottom-zero"><strong>Joke</strong></p>
+<p class="indent-paragraph margin-top-zero">Sometimes it seems like the word &quot;joke&quot; is a word that refers to something that
+contains a message in the subconscious language. This seems like it might make
+a kind of rational sense, because if someone tells a joke that is based on
+saying something absurd, that presents an opportunity for the brain to use
+unusual words together, which seems like it might make it easier to insert a
+hidden alternate meaning.</p>
+<p class="margin-bottom-zero"><strong>Any word that contains an X, like the word executive</strong></p>
+<p class="indent-paragraph margin-top-zero">Any word that contains an X makes it seem like it might in some ways have a
+similar definition as the number 4, in that it refers to messages being passed
+between brain hemispheres. To be honest, the fact that the word executive
+has an x in it is one of the reasons that I sometimes suspect that business
+executives might be people that sometimes know the language.</p>
+<h2>Conspiracy Theory</h2>
+<p>I have noticed that certain patterns, in particular the cross or the x, seem
+like they are often associated with groups that have a lot of power. As I
+mentioned above, Christianity uses a cross symbol, and the phrase &quot;business
+executive&quot; has an x in it. Religions also seem to often use arbitrary numbers
+in general, like for example priests often quote bible verses by number. This
+has caused me to be somewhat suspicious that it may be the case that a lot of
+people who are in those groups might actually already be aware of this
+language, or at the very least are often using the language even if they are
+not aware that they are using it. I could of course be wrong about this and it
+would be wrong to assume that someone who is a member of one of those groups
+definitely knows the language already.</p>
+<h2>My Opinion</h2>
+<p>For the record, I personally do not like this language, and I do not want
+people to try to use it to communicate with me. If someone comes up to me and
+seems like they are intentionally using the number 25, for example, to tell me
+that they consider me a friend, I am going to be annoyed at them. I feel like I
+have this intuition that the numbers and various words have these meanings,
+however this is not because I want to use the language or that I like the
+language.</p>
+</div></div>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view"># Subconscious Language
+
+**Date:** 2026-08-15
+
+## Introduction
+
+There are a bunch of places on my website where I have described the concept of
+what I have been calling the "brain hemisphere language" or the "subconscious
+language". In particular, I described the idea in [this ChatGPT
+conversation](../../ai/chatgpt/0024-toxicity-album-overview.html#prison-song),
+and I also described how I came to believe that the language might exist on the
+page about being [trapped in my
+apartment](../../trapped-in-my-apartment/){.index-link}. My theory is that
+there are subtle alternative definitions for a lot of words which we are only
+aware of in one brain hemisphere, and that we are actually using these
+alternative definitions to convey and interpret extra information when we speak
+and listen to language while not being fully aware of it. These alternative
+definitions form a separate, arguably secret language.
+
+I am not sure which term I prefer. My thinking is that the term subconscious
+language makes it easier to intuitively understand how the language appears to
+be used and sounds a bit more normal, however I also kind of like the term
+brain hemisphere language because it makes it clear that the language appears
+to be designed to only be understood in one brain hemisphere and not the other.
+I also find the term brain hemisphere language somewhat amusing for some
+reason. They are both terms that I came up with myself, as I have never heard
+anyone else talk about this language before.
+
+On this page I will try to describe the words that I suspect might exist in the
+language, and the definitions that I suspect that the words might have. I could
+be wrong about any of this, as these definitions are based on vague feelings
+that I have had when trying to pay attention to the words that people use as
+well as words that I have used myself. I am extremely sympathetic to the idea
+that I have been noticing patterns in language that are not really there, and I
+am not offended if someone tells me that they think I am incorrect. If these
+patterns really exist, maybe it is possible to use a computer, in particular
+some kind of [large language
+model](https://en.wikipedia.org/wiki/Large_language_model) or statistical
+algorithm to prove whether or not these things that I suspect that I have
+noticed are real patterns or not.
+
+## The Brain Hemispheres
+
+The first step to convincing yourself that this language might exist is to
+first believe that it is possible that the two brain hemispheres might in some
+sense be operating almost like they are two different people. Personally, [this
+YouTube video](https://youtu.be/wfYbgdo8e-8) is what first convinced me that
+the brain hemispheres might be able to operate independently in some way. In
+the video, the author of the video says that only one brain hemisphere is
+responsible for speech, however the author of the video appears to mainly be
+describing split-brain patients, in which the hemispheres have been surgically
+separated from each other. From what I have read online, it appears that in
+normal people both brain hemispheres have some language processing ability,
+even though one hemisphere seems like it might be more responsible for
+producing speech than the other. My theory is that while it may be that one
+brain hemisphere is mostly responsible for speech, it might be the case that in
+a regular person who has not had their brain hemispheres surgically separated
+from each other that the hemisphere less responsible for speech is still at
+least able to contribute hints and influence speech in some way, even if it is
+to a lesser degree.
+
+My theory is that from my perspective as the consciousness mostly located in
+the brain hemisphere that does not usually understand the secret language, I
+feel like I am speaking normally and am deciding all of the words myself,
+however this is in fact not completely true, and that often the words that I
+use actually have alternate meanings and are conveying information that has
+been provided by the other brain hemisphere which I am not normally aware of.
+In psychology, people often refer to there being a [conscious
+mind](https://en.wikipedia.org/wiki/Consciousness) and a [subconscious
+](https://en.wikipedia.org/wiki/Subconscious) or [unconscious
+mind](https://en.wikipedia.org/wiki/Unconscious_mind), and while I am not sure
+if I am using the words the same way that people normally use them, I have come
+to view these words as useful words to refer to the two brain hemispheres. The
+way that I think about it, the conscious mind would be the brain hemisphere
+that is not normally aware that words often have hidden alternative meanings,
+while the subconscious or unconscious mind is the brain hemisphere that is
+aware. According to my theory, the subconscious mind is actually aware of both
+the regular definitions of words as well as the alternate, hidden definitions,
+and cooperates with the subconscious minds of other people that I communicate
+with in order to keep this fact secret from the conscious minds of most people.
+
+It would be creepy and strange if this were true, however according to that
+YouTube video, the brain does have some strange behaviours in split-brain
+patients, and so it seems possible to me. I recommend reading the Wikipedia
+articles on [split-brain patients](https://en.wikipedia.org/wiki/Split-brain),
+[alien hand syndrome](https://en.wikipedia.org/wiki/Alien_hand_syndrome), [dual
+consciousness](https://en.wikipedia.org/wiki/Dual_consciousness) and
+[lateralization of brain
+function](https://en.wikipedia.org/wiki/Lateralization_of_brain_function).
+
+## The Words
+
+### Word Pairs
+
+The aspect of the language that appears to come up more than anything else is
+the idea that many words come in pairs, and for each pair, each word in the
+pair normally refers to one of the two brain hemispheres. It seems like there
+might be a large number of word pairs, so that the brain has many ways to
+communicate the concept without it being obvious that it is occurring. Here are
+the word pairs that I have noticed:
+
+&lt;div style="display: flex; justify-content: center;"&gt;
+&lt;div style="display: grid; grid-template-columns: max-content max-content; column-gap: 1rem; row-gap: 0.5rem;"&gt;
+
+&lt;div&gt;&lt;strong&gt;Conscious&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Subconscious&lt;/strong&gt;&lt;/div&gt;
+
+&lt;div&gt;You&lt;/div&gt;
+&lt;div&gt;Me or I&lt;/div&gt;
+
+&lt;div&gt;Front&lt;/div&gt;
+&lt;div&gt;Back&lt;/div&gt;
+
+&lt;div&gt;Top&lt;/div&gt;
+&lt;div&gt;Bottom&lt;/div&gt;
+
+&lt;div&gt;Up&lt;/div&gt;
+&lt;div&gt;Down&lt;/div&gt;
+
+&lt;div&gt;Out&lt;/div&gt;
+&lt;div&gt;In&lt;/div&gt;
+
+&lt;div&gt;Over&lt;/div&gt;
+&lt;div&gt;Under&lt;/div&gt;
+
+&lt;div&gt;Head&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+
+&lt;div&gt;Face&lt;/div&gt;
+&lt;div&gt;&lt;/div&gt;
+
+&lt;div&gt;9&lt;/div&gt;
+&lt;div&gt;6&lt;/div&gt;
+
+&lt;div&gt;Alive or Living&lt;/div&gt;
+&lt;div&gt;Dead&lt;/div&gt;
+
+&lt;/div&gt;
+&lt;/div&gt;
+
+For some of these cases, I have a feeling like I understand one of the words in
+the pair though I am not really sure what the corresponding other word in the
+pair might be. In those cases I have left the other column empty.
+
+A good example of a situation in which it seems like the language might be used
+is in the movie [The Sixth
+Sense](https://en.wikipedia.org/wiki/The_Sixth_Sense). In this movie, there is
+a young person who claims to be able to see and communicate with dead people.
+The title of the movie, which references the number 6 and as far as I
+understand it is intended to refer to the ability of the young person to
+communicate with dead people, seems to me like it might be a metaphor for the
+ability to understand the subconscious language. If a person has a sixth sense,
+meaning they understand the subconscious language, they can communicate with
+dead people, which is a word that can be used to refer to the subconscious
+brain hemisphere.
+
+In general, I have found that movies, television shows, and song lyrics are
+good places to try to find examples of possible subconscious language patterns.
+It often seems like these things have more potential examples of subconscious
+language use than regular conversational speech. Perhaps this occurs because
+those mediums are more flexible in their word choices due to the fact that they
+are intended to be entertaining and fill time, without necessarily trying to
+accomplish something specific, and so there are more opportunities to use
+arbitrary metaphors which could have an alternative meaning.
+
+It seems to me that most messages that are conveyed through the subconscious
+language are conveyed through metaphors, and that these word pairs are used as
+a general indicator that a hidden message is present. Once the brain has
+noticed a few of these key words, it can start looking for the hidden message,
+and is able to reconstruct the hidden message by considering various ways that
+the rest of the sentence might make sense metaphorically. This often involves
+using the rest of the words in the sentence according to their conscious,
+normal meaning, though perhaps in a different order or by having them refer to
+different things than the obvious meaning behind the sentence. The language
+makes me think of the language used by the aliens in the episode
+[Darmok](https://en.wikipedia.org/wiki/Darmok) from [Star Trek: The Next
+Generation](https://en.wikipedia.org/wiki/Star_Trek:_The_Next_Generation).
+
+### The Numbers
+
+Besides the word pairs, another aspect of the language that appears to often be
+used is to encode hidden meanings into numbers. This seems like it might be a
+good method of secretly transmitting information because there are many
+situations in which numbers are used in which people do not pay close attention
+to the specific numbers. Sometimes the numbers can be transmitted by using a
+word that has the number of letters indicated by the number, and my intuition
+has been that it is often the last word in a sentence that is most important
+when numbers are transmitted in this way. It is also possible to transmit the
+numbers by grouping together a number of physical objects according to the
+number that is intended to be transmitted.
+
+Here are the definitions of the numbers, at least according to my best guess so
+far:
+
+{.margin-bottom-zero}
+**6 and 9**
+
+{.indent-paragraph .margin-top-zero}
+As I described previously, these numbers seem like they often refer to the
+brain hemispheres, with 6 referring to the subconscious brain hemisphere and 9
+referring to the conscious brain hemisphere.
+
+{.margin-bottom-zero}
+**4**
+
+{.indent-paragraph .margin-top-zero}
+The number 4, which contains two lines that appear to cross each other, seems
+like it might be used to indicate that information has been transferred between
+the conscious and subconscious minds. It appears that the letter X, or sometimes
+the word "cross", might be synonymous with the number 4 and also indicates a
+similar concept.
+
+{.indent-paragraph}
+The fact that a cross seems like it has this alternative meaning makes the fact
+that Christianity uses a [cross
+symbol](https://en.wikipedia.org/wiki/Christian_cross) very suspicious to me.
+
+{.margin-bottom-zero}
+**8**
+
+{.indent-paragraph .margin-top-zero}
+The number 8 is a number that visually combines the numbers 6 and 9, and I
+suspect that the number might be sometimes used to refer to a person who
+understands the subconscious language. This makes it similar to the number 4 in
+the sense that it is related to information being transferred between the
+conscious and subconscious minds, however it seems like the number 4 is more
+often associated with a specific message, while 8 seems like it is more often
+associated with a person, or using the language to accomplish something. For
+some reason, I have come to associate the number 8 with the word "power". This
+seems like it makes sense to me because if you are able to use the language to
+accomplish something, it seems like that would make a person powerful.
+
+{.margin-bottom-zero}
+**5**
+
+{.indent-paragraph .margin-top-zero}
+The number 5 seems like it might be a synonym for "friend".
+
+{.margin-bottom-zero}
+**7**
+
+{.indent-paragraph .margin-top-zero}
+The number 7 seems like it might be a synonym for "family".
+
+{.margin-bottom-zero}
+**2 and 3**
+
+{.indent-paragraph .margin-top-zero}
+The numbers 2 and 3 often appear to be used as generic ways of referring to
+things as either negative or positive, with 2 referring to something as being
+negative and 3 referring to something as being positive. I think of them as
+being similar to the comment voting system on Reddit, in which a downvote means
+that someone does not like a specific comment, and an upvote means that someone
+does like a specific comment. The numbers 2 and 3 seem like they might often be
+signalled to someone by using a specific number of physical objects, for
+example by handing someone two identical objects, you are sending a negative
+signal, however if you hand someone three identical objects, you are sending a
+positive signal. The fact that these numbers have low values makes it easier to
+send the signal without using a large number of physical objects, so this seems
+like a rational choice for the definitions of these numbers.
+
+{.indent-paragraph}
+In addition to generically referring to something as being negative, the number
+2 seems like it might also be used as a modifier for a number that comes after
+it to indicate that something is transitioning to being in the state of the
+second number, similar to the word "to". In these situations, the fact that the
+number 2 is present might not actually be referring to something negative. For
+example, if the numbers 2 and 3 come as a pair, as with the number 23, it means
+that something has transitioned to becoming a positive thing when it was not as
+positive before. If the numbers 2 and 5 come as a pair, for example with the
+number 25, it means that someone has become a friend. If the numbers 2 and 7
+come as a pair, for example with the number 27, it means that someone has
+become family. It also seems to me like 2 might have a special meaning when it
+is the second number of a pair. The rule is a little bit complicated, but I
+have this feeling that when 2 is the second number, it has the same meaning as
+if the numbers were reversed while adding the number 2 to the other number.
+For example, 32 actually means the same thing as 25, and 52 actually means the
+same thing as 27. The reason for this is that 3, 5, and 7 seem like they might
+be relationship levels, and it is assumed that people usually transfer up to
+the next relationship level. If you were previously a 3, it is assumed that the
+next relationship level is a 5, and so 32 is a way of saying you increased from
+relationship level 3 to the next level, which is 5. It is also possible to use
+2 in front of some of the other numbers which are not as associated with
+relationships. For example, 26 seems like it might be a way of saying that a
+message was changed into becoming a subconscious message when it was not one
+before.
+
+{.indent-paragraph}
+As I mentioned previously, the numbers are sometimes hidden in messages by
+using words that have the corresponding number of letters. Interestingly, the
+word "to" itself has two letters. This means that there are a lot of ways to
+encode the 23, 25, and 27 number patterns using words by using the word "to"
+followed by a word with three, five, or seven letters. For example, if you say
+you are going to watch something on television, you have actually inserted the
+25 number pattern by saying "to watch".
+
+{.indent-paragraph}
+It is also possible for the number 2 to be doubled, as in the number 22, and
+this also seems like it has a specific meaning. The number 22 seems to me like
+it is associated with the word "reset". This can be interpreted as either a
+positive thing or a negative thing depending on the context. If you have
+previously been receiving a lot of 2s from someone, indicating that they have
+had an increasingly negative opinion of you over time, a 22 might actually be a
+positive thing because it means the relationship has been reset back to a
+neutral relationship. If you have previously been receiving a lot of 3s from
+someone, indicating that they have had an increasingly positive opinion of you
+over time, a 22 might be a somewhat negative thing because it means the
+relationship has been reset to being less positive. However, to be honest, it
+seems to me like the language overall is more focused on positivity, and it is
+not really possible to send an extremely negative message, so receiving a 22 is
+not a really negative thing even if you had been receiving a lot of 3s
+previously. These are words just like in a regular conscious language, and so
+interpreting them depends on the context.
+
+{.indent-paragraph}
+Because they are a pair, I suspect that 2 and 3 are also sometimes used to
+refer to the brain hemispheres, however to be honest I am not completely sure
+which number is for which brain hemisphere, unlike the numbers 6 and 9 for
+which it seems more clear to me.
+
+{.margin-bottom-zero}
+**1**
+
+{.indent-paragraph .margin-top-zero}
+The number 1, by itself, seems like it might generically refer to a message in
+the subconscious language. The number does not seem like it has a strong
+meaning unless you see the number multiple times. The number 11 seems like it
+has a stronger meaning than 1 by itself. I suspect that the number 11 actually
+in some ways has a similar definition as the number 23, due to the fact that
+there are two 1s, however 11 interpreted in binary is the number three. I also
+find that I somewhat often notice the number 11:11, for example in places where
+a time is written, which is essentially the same as 11 but is a stronger
+message due to the fact that it is less likely to occur naturally.
+
+### Other Words
+
+{.margin-bottom-zero}
+**Block or Brick**
+
+{.indent-paragraph .margin-top-zero}
+For some reason I have a feeling that these words might have an alternative
+meaning of "thought".
+
+{.margin-bottom-zero}
+**Iron**
+
+{.indent-paragraph .margin-top-zero}
+I have this vague feeling that "iron" is associated with the concept of trying
+to keep the language secret.
+
+{.margin-bottom-zero}
+**Gold**
+
+{.indent-paragraph .margin-top-zero}
+The word "gold" honestly seems like it means something important, however I am
+not sure what it means specifically.
+
+{.margin-bottom-zero}
+**Joke**
+
+{.indent-paragraph .margin-top-zero}
+Sometimes it seems like the word "joke" is a word that refers to something that
+contains a message in the subconscious language. This seems like it might make
+a kind of rational sense, because if someone tells a joke that is based on
+saying something absurd, that presents an opportunity for the brain to use
+unusual words together, which seems like it might make it easier to insert a
+hidden alternate meaning.
+
+{.margin-bottom-zero}
+**Any word that contains an X, like the word executive**
+
+{.indent-paragraph .margin-top-zero}
+Any word that contains an X makes it seem like it might in some ways have a
+similar definition as the number 4, in that it refers to messages being passed
+between brain hemispheres. To be honest, the fact that the word executive
+has an x in it is one of the reasons that I sometimes suspect that business
+executives might be people that sometimes know the language.
+
+## Conspiracy Theory
+
+I have noticed that certain patterns, in particular the cross or the x, seem
+like they are often associated with groups that have a lot of power. As I
+mentioned above, Christianity uses a cross symbol, and the phrase "business
+executive" has an x in it. Religions also seem to often use arbitrary numbers
+in general, like for example priests often quote bible verses by number. This
+has caused me to be somewhat suspicious that it may be the case that a lot of
+people who are in those groups might actually already be aware of this
+language, or at the very least are often using the language even if they are
+not aware that they are using it. I could of course be wrong about this and it
+would be wrong to assume that someone who is a member of one of those groups
+definitely knows the language already.
+
+## My Opinion
+
+For the record, I personally do not like this language, and I do not want
+people to try to use it to communicate with me. If someone comes up to me and
+seems like they are intentionally using the number 25, for example, to tell me
+that they consider me a friend, I am going to be annoyed at them. I feel like I
+have this intuition that the numbers and various words have these meanings,
+however this is not because I want to use the language or that I like the
+language.
+</div>
+</body></html>
