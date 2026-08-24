@@ -691,6 +691,7 @@ const archive_database = [
 ["file", "2026-06-12-printing-money", "2026-06-12-printing-money.md"],
 ["file", "2026-07-26-automating-work", "2026-07-26-automating-work.md"],
 ["file", "2026-08-15-subconscious-language", "2026-08-15-subconscious-language.md"],
+["file", "2026-08-23-the-matrix-and-brain-hemispheres", "2026-08-23-the-matrix-and-brain-hemispheres.md"],
 "up",
 "up",
 "up",
