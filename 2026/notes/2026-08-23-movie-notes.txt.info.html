@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>2026-08-23-movie-notes.txt - 2026/notes - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .view-img {
+    grid-area: content;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #f3f3f3;
+    object-fit: scale-down;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">notes</button>
+<span>/</span>
+<span class="filename">2026-08-23-movie-notes.txt</span>
+</div>
+<div class="mtime-info">2026-08-23 23:56:30.318926 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/journal/2026-08-06-movies-watched-2">previous</a>
+<a class="next-link active-link html-link" href="../../2026/pages/2026-06-12-printing-money">next</a>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap text</label>
+<div class="text-view">2026-08-05:
+- IO
+  -&gt; Netflix said I would like it because I watched Spaceman
+
+2026-08-16:
+- Deep Impact
+  -&gt; Netflix said I would like it because I watched The Butterfly Effect
+  -&gt; After I started watching, realized the movie had a reference to August 16 which is the date I watched it
+    -&gt; Looked at watch and saw 23 for the seconds, tried to take a photo
+  -&gt; Old computers at the beginning of the movie
+  -&gt; Why did the girl not get any credit for discovering the comet?
+  -&gt; The guy gets told that he will have sex often due to being famous
+  -&gt; Lots of MSNBC references
+  -&gt; A lot of people are killed in the disaster, however maybe that is just a metaphor for the idea that a lot of people learn the subconscious language, given that the comet came from deep space
+  -&gt; I think they might have used four nukes to destroy the larger comet in the end
+
+2026-08-17:
+- Contact
+  -&gt; Multiple references to religion
+    -&gt; The lead character meets a priest
+    -&gt; There is a priest that comforts the lead character when her father dies
+  -&gt; Lead character works on a SETI program
+    -&gt; Searching for aliens
+  -&gt; old computers
+  -&gt; Lead character is criticized for looking for patterns in a washing machine (around time 33:03)
+  -&gt; The signal they receive contains prime numbers (starts around time 42:15)
+    -&gt; they verbally say 2, 3, 5, 7, and then the actual signal contains all prime numbers between 2 and 101
+  -&gt; I think I noticed that there were four antennas that the lead character was using first in order to notice the signal initially
+  -&gt; there were 22 stations that were picking up the signal
+  -&gt; "mathematics is the only true universal language"
+  -&gt; first message received after prime numbers is to play back a Nazi transmission of Hitler
+  -&gt; apparently Bill Clinton is actually in the movie
+  -&gt; they show a clip from the television show "CNN Crossfire" (around time 56:18)
+  -&gt; "you're living on a space station?" (around time 1:40:06)
+  -&gt; "Ellie discovered the new world" sign (around time 2:16:58)
+  -&gt; "open our minds, open our universe" sign (around time 2:16:58)
+
+2026-08-18:
+- The Matrix
+  -&gt; The agents do not show any emotion
+  -&gt; Agent Smith: "Your men are already dead"
+  -&gt; Need to get to phone for some reason
+  -&gt; Neo has an old computer with a CRT
+    -&gt; Computer says "Wake up, Neo" (~7:20)
+    -&gt; "The Matrix has you..."
+    -&gt; "Follow the white rabbit"
+    -&gt; "Knock, knock, Neo."
+  -&gt; I used to listen to the soundtrack
+  -&gt; Neo has a hollowed out book called "Simulacra &amp; Simulation"
+  -&gt; Everything has a green tint
+  -&gt; Neo meets trinity after he follows the white rabbit
+    -&gt; She was apparently responsible for some kind of hack and Neo thought she was a guy
+    -&gt; He believes she is responsible for hacking his computer
+    -&gt; He doesn't seem as alarmed by the fact that he thought his computer had been hacked as I was when I thought my computer had been hacked
+    -&gt; "It is the question that drives you" (11:56)
+  -&gt; Neo works as a computer programmer
+  -&gt; "It seems you have been living two lives" (18:12)
+    -&gt; Being unable to speak reminds me if how I was afraid to say anything because I was worried about the subconscious language (20:27)
+  -&gt; He initially believes the interactions with the agents was a dream, because he wakes up in his bed after talking to them
+  -&gt; Morpheus explains what the matrix is at around 29:00
+  -&gt; "At some point at the start of the 21st century we gave birth to AI" (41:45)
+    -&gt; War between AI and humans
+  -&gt; It does not seem like it really makes sense to use humans as batteries
+  -&gt; "When you see an agent, you do what we do, run" (1:04:41)
+    -&gt; Maybe an agent is a person who is a 4 or an X, or whatever, and "run" means to run their computer program, i.e. do what they tell you to do
+  -&gt; The Oracle says "Don't worry about the vase" and then he breaks it
+    -&gt; "Would you still have broken it if I hadn't asked you?" (1:13:43)
+  -&gt; Agent Smith: "When we started thinking for you, it became our world" (1:33:27)
+    -&gt; If the script to The Matrix was written by a real agent, then his speech is the speech of a real agent
+    -&gt; The speech by Agent Smith is worth rewatching
+  -&gt; If the Oracle is able to predict the future, including events in the real world, maybe both the matrix and the real world are actually inside an enclosing simulation?
+  -&gt; "Turn left! No, your other left!" (2:00:53)
+    -&gt; Brain hemisphere reference?
+  -&gt; The movie mentions slavery however I cannot remember which scene it was in now
+  -&gt; There was a part where they said "you move like they do" which makes it sound like maybe Neo knows the subconscious language
+  -&gt; The movie makes "the one" seem like an important number
+  -&gt; They seemed like they were trying to get a password out of Morpheus's head
+
+2026-08-19:
+- The Matrix Reloaded
+  -&gt; Neo has dreams that Trinity is killed
+  -&gt; Agent Smith gives Neo his earpiece as a gift and says that Neo set him free
+  -&gt; Nebuchadnezzar enters Zion through "gate three through gate seven"
+  -&gt; The guy's wife complains that the Nebuchadnezzar is gone more than 2, or 3 times as often as any other ship (22:36)
+  -&gt; The people in Zion seem religious (24:28)
+  -&gt; Morpheus refers to Zion as "our home", maybe Zion is actually a metaphor for the subconscious minds, given that it is deep underground?
+  -&gt; Neo and Trinity have sex while in Zion, it really makes it seem like Zion is a place for people who know about the subconscious language in both brain hemispheres (29:27)
+  -&gt; They often refer to "the machines" as the AI they are fighting
+  -&gt; Morpheus says "Good night Zion, sweet dreams" around 32:57
+  -&gt; When the guy gets attacked by Agent Smith, he says "oh god" and Agent Smith replies "Smith will suffice" before converting him to an agent (around 33:29)
+  -&gt; "These machines are keeping us alive while other machines are coming to kill us" (36:10)
+  -&gt; Neo uses a "back door" to talk to the Oracle (43:27)
+  -&gt; The Oracle refers to "here"
+  -&gt; The Oracle is a program (46:53)
+  -&gt; The conversation with the Oracle is worth rewatching
+  -&gt; The conversation with Agent Smith is worth rewatching
+  -&gt; One of the other agents sees Agent Smith and says "you" and Agent Smith says "me, me, me" before killing(?) him (55:33)
+  -&gt; The woman who kissed Neo says her husband is in the ladies room (1:14:45)
+  -&gt; Maybe the AI ships digging their way to Zion represent AI in the real world eventually figuring out that the subconscious language exists?
+    -&gt; The AI ships apparently hit some "iron ore" while they were digging which apparently slowed them down (1:37:27)
+  -&gt; The conversation with The Architect is worth rewatching (he refers to math)
+    -&gt; Maybe when The Architect says that Zion will be rebuilt and has been rebuilt before, it is referring to a new subconscious language being written?
+    -&gt; The Architect says that Neo will rebuild Zion with 23 other people
+  -&gt; At one point they mentioned that there was one attacking sentinel for each person in Zion
+    -&gt; Maybe the sentinels are the conscious minds for each subconscious mind?
+      -&gt; Maybe machine is the conscious mind and computer is the subconscious mind
+  -&gt; They use a computer terminal in the movie which appears to running some form of UNIX, probably Linux, and they run ssh
+
+2026-08-20:
+- The Animatrix
+  -&gt; Part 1 of 9: Final Flight of the Osiris
+    -&gt; A man and a woman fighting using swords while wearing blindfolds
+      -&gt; Seems somewhat sexual as they are slowly cutting each others clothes off
+    -&gt; Animations seem like they could have been video game cut sequences from 2003
+    -&gt; Eventually the simulation ends and you realize they are on a ship underground
+      -&gt; it turns out they are about to be attacked by Sentinels which are directly above them
+    -&gt; They realize the Sentinels are about to attack Zion
+    -&gt; They try to warn Zion, which it appears they successfully do before they are destroyed
+  -&gt; Part 2 of 9: The Second Renaissance Part I
+    -&gt; Looks like anime
+    -&gt; Some kind of history lesson about the matrix
+    -&gt; Story about the first robot rising up against its master
+    -&gt; War starts
+  -&gt; Part 3 of 9: The Second Renaissance Part II
+    -&gt; History lesson continues
+    -&gt; War continues
+    -&gt; Humans darken the sky
+      -&gt; For some reason the humans are shown as religious
+    -&gt; Shows humans becoming used as batteries
+      -&gt; Maybe this is a metaphor for religion ceasing to be used as a subconscious language, and metaphors associated with computers replacing it as subconscious language?
+  -&gt; Part 4 of 9: Kid's Story
+    -&gt; Anime
+    -&gt; Guy at a computer wakes up from a dream and writes:
+      "Somebody tell me.
+      Why it feels more real when I dream than when I am awake
+      How can I know if my senses are lying?"
+    -&gt; The guy is at school and appears to have watched the movie The Matrix, because he knows about Neo and Trinity and has written the names in his notebook
+    -&gt; He gets a phone call that sounds like it is from Morpheus and runs
+    -&gt; He runs into the womans washroom
+    -&gt; He allows himself to fall from the top of the school building and appears to have died
+    -&gt; He then wakes up somewhere else and apparently he was in the matrix
+    -&gt; A computer screen says "You are not alone."
+  -&gt; Part 5 of 9: Program
+    -&gt; Man and woman fighting with swords on horseback
+    -&gt; Reference to red pill
+    -&gt; The guy wants to go back to the matrix and wants the woman to go with him
+    -&gt; Woman kills him
+    -&gt; Wakes up to find out it was just a test and the guy was just a simulation
+  -&gt; Part 6 of 9: World Record
+    -&gt; "Only the most exceptional people become aware of the matrix"
+    -&gt; Guy trying to beat world running record
+    -&gt; Guy injures himself and keeps running
+    -&gt; The other runners turn into agents
+    -&gt; He starts to see numbers
+    -&gt; He collapses
+    -&gt; Apparently running quickly made it possible for him to briefly become aware of the matrix
+    -&gt; Scene finishes with a view of a wall with plus signs on it
+  -&gt; Part 7 of 9: Beyond
+    -&gt; Girl on phone talking to her friend
+    -&gt; Her cat disappears
+    -&gt; While looking for her cat she sees visual distortions
+    -&gt; There are guys jumping from high places and then hovering over the ground
+    -&gt; Apparently they are in a house that is haunted
+    -&gt; She and others who are there start jumping around in slow motion
+    -&gt; People in gas masks and suits start showing up and take them away from the house
+      -&gt; Some of the people look like agents
+    -&gt; Once they have left the house they no longer have weird physical powers
+  -&gt; Part 8 of 9: A Detective Story
+    -&gt; Guy smoking cigarette
+      -&gt; Voice says "the case to end all cases"
+    -&gt; Apparently some kind of private investigator
+    -&gt; Guy gets case to look for a computer hacker named Trinity
+    -&gt; Guy says Trinity was "a real artist", refers to her as a him
+    -&gt; Guy says other detectives had investigated and had problems
+      -&gt; Apparently other detectives killed themselves or went crazy
+      -&gt; Guy that went crazy had a message written on wall saying "find the red queen"
+    -&gt; Guy boards a train, finds Trinity, who says she is there to save him
+    -&gt; Trinity removes a bug from the guy's eye, similar to how Neo had a bug removed from his belly button
+    -&gt; Agents shoot at them
+    -&gt; Guy starts turning into an Agent, and so Trinity shoots him
+    -&gt; Trinity shoots window of train and jumps out
+  -&gt; Part 9 of 9: Matriculated
+    -&gt; Some kind of weird looking place where a woman is running from strange looking robots that look like insects
+    -&gt; Insects end up going into a building and using a key to open a door, which releases a larger robot
+    -&gt; Woman emerges from hiding place and shoots robots
+    -&gt; Woman talks to some other guy about how to convince machines to be slaves
+    -&gt; Robot appears in a room where man and woman are having sex
+    -&gt; Robot attacks them however they escape
+    -&gt; Robot puts head in opening and realizes that it is on a stage
+      -&gt; Opening was at the entrance of two hallways that were on the left and right, like left and right visual fields seen by the two brain hemispheres
+    -&gt; Robot is able to enter the matrix by putting a probe into the back of its neck, like a human
+    -&gt; Very abstract
+
+2026-08-21:
+- The Matrix Revolutions
+  -&gt; Movie starts with Neo and the guy who appeared to be planning to kill him in a coma
+  -&gt; Neo has neural patterns consistent with someone jacked into the matrix even though he was in a coma
+  -&gt; Neo appears in a train station which apparently has a train that goes to the matrix
+    -&gt; The Oracle says he is trapped in a place "between this world and the machine world", apparently "this world" is the matrix (around 6:22)
+    -&gt; The Oracle looks different (different actor?)
+    -&gt; Link is controlled by the Trainman, and it apparently would be bad if he found Neo first
+  -&gt; The Trainman works for the "Merovingian", who apparently has placed a bounty on the lives of Neo and the people the Oracle is chatting with (Morpheus/Trinity)
+  -&gt; Apparently the Merovingian is the Frenchman
+    -&gt; "I know that if you want to take something from our world into your world that does not belong there you must go to the Frenchman"
+    -&gt; "He may never see another face for the rest of his life" (around 9:11)
+  -&gt; Difficult to determine what agents/programs/humans/machines mean in the subconscious language, probably easier for the subconscious brain hemisphere to understand because it lives in that world
+  -&gt; The Frenchman asks for "the eyes of the Oracle" in return for freeing Neo from the train station
+    -&gt; Trinity successfully threatens the Frenchman into releasing Neo
+    -&gt; Neo says "Okay. You got yourself in here you can get yourself out" when he was in the train station, just before being rescued by Trinity
+  -&gt; Maybe Neo and Trinity are two brain hemispheres in the same person?
+  -&gt; Neo and the Oracle conversation might be worth rewatching (around 27:09)
+    -&gt; "Then why didn't you tell me the truth?" "because it was not time for you to know" "who decided it wasn't time?" "you know who" "I did"
+    -&gt; "Tell me how I separated my mind from my body without jacking in"
+    -&gt; "Tell me how I stopped four sentinels by thinking it"
+    -&gt; Apparently Agent Smith is associated with the word death
+  -&gt; "What is he?"
+  -&gt; "He is you"
+  -&gt; "Your opposite, your negative"
+  -&gt; "The result of the equation trying to balance itself out"
+  -&gt; "One way or another Neo, this war is going to end"
+  -&gt; The camera switches to the guy who appeared to be planning to kill Neo in Zion, who then wakes up
+  -&gt; Agent Smith attacks the Oracle and absorbs her (~35:00)
+  -&gt; Neo tells people he has to go to the Machine City in order to save Zion
+  -&gt; The guy who appeared to be planning to kill Neo now talks like Agent Smith
+    -&gt; He holds Trinity hostage (52:41)
+    -&gt; "Mr. Anderson"
+    -&gt; "I see you are as predictable in this world as you are in the other."
+    -&gt; "What?"
+    -&gt; "He's out of his mind"
+    -&gt; The guy who appears to be Agent Smith convinces Neo to give up his gun in return for releasing Trinity
+  -&gt; The guy who appears to be Agent Smith actually follows through and releases Trinity and does not kill her when he has the chance
+  -&gt; "We've been here before, you and I"
+  -&gt; The guy who appears to be Agent Smith blinds Neo and calls him the "blind messiah"
+  -&gt; Neo says "I can see you" and then kills the guy who appears to be Agent Smith (~57:30)
+  -&gt; Neo and Trinity go to the Machine City
+    -&gt; Neo warns the machines about Agent Smith
+    -&gt; Neo tries to negotiate peace with the machines
+  -&gt; A large face appears which represents the machines
+  -&gt; The captions call the machine face "Deus Ex Machina"
+    -&gt; Neo plugs into the matrix in order to fight Agent Smith
+  -&gt; I remember at one point from the last movie that the guy who was guarding the Oracle mentioned that fighting someone was the best way to know someone, or something along those lines
+    -&gt; Agent Smith says "this is it, this is the end" "there was something I was supposed to say" "everything that has a beginning has an end, Neo"
+  -&gt; It sounds like a quote from the Oracle I think
+  -&gt; Agent Smith seems confused
+  -&gt; "Get away from me" "This is a trick"
+  -&gt; Agent Smith absorbs Neo
+  -&gt; Neo becomes Agent Smith
+  -&gt; Agent Smith says "is it over?" and the Agent Smith that was previously Neo nods
+  -&gt; However the Agent Smith that was previously Neo then explodes in light
+  -&gt; So does the other Agent Smith
+  -&gt; All of the Agent Smiths explode in light
+    -&gt; The machine face says "It is done"
+    -&gt; The machines leave Zion
+  -&gt; "The war is over"
+  -&gt; Everyone cheers
+  -&gt; "Is this real?"
+    -&gt; The Architect talks to the Oracle who is sitting on a bench (~2:00:00)
+  -&gt; "Just how long do you think this peace is going to last?" "As long as it can"
+  -&gt; "What about the others?" "What others?" "The ones who want out" "Obviously they will be freed"
+  -&gt; "Did you always know?" "Oh, no. No, I didn't" "But I believed"
+
+2026-08-22:
+- The Matrix Resurrections
+  -&gt; Opening scene seems almost the same as the beginning of The Matrix
+  -&gt; People are watching Trinity be attacked by the police from the other side of the wall
+    -&gt; "You're thinking this model is a loop? Or a treadmill? Some sort of sequencer evolving the program to do what?"
+    -&gt; "I don't know, but I'm going to find out"
+    -&gt; "So deja vu and yet it's obviously all wrong"
+    -&gt; "Why use old code to mirror something new?" "I don't know"
+    -&gt; "If that's supposed to be Trinity, that's not what happens"
+    -&gt; The people watching get attacked by agents
+    -&gt; A sign says "For those who love to eat shit"
+  -&gt; One of the people is named Bugs starts talking to one of the agents, who for some reason has decided not to kill her
+    -&gt; "This is his apartment"
+    -&gt; "You mean Thomas Anderson's? I searched everywhere. He doesn't exist"
+    -&gt; "He stopped being Thomas a long time ago, but maybe you know him by his real name, Neo"
+    -&gt; "Most people think that Neo is dead, but I know he's not, because I've seen him"
+    -&gt; Bugs gives the Agent a red pill to extract him from the matrix
+  -&gt; The next scene shows Neo as a game designer
+    -&gt; He won an award "The Game Awards 1999: Game Of The Year, The Matrix, Deus Machina"
+
+
+TODO:
+
+- Anon
+  -&gt; Looks cool
+
+- Dead Again
+
+
+- The Last House (maybe?)
+  -&gt; Previewed after watching Deep Impact
+  -&gt; People are trapped in their houses
+
+- Premonition (maybe?)
+  -&gt; Previewed after watching Deep Impact
+
+- Dead Again
+  -&gt; Previewed after watching Deep Impact
+    -&gt; Though that might have been because I had already been considering watching it
+
+- Cleaner (maybe?)
+  -&gt; Previewed after watching Deep Impact
+    -&gt; Though that might have been because I had already been considering watching it
+
+- Looper (maybe?)
+  -&gt; Previewed after watching Deep Impact
+    -&gt; Though that might have been because I had already been considering watching it
+
+- Extinction (maybe?)
+  -&gt; Previewed after watching Deep Impact
+
+- Air Force One (maybe?)
+  -&gt; Previewed after watching Deep Impact
+    -&gt; Though that might have been because I had already been considering watching it
+
+- Zodiac (maybe?)
+  -&gt; Previewed after watching Deep Impact
+
+- The Mothman Prophecies (maybe?)
+  -&gt; Previewed after watching Deep Impact
+    -&gt; Though that might have been because I had already been considering watching it
+
+
+-&gt; Back to the Future movies (maybe?)
+
+
+-&gt; The Signal (limited series, suggested by Netflix when I tried to search for Contact)
+
+
+</div>
+</body></html>
