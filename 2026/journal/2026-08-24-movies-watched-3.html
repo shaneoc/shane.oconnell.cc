@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<!-- Copyright 2025 Shane O'Connell -->
+<html><head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Movies Watched 3 - 2026/journal - shane.oconnell.cc</title>
+<style>
+body {
+    display: grid;
+    margin: 0;
+    background: #eeeeee;
+    font-family: sans-serif;
+    overflow-wrap: break-word;
+    height: 100dvh;
+}
+
+@media (min-width: 50rem) {
+    body {
+        grid-template-areas:
+            "file-path  view-source wrap-text mtime   prev    next"
+            "content    content     content   content content content";
+        grid-template-rows: max-content 1fr;
+        grid-template-columns: 1fr repeat(5, max-content);
+    }
+
+    body > .view-source-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-bottom: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media (not (min-width: 50rem)) and (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path   file-path file-path file-path file-path"
+            "content     content   content   content   content"
+            "view-source wrap-text mtime     prev      next";
+        grid-template-rows: max-content 1fr max-content;
+        grid-template-columns: repeat(2, max-content) 1fr repeat(2, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-right: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+@media not (min-width: 35rem) {
+    body {
+        grid-template-areas:
+            "file-path file-path   file-path file-path file-path"
+            "content   content     content   content   content"
+            "mtime     mtime       mtime     mtime     mtime"
+            ".         view-source wrap-text prev      next";
+        grid-template-rows: max-content 1fr repeat(2, max-content);
+        grid-template-columns: 1fr repeat(4, max-content);
+    }
+
+    body > .view-source-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .wrap-text-label {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .mtime-info {
+        border-top: thin solid #999999;
+    }
+
+    body > .prev-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+
+    body > .next-link {
+        border-top: thin solid #999999;
+        border-left: thin solid #999999;
+    }
+}
+
+a:link {
+    color: #666666;
+}
+
+a:visited {
+    color: #000000;
+}
+
+a.plain-link {
+    text-decoration: none;
+    color: #000000;
+}
+
+a.plain-link:visited {
+    color: #000000;
+}
+
+button {
+    background: inherit;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 0;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #dddddd;
+}
+
+label {
+    cursor: pointer;
+}
+
+body > .file-path {
+    grid-area: file-path;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    border-bottom: thin solid #999999;
+}
+
+body > .file-path > .archive-link {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .file-path > .archive-link:link {
+    color: #000000;
+}
+
+body > .file-path > .archive-link:hover {
+    background: #dddddd;
+}
+
+body > .file-path > .popup-button {
+    padding: 0.2rem 0.3rem;
+    user-select: text;
+}
+
+body > .file-path > .filename {
+    padding: 0.2rem 0.3rem;
+}
+
+body > .view-source-label {
+    grid-area: view-source;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .view-source-label:hover {
+    background: #dddddd;
+}
+
+body > .wrap-text-label {
+    grid-area: wrap-text;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .wrap-text-label:hover {
+    background: #dddddd;
+}
+
+body > .mtime-info {
+    grid-area: mtime;
+    text-align: center;
+    color: #444444;
+    padding: 0.2rem 0.3rem;
+}
+
+body > .prev-link {
+    grid-area: prev;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+body > .next-link {
+    grid-area: next;
+    text-decoration: none;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+}
+
+.active-link:link {
+    color: #000000;
+}
+
+.active-link:hover {
+    background: #dddddd;
+}
+
+.disabled-link {
+    color: #333333;
+}
+
+.popup-menu {
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    background: #eeeeee;
+    border: thin solid #999999;
+    min-width: 5rem;
+    box-sizing: border-box;
+}
+
+.popup-menu > div {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.popup-menu > div > .file-button {
+    text-align: left;
+    padding: 0.2rem 0.3rem;
+    user-select: none;
+    min-width: max-content;
+}
+
+.popup-menu > div > .file-button:hover {
+    background: #dddddd;
+}
+
+.popup-menu > div > .directory-button {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    min-width: max-content;
+}
+
+.popup-menu > div > .directory-button > span:first-of-type {
+    padding: 0.2rem 0.3rem;
+}
+
+.popup-menu > div > .directory-button > span:last-of-type {
+    margin-left: auto;
+    margin-right: 0.2rem;
+    width: 0.4rem;
+    height: 0.5rem;
+    background: #333333;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+}
+
+.index-menu-item {
+    border-top: thin solid #999999;
+}
+
+body > .text-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    font-family: monospace;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > input[type="checkbox"] {
+    display: none;
+}
+
+body > .html-view {
+    grid-area: content;
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+    color: #ffffff;
+    overflow: auto;
+    padding: 0.3rem;
+}
+
+body > .html-view > div {
+    width: clamp(50ch, 50%, 80ch);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+body > .html-view > div a {
+    color: #00ff00;
+}
+
+body > .html-view > div a:visited {
+    color: #00ff00;
+}
+
+body > .html-view > div h1, body > .html-view > div h2 {
+    color: #00ff00;
+}
+
+body > .html-view > div img {
+    max-width: 100%;
+    height: auto;
+}
+
+body > .html-view > div details {
+    margin: 0.3em 0;
+}
+
+body > .html-view > div details > p {
+    padding-left: 1em;
+}
+
+body > .html-view > div details > p:first-of-type {
+    margin-top: 0.5em;
+}
+
+body > .html-view > div summary {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0.2em 0.4em;
+}
+
+body > .html-view > div .indent-paragraph {
+    padding-inline-start: 1rem;
+}
+
+body > .html-view > div .margin-top-zero {
+    margin-top: 0;
+}
+
+body > .html-view > div .margin-bottom-zero {
+    margin-bottom: 0;
+}
+
+body > #view-source-checkbox:not(:checked) + * + * {
+    display: block;
+}
+
+body > #view-source-checkbox:checked + * + * + * + * + * {
+    display: block;
+}
+
+body > #wrap-text-checkbox:not(:checked) + * + * {
+    white-space: pre;
+}
+
+body > #wrap-text-checkbox:checked + * + * {
+    white-space: break-spaces;
+}
+
+body > input[type="checkbox"]:checked + * {
+    background: #e3e3e3;
+}
+
+body > input[type="checkbox"]:checked + *:hover {
+    background: #dddddd;
+}
+</style>
+<script src="../../database.js"></script>
+<script>
+if (document.location.href.startsWith('file:')) {
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const index_links = document.getElementsByClassName('index-link');
+        for (let i = 0; i < index_links.length; i++) {
+            index_links[i].href += 'index.html';
+        }
+        const html_links = document.getElementsByClassName('html-link');
+        for (let i = 0; i < html_links.length; i++) {
+            html_links[i].href += '.html';
+        }
+    });
+}
+const root_relpath = "../../";
+let popup_buttons = new Array();
+let popup_stack = new Array();
+let path_stack = new Array();
+let path_match_count = 0;
+
+function attach_menu(button_el, popup_el) {
+    button_el.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_left = popup_style.getPropertyValue('border-left-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `${button_rect.bottom}px`;
+        popup_el.style.left = `calc(${button_rect.left}px - ${popup_border_left})`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+
+        popup_el.showPopover();
+    });
+}
+
+function attach_submenu(button_el, popup_el) {
+    button_el.popoverTargetElement = popup_el;
+    button_el.popoverTargetAction = 'show';
+
+    button_el.addEventListener('click', () => {
+        const popup_style = window.getComputedStyle(popup_el);
+        const popup_border_top = popup_style.getPropertyValue('border-top-width');
+        const button_rect = button_el.getBoundingClientRect();
+
+        popup_el.style.top = `calc(${button_rect.top}px - ${popup_border_top})`;
+        popup_el.style.left = `${button_rect.right}px`;
+        popup_el.style.height = 'revert';
+        popup_el.style.width = 'revert';
+    });
+}
+
+function create_popup() {
+    const popup_el = document.createElement('div');
+    popup_el.popover = 'auto';
+    popup_el.classList.add('popup-menu');
+    popup_el.appendChild(document.createElement('div'));
+    document.body.appendChild(popup_el);
+    popup_stack.push(popup_el);
+
+    popup_el.addEventListener('toggle', () => {
+        if (popup_el.checkVisibility()) {
+
+            const file_path_el = document.getElementById('file-path');
+            const file_path_rect = file_path_el.getBoundingClientRect();
+            const popup_rect = popup_el.getBoundingClientRect();
+            const body_rect = document.body.getBoundingClientRect();
+
+            const max_top = Math.max(
+                file_path_rect.height, body_rect.height - popup_rect.height);
+            const max_left = Math.max(0, body_rect.width - popup_rect.width);
+
+            if (popup_rect.top > max_top) {
+                popup_el.style.top = `${max_top}px`;
+
+                if ((max_top + popup_rect.height) > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - max_top}px`;
+                }
+            } else {
+                if (popup_rect.bottom > body_rect.height) {
+                    popup_el.style.height = `${body_rect.height - popup_rect.top}px`;
+                }
+            }
+
+            if (popup_rect.left > max_left) {
+                popup_el.style.left = `${max_left}px`;
+
+                if ((max_left + popup_rect.width) > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - max_left}px`;
+                }
+            } else {
+                if (popup_rect.right > body_rect.width) {
+                    popup_el.style.width = `${body_rect.width - popup_rect.right}px`;
+                }
+            }
+        }
+    });
+
+    return popup_el;
+}
+
+window.addEventListener('load', (event) => {
+    document.querySelectorAll('.popup-button').forEach((button) => {
+        popup_buttons.push(button);
+    });
+
+    const root_popup_el = create_popup();
+
+    const archive_link_el = document.querySelector('.archive-link');
+    attach_menu(archive_link_el, root_popup_el);
+
+    for (const db_entry of archive_database) {
+        if (Array.isArray(db_entry)) {
+            const entry_type = db_entry[0];
+            const url_name = db_entry[1];
+            const display_name = db_entry.length == 3 ? db_entry[2] : db_entry[1];
+
+            if (entry_type === 'dir') {
+                const menu_item_el = document.createElement('button');
+                menu_item_el.classList.add('directory-button');
+
+                const button_label_el = document.createElement('span');
+                button_label_el.appendChild(document.createTextNode(display_name));
+                menu_item_el.appendChild(button_label_el);
+
+                const button_arrow_el = document.createElement('span');
+                menu_item_el.appendChild(button_arrow_el);
+
+                popup_stack.at(-1).firstChild.appendChild(menu_item_el);
+
+                const child_popup_el = create_popup();
+                attach_submenu(menu_item_el, child_popup_el);
+
+                path_stack.push(url_name);
+
+                if (path_match_count == (popup_stack.length - 2) &&
+                    path_match_count < popup_buttons.length) {
+
+                    const button_el = popup_buttons[path_match_count];
+
+                    if (button_el.textContent === display_name) {
+                        attach_menu(button_el, child_popup_el);
+                        path_match_count++;
+                    }
+                }
+            } else {
+                let link_href = root_relpath;
+                for (let path_idx = 0; path_idx < path_stack.length; path_idx++) {
+                    link_href += path_stack[path_idx] + '/';
+                }
+                link_href += url_name;
+                if (document.location.href.startsWith('file:')) {
+                    link_href += '.html';
+                }
+
+                const link_el = document.createElement('a');
+                link_el.href = link_href;
+                link_el.classList.add('file-button');
+                link_el.appendChild(document.createTextNode(display_name));
+                popup_stack.at(-1).firstChild.appendChild(link_el);
+            }
+        } else {
+            popup_stack.pop();
+            path_match_count = Math.min(path_match_count, popup_stack.length - 1);
+            path_stack.pop();
+        }
+    }
+
+    const index_menu_item_el = document.createElement('a');
+    index_menu_item_el.href = root_relpath + 'archive/';
+    if (document.location.href.startsWith('file:')) {
+        index_menu_item_el.href += 'index.html';
+    }
+    index_menu_item_el.classList.add('file-button');
+    index_menu_item_el.classList.add('plain-link');
+    index_menu_item_el.classList.add('index-menu-item');
+    index_menu_item_el.appendChild(document.createTextNode('Index'))
+    root_popup_el.firstChild.appendChild(index_menu_item_el);
+
+    const home_menu_item_el = document.createElement('a');
+    home_menu_item_el.href = root_relpath;
+    if (document.location.href.startsWith('file:')) {
+        home_menu_item_el.href += 'index.html';
+    }
+    home_menu_item_el.classList.add('file-button');
+    home_menu_item_el.classList.add('plain-link');
+    home_menu_item_el.appendChild(document.createTextNode('Home'))
+    root_popup_el.firstChild.appendChild(home_menu_item_el);
+});
+</script>
+</head><body>
+<div id="file-path" class="file-path">
+<a href="../../archive/" class="archive-link index-link">Archive</a>
+<button class="popup-button">2026</button>
+<span>/</span>
+<button class="popup-button">journal</button>
+<span>/</span>
+<span class="filename">2026-08-24-movies-watched-3.md</span>
+</div>
+<div class="mtime-info">2026-08-24 23:59:46.255204 UTC</div>
+<a class="prev-link active-link html-link" href="../../2026/journal/2026-08-06-movies-watched-2">previous</a>
+<a class="next-link active-link html-link" href="../../2026/journal/2026-08-24-movies-watched-3-photos/photo-1-deep-impact-august-16.jpg.info">next</a>
+<input type="checkbox" id="view-source-checkbox" />
+<label class="view-source-label" for="view-source-checkbox">view source</label>
+<div class="html-view"><div><h1>Movies Watched 3</h1>
+<p><strong>Date:</strong> 2026-08-24</p>
+<h2>Deep Impact (1998)</h2>
+<p>After taking a break from watching movies for a while, I decided to watch
+another one. At first I was not planning to write a journal entry about
+whatever movie that I picked, so I tried to pick one that I did not think would
+have any significant metaphors about <a href="../pages/2026-08-15-subconscious-language" class="html-link">the subconscious
+language</a>. After
+scrolling through the movies on Netflix, I ended up going with <a href="https://en.wikipedia.org/wiki/Deep_Impact_(film)">Deep
+Impact</a>. However, it turned
+out that I was wrong about there being metaphors about the subconscious
+language. In addition, if we are <a href="../../2025/journal/2025-01-02-ai-singularity-computer-simulation" class="html-link">living in a deterministic computer
+simulation</a>
+of reality in which all events are predetermined, it seems like whoever made
+the simulation wanted to force me to write another journal entry.</p>
+<figure>
+<div style="display: flex; flex-direction: row; gap: 1rem">
+<a href="2026-08-24-movies-watched-3-photos/photo-1-deep-impact-august-16.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-1-deep-impact-august-16.jpg" loading="lazy" /></a>
+<a href="2026-08-24-movies-watched-3-photos/photo-2-deep-impact-eight-months.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-2-deep-impact-eight-months.jpg" loading="lazy" /></a>
+</div>
+<figcaption>Photo 1 and 2 - Photos of my television while watching Deep Impact
+</figcaption>
+</figure>
+<p>The first moment that I realized that I would have to write a journal entry was
+when I was watching the movie and they referenced the date August 16. By
+coincidence, the date that I was watching the movie was August 16. This seemed
+unlikely, which was why I started thinking that perhaps this was an intentional
+signal from whoever made the simulation that we are living inside.</p>
+<p>Shortly after taking the first photo, there was a reference to the number
+eight. If you have read my page on the subconscious language, you know that my
+theory is that numbers often have alternative meanings in the subconscious
+language that are normally only understood in the right brain hemisphere. In
+this case, I am not sure what meaning this specific number might have in the
+context of the movie if it is being used as part of a message in the
+subconscious language. However, the photo also contains a photo of a woman, and
+I felt that if I was going to include a photo of someone who was male that I
+wanted to also include a photo of someone who was female. I am single and am
+attracted to women, so the presence of the woman makes me feel more
+comfortable. Also, ahead of writing this journal entry I imagined putting these
+photos into it and putting them side by side. If you are paying attention and
+somewhat understand the concepts behind the brain hemispheres and the
+subconscious language, you know that it made sense that I thought to do this
+due to the fact that it sometimes seems like the brain hemispheres are referred
+to using the male and female genders. Maybe arranging the photos this way was a
+suggestion made by my right brain hemisphere.</p>
+<p>As part of these photos, you can observe that I have some clutter under my
+television in the form of a pile of <a href="https://en.wikipedia.org/wiki/Twist_tie">twist
+ties</a>. When the police decided to
+<a href="../../2025/journal/2025-12-14-strange-2021" class="html-link">bring me to a psychiatric facility in
+2021</a>, they mentioned
+that they felt that my apartment was messy, and it seemed like that was part of
+their justification for forcing me to go. Maybe that means that I should clean
+them up. Unfortunately, I had not done so by the time that I took this photo,
+and so you will simply have to deal with the fact that they are there.</p>
+<p>In addition to the unlikely nature of the August 16 date, there was something
+else that happened which caused me to believe that I should write a journal
+entry. I looked at my watch, and the time on my watch was showing 23 for the
+seconds. A similar thing happened while I was considering watching <a href="https://en.wikipedia.org/wiki/The_Woman_in_the_Window_(2021_film)">The Woman
+in the
+Window</a> in
+my <a href="2026-08-06-movies-watched-2" class="html-link">previous journal entry</a>. This is a
+number pattern that I feel that I have seen a statistically significant number
+of times whenever I have looked at the time, which is something else that has
+caused me to suspect that we might be living in a deterministic virtual reality
+computer simulation. In order to prove that it occurred, I quickly tried to
+take a photo of my watch.</p>
+<figure>
+<a href="2026-08-24-movies-watched-3-photos/photo-3-watch-23-24-seconds.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-3-watch-23-24-seconds.jpg" loading="lazy" /></a>
+<figcaption>Photo 3 - Photo of my watch taken one second after it had shown 23
+for the seconds
+</figcaption>
+</figure>
+<p>I was not fast enough to actually capture the 23, as it took me a second to get
+my phone out, however you can see that it really happened and I was not
+hallucinating. It really did show 23 for the seconds. The image is cut off on
+the right side because I normally have a piece of tape over my smartphone
+camera, as I do not trust the phone not to be hacked and to have someone
+remotely looking through the camera. I tried to fold the piece of tape back
+quickly however I did not do it quickly enough to avoid it having it be part of
+the photo.</p>
+<p>As for the movie itself, I felt that it was a reasonably good movie, though
+somewhat depressing. It is a movie about a large comet that is on a collision
+course with Earth, which according to the calculations in the movie was large
+enough to cause the extinction of the human race. Most of the movie describes
+the events leading up to the collision. I had seen the movie before a long time
+ago, however I thought that more of the movie took place after the collision,
+rather than before. It was the fact that most of the movie was about the events
+leading up to the collision which made the movie seem a bit depressing to me,
+because there were many scenes with people worrying about it with many of them
+accepting that they might die during the event. Once the collision occurred,
+many people did die, which also made it seem a bit depressing to me.</p>
+<p>However, after watching the movie, I realized that there might be some
+subconscious language elements which make the movie a bit less depressing. As
+far as I understand what appears to be the subconscious language, the idea of
+death is actually often a metaphor for a person starting to understand the
+subconscious language. Therefore, it is possible that this movie is actually
+about an event in which a lot of people start to understand the subconscious
+language. I noticed that the spaceship which is sent to try to divert the comet
+is called the <a href="https://en.wikipedia.org/wiki/Messiah">Messiah</a>, which appears
+to be a religious reference. Part of my theory about the subconscious language
+is that it is widely used in religious texts and is one of the reasons that
+religion exists, and so perhaps the fact that the spaceship is named Messiah
+symbolizes the idea that religious aspects of society might be opposed to
+people understanding the language due to the fact that they might possibly have
+been using it to convey secret messages.</p>
+<p>There were a few other small things that I noticed. At the beginning of the
+movie, a young woman and a young man are the people who first observe the comet
+through a telescope. For some reason, even though they saw the comet at the
+same time, the guy is the one who gets all of the credit. The woman
+misidentifies it the star <a href="https://en.wikipedia.org/wiki/Megrez">Megrez</a> at
+first, however it still seemed to me like she should get some credit. The lack
+of recognition was so severe that the people in charge decided to save the guy
+and his family in a large government-run shelter while leaving the woman and
+her family to die. It did not seem fair. Another moment that stood out to me
+was when the guy was talking to a large group of students in his high school
+about the discovery, and one of the other students stood up and shouted out
+that the guy was going to end up having a lot of sex for having discovered the
+comet. It was hard for me not to suspect that I might be in a similar situation
+as the guy who discovered the comet due to the fact that I might have
+discovered the subconscious language, and so it gave me some hope that perhaps
+I will be able to have sex at some point in the future.</p>
+<h2>Contact (1997)</h2>
+<p>The next movie that I watched was
+<a href="https://en.wikipedia.org/wiki/Contact_(1997_American_film)">Contact</a>. This is
+a movie that was not on Netflix when I looked, however I own the movie on DVD
+so I watched it on DVD. I decided to watch this movie as I had seen it somewhat
+recently shortly after buying the DVD and so I knew what to expect. I knew that
+it was a less depressing movie than Deep Impact, and I was pretty sure that
+there would be some subconscious language metaphors that I could describe.</p>
+<p>Contact is a movie about a radio signal that is received from space which
+appears to have been sent by aliens. This kind of story makes me think it could
+have subconscious language metaphors due to the reference to space, which I
+suspect is a word that has an alternate definition of referring to the
+subconscious language. Aliens are also referenced in the name of <a href="https://en.wikipedia.org/wiki/Alien_hand_syndrome">alien hand
+syndrome</a>, which is a
+medical condition that is known to occur in people who have had their <a href="https://en.wikipedia.org/wiki/Corpus_callosotomy">brain
+hemispheres surgically
+separated</a>, and so it seems
+possible that the word alien might have an alternate definition of referring to
+the right brain hemisphere, which is the hemisphere that is normally aware of
+the subconscious language, which would match the use of the word space to refer
+to the language.</p>
+<p>I like this movie, which is why I bought it on DVD. I like the mystery
+associated with trying to understand the alien message. Watching it again, I
+also realize that I like that they used a bunch of computers in the movie that
+were modern around 1997, which makes me feel nostalgic when I see them. When I
+was in high school, I used to participate in the <a href="https://en.wikipedia.org/wiki/SETI@home">SETI@home
+project</a>, and in the movie they often
+use the term
+<a href="https://en.wikipedia.org/wiki/Search_for_extraterrestrial_intelligence">SETI</a>
+to refer to their search for an alien signal, which makes me feel a bit
+nostalgic as well. The fact that the lead character is female is an added
+bonus. I find the fact that she is interested in science attractive.</p>
+<p>Having spent some time considering the movie in the context of the subconscious
+language, there are a few things that stick out to me. One obvious thing is
+that the message from space initially consists of a sequence of numbers, which
+turn out to be <a href="https://en.wikipedia.org/wiki/Prime_number">prime numbers</a>. In
+order to explain this, one of the characters says that &quot;mathematics is the only
+true universal language&quot;. This is an interesting concept which actually kind of
+makes sense without considering the alternative definitions associated with the
+subconscious language. If you also think about it in terms of the subconscious
+language, however, it sounds like it could be referring to the number system
+which I described on my page about the subconscious language. I also notice
+that the word &quot;universal&quot; starts with the prefix &quot;un&quot;, which I suspect might be
+an indicator that the word is intended to also refer to the right brain
+hemisphere and the subconscious language. There are also a bunch of references
+to religion in the movie in various ways. This is something else that I suspect
+might partially be in the movie in order to reference the subconscious
+language. If you are looking for a good movie with a lot of potential
+subconscious language references, I definitely recommend the movie Contact. I
+wish the ending was a bit longer and a bit more elaborate, however it is still
+an enjoyable movie.</p>
+<h2>The Matrix (1999)</h2>
+<h2>The Matrix Reloaded (2003)</h2>
+<h2>The Animatrix (2003)</h2>
+<h2>The Matrix Revolutions (2003)</h2>
+<h2>The Matrix Resurrections (2021)</h2>
+<p>For the next five days after watching Contact, I decided to watch <a href="https://en.wikipedia.org/wiki/The_Matrix">The
+Matrix</a>, as well as its sequals <a href="https://en.wikipedia.org/wiki/The_Matrix_Reloaded">The
+Matrix Reloaded</a>, <a href="https://en.wikipedia.org/wiki/The_Animatrix">The
+Animatrix</a>, <a href="https://en.wikipedia.org/wiki/The_Matrix_Revolutions">The Matrix
+Revolutions</a>, and <a href="https://en.wikipedia.org/wiki/The_Matrix_Resurrections">The
+Matrix Resurrections</a>.
+The Matrix is one of my favourite movies of all time, and it seemed like a very
+appropriate movie to watch when considering the idea that we all might live in
+a computer simulation, given that the idea that we all live in a computer
+simulation is an important aspect of the plot of the movie as well as its
+sequels. I own most of these movies on both Blu-Ray and DVD.</p>
+<p>After watching these movies again, I realized that they appear to have many
+very obvious references to the subconscious language. I started writing a long
+description in this journal entry, however I realized that I had so much to say
+about these specific movies that I decided to create a <a href="../pages/2026-08-23-the-matrix-and-brain-hemispheres" class="html-link">dedicated
+page</a> about
+the movies, which I plan to use to describe what I have noticed in more detail.</p>
+<figure>
+<a href="2026-08-24-movies-watched-3-photos/photo-4-matrix-trinity-helicopter-explosion.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-4-matrix-trinity-helicopter-explosion.jpg" loading="lazy" /></a>
+<figcaption>Photo 4 - Photo of my television showing an epic scene from The
+Matrix with a large explosion. The movie contains a lot of explosions, which is
+a word that contains the letter x, which as far as I can tell is a letter that
+is often used to indicate that a message in the subconscious language is
+present. Perhaps explosions are a subconscious language reference.
+</figcaption>
+</figure>
+<p>My theory is that the simulated world that the characters live inside, which
+they call &quot;the matrix&quot;, is a reference to the world that we currently live in,
+in which most people are not aware of the subconscious language in their left
+brain hemisphere. In the movies, there are people referred to as agents who
+generally attack the main character Neo whenever they see him while he is
+inside the matrix. Any random person can spontaneously turn into an agent and
+become hostile. My theory is that Neo represents someone who has learned about
+the subconscious language in his left brain hemisphere, while the agents
+represent people who are only aware of the language in their right brain
+hemisphere and not their left brain hemisphere, and who work together to try to
+keep the language secret.</p>
+<p>Before this I had seen all of these movies before with the exception of The
+Animatrix, which I purchased on DVD somewhat recently and had not yet had a
+chance to watch. The Animatrix is actually a collection of nine short stories
+that reference aspects of the other movies, and are not part of the overall
+storyline of the other movies. Some of them are very abstract. I found these
+short stories interesting, in particular due to the fact that some of them have
+the most obvious subconscious language references that I have seen so far.</p>
+<figure>
+<div style="display: flex; flex-direction: row; gap: 1rem">
+<a href="2026-08-24-movies-watched-3-photos/photo-5-animatrix-running-from-agents.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-5-animatrix-running-from-agents.jpg" loading="lazy" /></a>
+<a href="2026-08-24-movies-watched-3-photos/photo-6-animatrix-numbers.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-6-animatrix-numbers.jpg" loading="lazy" /></a>
+</div>
+<figcaption>Photo 5 and 6 - Photos of my television while watching
+<a href="https://en.wikipedia.org/wiki/The_Animatrix#World_Record">World
+Record</a>, one of the short stories from The Animatrix
+</figcaption>
+</figure>
+<p>One of the short stories is called World Record, which is about a competitive
+runner. According to the short story, it is possible for people to become aware
+of the matrix when they are in certain unusual circumstances, one of which is
+apparently when they are running. At one point the main character is running in
+a competitive running race and he starts to become aware of the matrix, which
+causes agents to take over the bodies of some of the other runners and chase
+him. While he is running, he briefly starts to see numbers floating in the air.
+I suspect that these numbers are a reference to the numbers that are used as
+part of the subconscious language. I feel that this is a good example of
+something which seems very likely to be a subconscious language reference,
+because the numbers do not seem like they make sense as part of the actual
+story involving the runner. Aside from being a potential subconscious language
+reference, they seem very random.</p>
+<figure>
+<div style="display: flex; flex-direction: row; gap: 1rem">
+<a href="2026-08-24-movies-watched-3-photos/photo-7-animatrix-kissing.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-7-animatrix-kissing.jpg" loading="lazy" /></a>
+<a href="2026-08-24-movies-watched-3-photos/photo-8-animatrix-visual-fields.jpg">
+<img src="2026-08-24-movies-watched-3-photos/photo-8-animatrix-visual-fields.jpg" loading="lazy" /></a>
+</div>
+<figcaption>Photo 7 and 8 - Photos of my television while watching
+<a href="https://en.wikipedia.org/wiki/The_Animatrix#Matriculated">Matriculated</a>,
+one of the short stories from The Animatrix
+</figcaption>
+</figure>
+<p>Another short story is called Matriculated, which is one of the most abstract
+of the short stories. I found it a bit hard to follow, and I had to read the
+description on Wikipedia in order to understand what was supposed to be
+happening. However, it appears to contain a scene which seems very likely to me
+to be a subconscious language reference. As part of the short story, a robot is
+inserted into a simulated environment which appears similar to the matrix, and
+as he walks around the environment he encounters a man and a woman embracing
+each other and kissing. After the man and woman encounter the robot, they run
+away from it and the robot chases them. Eventually, they end up running down a
+very strange looking hallway which splits into two directions. The man goes
+down the left hallway while the woman goes down the right hallway. The way the
+camera shows the hallways, they appear to line up with the left and right
+visual fields seen by the two brain hemispheres. This seemed to me like a very
+obvious brain hemisphere reference, especially considering that the male and
+female genders seem to often be used to refer to the brain hemispheres in the
+subconscious language.</p>
+<p>Overall, I enjoyed watching all of these movies. I have a lot more that I could
+say about The Matrix, however I will try to keep the detailed discussion on the
+separate page dedicated to the topic. If you find these concepts interesting,
+please keep in mind that I am <a href="../../trapped-in-my-apartment/" class="index-link">trapped in my
+apartment</a>, and have been trying,
+unsuccessfully so far, to convince someone to help me. Perhaps the reason that
+nobody is helping me has something to do with the subconscious language, and I
+am, in fact, being attacked by people similar to the agents in the matrix
+movies, who are only aware of the subconscious language in their right brain
+hemisphere and not their left. Hopefully, if this is the case, my detailed
+descriptions should help solve the problem.</p>
+</div></div>
+<input type="checkbox" id="wrap-text-checkbox" checked />
+<label class="wrap-text-label" for="wrap-text-checkbox">wrap source</label>
+<div class="text-view"># Movies Watched 3
+
+**Date:** 2026-08-24
+
+## Deep Impact (1998)
+
+After taking a break from watching movies for a while, I decided to watch
+another one. At first I was not planning to write a journal entry about
+whatever movie that I picked, so I tried to pick one that I did not think would
+have any significant metaphors about [the subconscious
+language](../pages/2026-08-15-subconscious-language){.html-link}. After
+scrolling through the movies on Netflix, I ended up going with [Deep
+Impact](https://en.wikipedia.org/wiki/Deep_Impact_(film)). However, it turned
+out that I was wrong about there being metaphors about the subconscious
+language. In addition, if we are [living in a deterministic computer
+simulation](../../2025/journal/2025-01-02-ai-singularity-computer-simulation){.html-link}
+of reality in which all events are predetermined, it seems like whoever made
+the simulation wanted to force me to write another journal entry.
+
+&lt;figure&gt;
+&lt;div style="display: flex; flex-direction: row; gap: 1rem"&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-1-deep-impact-august-16.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-1-deep-impact-august-16.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-2-deep-impact-eight-months.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-2-deep-impact-eight-months.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;/div&gt;
+&lt;figcaption&gt;Photo 1 and 2 - Photos of my television while watching Deep Impact
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+The first moment that I realized that I would have to write a journal entry was
+when I was watching the movie and they referenced the date August 16. By
+coincidence, the date that I was watching the movie was August 16. This seemed
+unlikely, which was why I started thinking that perhaps this was an intentional
+signal from whoever made the simulation that we are living inside.
+
+Shortly after taking the first photo, there was a reference to the number
+eight. If you have read my page on the subconscious language, you know that my
+theory is that numbers often have alternative meanings in the subconscious
+language that are normally only understood in the right brain hemisphere. In
+this case, I am not sure what meaning this specific number might have in the
+context of the movie if it is being used as part of a message in the
+subconscious language. However, the photo also contains a photo of a woman, and
+I felt that if I was going to include a photo of someone who was male that I
+wanted to also include a photo of someone who was female. I am single and am
+attracted to women, so the presence of the woman makes me feel more
+comfortable. Also, ahead of writing this journal entry I imagined putting these
+photos into it and putting them side by side. If you are paying attention and
+somewhat understand the concepts behind the brain hemispheres and the
+subconscious language, you know that it made sense that I thought to do this
+due to the fact that it sometimes seems like the brain hemispheres are referred
+to using the male and female genders. Maybe arranging the photos this way was a
+suggestion made by my right brain hemisphere.
+
+As part of these photos, you can observe that I have some clutter under my
+television in the form of a pile of [twist
+ties](https://en.wikipedia.org/wiki/Twist_tie). When the police decided to
+[bring me to a psychiatric facility in
+2021](../../2025/journal/2025-12-14-strange-2021){.html-link}, they mentioned
+that they felt that my apartment was messy, and it seemed like that was part of
+their justification for forcing me to go. Maybe that means that I should clean
+them up. Unfortunately, I had not done so by the time that I took this photo,
+and so you will simply have to deal with the fact that they are there.
+
+In addition to the unlikely nature of the August 16 date, there was something
+else that happened which caused me to believe that I should write a journal
+entry. I looked at my watch, and the time on my watch was showing 23 for the
+seconds. A similar thing happened while I was considering watching [The Woman
+in the
+Window](https://en.wikipedia.org/wiki/The_Woman_in_the_Window_(2021_film)) in
+my [previous journal entry](2026-08-06-movies-watched-2){.html-link}. This is a
+number pattern that I feel that I have seen a statistically significant number
+of times whenever I have looked at the time, which is something else that has
+caused me to suspect that we might be living in a deterministic virtual reality
+computer simulation. In order to prove that it occurred, I quickly tried to
+take a photo of my watch.
+
+&lt;figure&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-3-watch-23-24-seconds.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-3-watch-23-24-seconds.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;figcaption&gt;Photo 3 - Photo of my watch taken one second after it had shown 23
+for the seconds
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+I was not fast enough to actually capture the 23, as it took me a second to get
+my phone out, however you can see that it really happened and I was not
+hallucinating. It really did show 23 for the seconds. The image is cut off on
+the right side because I normally have a piece of tape over my smartphone
+camera, as I do not trust the phone not to be hacked and to have someone
+remotely looking through the camera. I tried to fold the piece of tape back
+quickly however I did not do it quickly enough to avoid it having it be part of
+the photo.
+
+As for the movie itself, I felt that it was a reasonably good movie, though
+somewhat depressing. It is a movie about a large comet that is on a collision
+course with Earth, which according to the calculations in the movie was large
+enough to cause the extinction of the human race. Most of the movie describes
+the events leading up to the collision. I had seen the movie before a long time
+ago, however I thought that more of the movie took place after the collision,
+rather than before. It was the fact that most of the movie was about the events
+leading up to the collision which made the movie seem a bit depressing to me,
+because there were many scenes with people worrying about it with many of them
+accepting that they might die during the event. Once the collision occurred,
+many people did die, which also made it seem a bit depressing to me.
+
+However, after watching the movie, I realized that there might be some
+subconscious language elements which make the movie a bit less depressing. As
+far as I understand what appears to be the subconscious language, the idea of
+death is actually often a metaphor for a person starting to understand the
+subconscious language. Therefore, it is possible that this movie is actually
+about an event in which a lot of people start to understand the subconscious
+language. I noticed that the spaceship which is sent to try to divert the comet
+is called the [Messiah](https://en.wikipedia.org/wiki/Messiah), which appears
+to be a religious reference. Part of my theory about the subconscious language
+is that it is widely used in religious texts and is one of the reasons that
+religion exists, and so perhaps the fact that the spaceship is named Messiah
+symbolizes the idea that religious aspects of society might be opposed to
+people understanding the language due to the fact that they might possibly have
+been using it to convey secret messages.
+
+There were a few other small things that I noticed. At the beginning of the
+movie, a young woman and a young man are the people who first observe the comet
+through a telescope. For some reason, even though they saw the comet at the
+same time, the guy is the one who gets all of the credit. The woman
+misidentifies it the star [Megrez](https://en.wikipedia.org/wiki/Megrez) at
+first, however it still seemed to me like she should get some credit. The lack
+of recognition was so severe that the people in charge decided to save the guy
+and his family in a large government-run shelter while leaving the woman and
+her family to die. It did not seem fair. Another moment that stood out to me
+was when the guy was talking to a large group of students in his high school
+about the discovery, and one of the other students stood up and shouted out
+that the guy was going to end up having a lot of sex for having discovered the
+comet. It was hard for me not to suspect that I might be in a similar situation
+as the guy who discovered the comet due to the fact that I might have
+discovered the subconscious language, and so it gave me some hope that perhaps
+I will be able to have sex at some point in the future.
+
+## Contact (1997)
+
+The next movie that I watched was
+[Contact](https://en.wikipedia.org/wiki/Contact_(1997_American_film)). This is
+a movie that was not on Netflix when I looked, however I own the movie on DVD
+so I watched it on DVD. I decided to watch this movie as I had seen it somewhat
+recently shortly after buying the DVD and so I knew what to expect. I knew that
+it was a less depressing movie than Deep Impact, and I was pretty sure that
+there would be some subconscious language metaphors that I could describe.
+
+Contact is a movie about a radio signal that is received from space which
+appears to have been sent by aliens. This kind of story makes me think it could
+have subconscious language metaphors due to the reference to space, which I
+suspect is a word that has an alternate definition of referring to the
+subconscious language. Aliens are also referenced in the name of [alien hand
+syndrome](https://en.wikipedia.org/wiki/Alien_hand_syndrome), which is a
+medical condition that is known to occur in people who have had their [brain
+hemispheres surgically
+separated](https://en.wikipedia.org/wiki/Corpus_callosotomy), and so it seems
+possible that the word alien might have an alternate definition of referring to
+the right brain hemisphere, which is the hemisphere that is normally aware of
+the subconscious language, which would match the use of the word space to refer
+to the language.
+
+I like this movie, which is why I bought it on DVD. I like the mystery
+associated with trying to understand the alien message. Watching it again, I
+also realize that I like that they used a bunch of computers in the movie that
+were modern around 1997, which makes me feel nostalgic when I see them. When I
+was in high school, I used to participate in the [SETI@home
+project](https://en.wikipedia.org/wiki/SETI@home), and in the movie they often
+use the term
+[SETI](https://en.wikipedia.org/wiki/Search_for_extraterrestrial_intelligence)
+to refer to their search for an alien signal, which makes me feel a bit
+nostalgic as well. The fact that the lead character is female is an added
+bonus. I find the fact that she is interested in science attractive.
+
+Having spent some time considering the movie in the context of the subconscious
+language, there are a few things that stick out to me. One obvious thing is
+that the message from space initially consists of a sequence of numbers, which
+turn out to be [prime numbers](https://en.wikipedia.org/wiki/Prime_number). In
+order to explain this, one of the characters says that "mathematics is the only
+true universal language". This is an interesting concept which actually kind of
+makes sense without considering the alternative definitions associated with the
+subconscious language. If you also think about it in terms of the subconscious
+language, however, it sounds like it could be referring to the number system
+which I described on my page about the subconscious language. I also notice
+that the word "universal" starts with the prefix "un", which I suspect might be
+an indicator that the word is intended to also refer to the right brain
+hemisphere and the subconscious language. There are also a bunch of references
+to religion in the movie in various ways. This is something else that I suspect
+might partially be in the movie in order to reference the subconscious
+language. If you are looking for a good movie with a lot of potential
+subconscious language references, I definitely recommend the movie Contact. I
+wish the ending was a bit longer and a bit more elaborate, however it is still
+an enjoyable movie.
+
+## The Matrix (1999)
+## The Matrix Reloaded (2003)
+## The Animatrix (2003)
+## The Matrix Revolutions (2003)
+## The Matrix Resurrections (2021)
+
+For the next five days after watching Contact, I decided to watch [The
+Matrix](https://en.wikipedia.org/wiki/The_Matrix), as well as its sequals [The
+Matrix Reloaded](https://en.wikipedia.org/wiki/The_Matrix_Reloaded), [The
+Animatrix](https://en.wikipedia.org/wiki/The_Animatrix), [The Matrix
+Revolutions](https://en.wikipedia.org/wiki/The_Matrix_Revolutions), and [The
+Matrix Resurrections](https://en.wikipedia.org/wiki/The_Matrix_Resurrections).
+The Matrix is one of my favourite movies of all time, and it seemed like a very
+appropriate movie to watch when considering the idea that we all might live in
+a computer simulation, given that the idea that we all live in a computer
+simulation is an important aspect of the plot of the movie as well as its
+sequels. I own most of these movies on both Blu-Ray and DVD.
+
+After watching these movies again, I realized that they appear to have many
+very obvious references to the subconscious language. I started writing a long
+description in this journal entry, however I realized that I had so much to say
+about these specific movies that I decided to create a [dedicated
+page](../pages/2026-08-23-the-matrix-and-brain-hemispheres){.html-link} about
+the movies, which I plan to use to describe what I have noticed in more detail.
+
+&lt;figure&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-4-matrix-trinity-helicopter-explosion.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-4-matrix-trinity-helicopter-explosion.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;figcaption&gt;Photo 4 - Photo of my television showing an epic scene from The
+Matrix with a large explosion. The movie contains a lot of explosions, which is
+a word that contains the letter x, which as far as I can tell is a letter that
+is often used to indicate that a message in the subconscious language is
+present. Perhaps explosions are a subconscious language reference.
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+My theory is that the simulated world that the characters live inside, which
+they call "the matrix", is a reference to the world that we currently live in,
+in which most people are not aware of the subconscious language in their left
+brain hemisphere. In the movies, there are people referred to as agents who
+generally attack the main character Neo whenever they see him while he is
+inside the matrix. Any random person can spontaneously turn into an agent and
+become hostile. My theory is that Neo represents someone who has learned about
+the subconscious language in his left brain hemisphere, while the agents
+represent people who are only aware of the language in their right brain
+hemisphere and not their left brain hemisphere, and who work together to try to
+keep the language secret.
+
+Before this I had seen all of these movies before with the exception of The
+Animatrix, which I purchased on DVD somewhat recently and had not yet had a
+chance to watch. The Animatrix is actually a collection of nine short stories
+that reference aspects of the other movies, and are not part of the overall
+storyline of the other movies. Some of them are very abstract. I found these
+short stories interesting, in particular due to the fact that some of them have
+the most obvious subconscious language references that I have seen so far.
+
+&lt;figure&gt;
+&lt;div style="display: flex; flex-direction: row; gap: 1rem"&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-5-animatrix-running-from-agents.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-5-animatrix-running-from-agents.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-6-animatrix-numbers.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-6-animatrix-numbers.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;/div&gt;
+&lt;figcaption&gt;Photo 5 and 6 - Photos of my television while watching
+&lt;a href="https://en.wikipedia.org/wiki/The_Animatrix#World_Record"&gt;World
+Record&lt;/a&gt;, one of the short stories from The Animatrix
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+One of the short stories is called World Record, which is about a competitive
+runner. According to the short story, it is possible for people to become aware
+of the matrix when they are in certain unusual circumstances, one of which is
+apparently when they are running. At one point the main character is running in
+a competitive running race and he starts to become aware of the matrix, which
+causes agents to take over the bodies of some of the other runners and chase
+him. While he is running, he briefly starts to see numbers floating in the air.
+I suspect that these numbers are a reference to the numbers that are used as
+part of the subconscious language. I feel that this is a good example of
+something which seems very likely to be a subconscious language reference,
+because the numbers do not seem like they make sense as part of the actual
+story involving the runner. Aside from being a potential subconscious language
+reference, they seem very random.
+
+&lt;figure&gt;
+&lt;div style="display: flex; flex-direction: row; gap: 1rem"&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-7-animatrix-kissing.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-7-animatrix-kissing.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;a href="2026-08-24-movies-watched-3-photos/photo-8-animatrix-visual-fields.jpg"&gt;
+&lt;img src="2026-08-24-movies-watched-3-photos/photo-8-animatrix-visual-fields.jpg" loading="lazy" /&gt;&lt;/a&gt;
+&lt;/div&gt;
+&lt;figcaption&gt;Photo 7 and 8 - Photos of my television while watching
+&lt;a href="https://en.wikipedia.org/wiki/The_Animatrix#Matriculated"&gt;Matriculated&lt;/a&gt;,
+one of the short stories from The Animatrix
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+
+Another short story is called Matriculated, which is one of the most abstract
+of the short stories. I found it a bit hard to follow, and I had to read the
+description on Wikipedia in order to understand what was supposed to be
+happening. However, it appears to contain a scene which seems very likely to me
+to be a subconscious language reference. As part of the short story, a robot is
+inserted into a simulated environment which appears similar to the matrix, and
+as he walks around the environment he encounters a man and a woman embracing
+each other and kissing. After the man and woman encounter the robot, they run
+away from it and the robot chases them. Eventually, they end up running down a
+very strange looking hallway which splits into two directions. The man goes
+down the left hallway while the woman goes down the right hallway. The way the
+camera shows the hallways, they appear to line up with the left and right
+visual fields seen by the two brain hemispheres. This seemed to me like a very
+obvious brain hemisphere reference, especially considering that the male and
+female genders seem to often be used to refer to the brain hemispheres in the
+subconscious language.
+
+Overall, I enjoyed watching all of these movies. I have a lot more that I could
+say about The Matrix, however I will try to keep the detailed discussion on the
+separate page dedicated to the topic. If you find these concepts interesting,
+please keep in mind that I am [trapped in my
+apartment](../../trapped-in-my-apartment/){.index-link}, and have been trying,
+unsuccessfully so far, to convince someone to help me. Perhaps the reason that
+nobody is helping me has something to do with the subconscious language, and I
+am, in fact, being attacked by people similar to the agents in the matrix
+movies, who are only aware of the subconscious language in their right brain
+hemisphere and not their left. Hopefully, if this is the case, my detailed
+descriptions should help solve the problem.
+</div>
+</body></html>
