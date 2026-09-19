@@ -50,6 +50,25 @@ a[href^="http"]:not([href^="https://shane.oconnell.cc/"]):not([href^="https://an
     mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" /></svg>') no-repeat center / contain;
 }
 
+details.section {
+    margin: 0.3rem 0;
+}
+
+details.section > p {
+    padding: 0 1.6rem;
+}
+
+details.section > h3 {
+    padding: 0 1.6rem;
+}
+
+details.section > summary {
+    cursor: pointer;
+    padding: 0.2rem 0.4rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
 li > p:first-child {
     margin-top: 0;
 }
@@ -88,6 +107,7 @@ details.recent-events > summary {
 
 details.recent-events {
     margin: 0.3rem 0;
+    padding: 0 1.6rem;
 }
 
 details.recent-events > p {
@@ -462,7 +482,9 @@ here are some recommendations for who to contact:</p>
 <li>Any other organization similar to the above</li>
 <li>Any lawyer</li>
 </ul>
-<h2>Introduction</h2>
+<h2>Overview</h2>
+<details class="section">
+<summary>Introduction</summary>
 <p>The title of this page is an accurate representation of how I am interpreting
 my current situation. It may sound like a strange thing that I am trapped in my
 apartment, however as far as I am concerned, it is in fact true. My friends and
@@ -510,7 +532,9 @@ anything to do with the subconscious language due to the fact that it appears
 possible that Intel might be able to use it as a backdoor to control any
 computer in the world that uses one of their processors, however the fact that
 it has this name makes me even more concerned about it.</p>
-<h2>Background</h2>
+</details>
+<details class="section">
+<summary>Background</summary>
 <p>I am a computer engineer living in
 <a href="https://en.wikipedia.org/wiki/Toronto">Toronto</a>, Canada. I am originally from
 <a href="https://en.wikipedia.org/wiki/Newfoundland_(island)">Newfoundland</a>, and I
@@ -607,7 +631,9 @@ a battering ram to force me to visit a psychiatric facility on January 12, 2026.
 </figcaption>
 </figure>
 <p>This page contains the results of my investigation, so far.</p>
-<h2>Current Status</h2>
+</details>
+<details class="section">
+<summary>Current Status</summary>
 <p>There are a few key things that, together, cause me to believe that if I leave
 my apartment that I could be locked out:</p>
 <ul>
@@ -1049,6 +1075,7 @@ https://shane.oconnell.cc/2026/pages/2026-08-15-subconscious-language.html</li>
 </ul>
 </li>
 </ul>
+</details>
 </details>
 <h2>Theories</h2>
 <details class="theory">
