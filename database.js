@@ -694,6 +694,7 @@ const archive_database = [
 ["file", "photo-7-animatrix-kissing.jpg.info", "photo-7-animatrix-kissing.jpg"],
 ["file", "photo-8-animatrix-visual-fields.jpg.info", "photo-8-animatrix-visual-fields.jpg"],
 "up",
+["file", "2026-10-05-google-ai-legal-advice", "2026-10-05-google-ai-legal-advice.md"],
 "up",
 ["dir", "notes"],
 ["file", "2026-08-23-movie-notes.txt.info", "2026-08-23-movie-notes.txt"],
